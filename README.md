@@ -8,11 +8,11 @@ commands
 
 ###### CREATING jars ####################
 
-jar cf <name>.jar *.class
+jar cf (name).jar *.class
 
 ###### VIEWING jars #####################
 
-jar tf <name>.jar
+jar tf (name).jar
 
 ###### COMPILING CLASSES ################
 
@@ -20,4 +20,4 @@ javac -cp "jep-2.3.0.jar;djep-1.0.0.jar;peersim-1.0.5.jar" *.java
 
 ###### RUNNING A SIMULATION #############
 
-java -cp "jep-2.3.0.jar;djep-1.0.0.jar;peersim-1.0.5.jar;<other jars>" peersim.Simulator <config>.txt
+java -cp "jep-2.3.0.jar;djep-1.0.0.jar;peersim-1.0.5.jar;<other jars>" peersim.Simulator (config).txt
