@@ -37,6 +37,14 @@ public gcp2pNodeInit(String prefix){
 	category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 }
 
+/**
+ * Initialize a regular node in the G-CP2P Network. Randomly choose among the three
+ * CDN servers as its closest CDN. Randomly generate its RTT values for each of the three
+ * landmarks (30-70 ms). Set the node's upload and download speed by randomly choosing
+ * from values between 0-1000 Kbps and 1000-2000 Kbps, respectively. Set the used upload
+ * and download speed to 0 since the node has not yet started streaming. Get a random video
+ * the node wants to stream from a list of 20 per category then put it in a category.   
+ */
 
 public void initialize(Node n)
 {

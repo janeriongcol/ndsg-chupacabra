@@ -9,21 +9,21 @@ public final string PAR_PROT = "protocol";
 /**
 *	Message TYPES
 */
-private int HELLO = 0;			//	HELLO MSG
-private int GOODBYE = 1;		//	LEAVING MSG
-private int UPLOAD = 2;			//	DATA TRANSFER
-private int CONNECT = 3;		//	REQUEST FOR CONNECTION
-private int REQUEST_PEERS_FROM_THIS_BIN = 4;	
-private int NOONE_STREAMS_IN_THIS_BIN = 5;
-private int REQUEST_PEERS_FROM_OTHER_BINS = 6;
-private int GET_SUPERPEER = 7;
-private int YOUR_SUPERPEER = 8;
-private int DO_YOU_HAVE_THIS = 9;	// do you have this video? applicable message for CDN
-private int I_HAVE_IT = 10;			// reply to DO_YOU_HAVE_THIS
-private int I_DONT_HAVE_IT = 11;	// reply to DO_YOU_HAVE_THIS
-private int REQUEST_MY_CLIENTS = 12;// new super peer asks for his clients
-private int YOUR_CLIENTS = 13;		// reply to REQUEST_MY_CLIENTS
-private int YOUR_PEERS = 14;
+private static final int HELLO = 0;			//	HELLO MSG
+private static final int GOODBYE = 1;		//	LEAVING MSG
+private static final int UPLOAD = 2;			//	DATA TRANSFER
+private static final int CONNECT = 3;		//	REQUEST FOR CONNECTION
+private static final int REQUEST_PEERS_FROM_THIS_BIN = 4;	
+private static final int NOONE_STREAMS_IN_THIS_BIN = 5;
+private static final int REQUEST_PEERS_FROM_OTHER_BINS = 6;
+private static final int GET_SUPERPEER = 7;
+private static final int YOUR_SUPERPEER = 8;
+private static final int DO_YOU_HAVE_THIS = 9;	// do you have this video? applicable message for CDN
+private static final int I_HAVE_IT = 10;			// reply to DO_YOU_HAVE_THIS
+private static final int I_DONT_HAVE_IT = 11;	// reply to DO_YOU_HAVE_THIS
+private static final int REQUEST_MY_CLIENTS = 12;// new super peer asks for his clients
+private static final int YOUR_CLIENTS = 13;		// reply to REQUEST_MY_CLIENTS
+private static final int YOUR_PEERS = 14;
 
 /*
 *	GLOBALS
