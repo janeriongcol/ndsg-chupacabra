@@ -15,57 +15,89 @@ public interface Overlay
 /**
  * 0 = CDN; 1 = SuperPeer; 2 = Regular Peer
  */
-public abstract int nodeTag ();
-
+public int nodeTag ();
+/**
+*	set the number of bins
+*/
+public void setSuperPeerSize(int size);
+/**
+*	set tbe superpeer of a bin
+*/
+public void setSuperPeer (Node peer, int binID);
 /**
  * applicable to Regular Peers
  */
-public abstract Node getSuperpeer ();
-
+public Node getSuperpeer (int binID);
 /**
  * Get list of peers 
  */
-public abstract Node [] getPeerList ();
+public Node [] getPeerList ();
 
 /**
  * Applicable to SuperPeers and CDN Servers
  */
-public abstract Node [] getClientList ();
+public Node [] getClientList ();
 
 /**
  * CDN = 100 Mbps
  * SuperPeer/Regular = 125 kbps
  */
-public abstract void setBandwidth (int bw);
-
-/**
- * Returns bandwidth
+ /**
+ *	Set the max download speed
  */
-public abstract int getBandwidth ();
+public void setDownloadSpd (int bw);
+ /**
+ *	Set the max upload speed
+ */
+public void setUploadSpd (int bw);
+ /**
+ *	Set the used upload speed
+ */
+public void setUsedDownloadSpd (int bw);
+ /**
+ *	Set the used upload speed
+ */
+public void setUsedUploadSpd (int bw);
+/**
+ * return the max download speed
+ */
+public int getDownloadSpd ();
+ /**
+ *	return the max upload speed
+ */
+public int getUploadSpd ();
+/**
+ * return the used download speed
+ */
+public int getUsedDownloadSpd ();
+/**
+ * return the used download speed
+ */
+public int getUsedUploadSpd ();
+
 
 /**
  * Set RTT
  */
-public abstract void setRTT (int RTT);
+public void setRTT (int RTT);	//kailangan pa ba to?
 
 /**
  * Get RTT
  */
-public abstract int getRTT ();
+public int getRTT ();	//kailangan pa ba to?
 
 /**
  * Set bin ID
  */
-public abstract void setBinID (int binID);
+public void setBinID (int binID);
 
 /**
  * Get bin ID
  */
-public abstract void getBinID ();
+public void getBinID ();
 
 /**
  * Get video list
  */
-public abstract Content [] getVidList ();
-
+public int[] getVideoList(); //dunno how
 }
