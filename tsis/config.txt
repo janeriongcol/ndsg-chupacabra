@@ -1,0 +1,20 @@
+#config file for gcp2p
+
+#set initial network size to 100 nodes with the first 3 nodes as CDN servers
+network.size 100
+
+MAXSIZE 1000
+
+random.seed 1234567890
+
+#parameters for event-driven protocol type
+simulation.endtime 10^9
+simulation.logtime 10^9
+
+protocol.gcp2p caviar.Gcp2pProtocol
+
+init.0 caviar.Gcp2pNetworkInitializer
+init.0.protocol gcp2p
+
+control.dynamics caviar.DynamicPop
+control.dynamics.maxsize MAXSIZE
