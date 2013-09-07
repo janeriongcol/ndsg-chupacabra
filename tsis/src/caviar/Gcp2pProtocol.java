@@ -1,6 +1,7 @@
 package caviar;
 
 import peersim.config.Configuration;
+import peersim.config.FastConfig;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.edsim.*;
@@ -44,8 +45,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	*/
 	int pid;
 	int nodeTag;			// Type of node: 0 - CDN, 1 - Superpeer, 2 - Regular
-	int closestCDN;			// ID of the closest CDN server
-	int connectedCDN;
+	int connectedCDN;		// "ID" of the CDN it is closest/connected to
 	int landmark1RTT;		// RTT to landmark 1
 	int landmark2RTT;		// RTT to landmark 2
 	int landmark3RTT;		// RTT to landmark 3
@@ -256,13 +256,6 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	
 	public void addClient(Node n){
 		// TODO Auto-generated method stub
-	}
-	
-	
-	//eto yung class natin for message
-	class ArrivedMessage {
-	
-		
 	}
 	
 	/*
