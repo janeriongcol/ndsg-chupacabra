@@ -55,24 +55,13 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.setNodeTag(2); // initialize the node to be Regular
 		prot.setConnectedCDN(CommonState.r.nextInt(3)); //random pick a CDN group to belong to range(0-2)
 		
-		Node cdn; 
+		Node cdn = prot.getConnectedCDN();
 		Gcp2pProtocol prot2;
-		switch(prot.getConnectedCDN()){		//add to the clienlist of its CDN
 		
-			case 0: cdn = Gcp2pProtocol.CDN1;
-					prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
-					prot2.addClient(n);
-					break;
-			case 1: cdn = Gcp2pProtocol.CDN2;
-					prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
-					prot2.addClient(n);
-					break;
-			case 2: cdn = Gcp2pProtocol.CDN3;
-					prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
-					prot2.addClient(n);	
-					break;
-		}//endswitch
-		
+		//add to the clientlist of its CDN
+		prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
+		prot2.addClient(n);
+			
 		
 		/**
 		 * Within each CDN group, assume 3 landmarks (basis for binning), randomize RTT values of the 

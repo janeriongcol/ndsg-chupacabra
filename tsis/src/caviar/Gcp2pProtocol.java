@@ -16,8 +16,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	// ------------------------------------------------------------------------
 	// Constants
 	// ------------------------------------------------------------------------
-	private static final int maxLandmarkRTT = 70;
-	private static final int minLandmarkRTT = 30;
+	public static final int maxLandmarkRTT = 70;
+	public static final int minLandmarkRTT = 30;
 	// ------------------------------------------------------------------------
 	// Parameters  
 	// ------------------------------------------------------------------------
@@ -67,7 +67,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	*GLOBALS
 	*/
 	int nodeTag;			// Type of node: 0 - CDN, 1 - Superpeer, 2 - Regular
-	int connectedCDN;		// "ID" of the CDN it is closest/connected to
+	Node connectedCDN;		// the CDN node it is closest/connected to
 	int cdnRTT;				// RTT of a client to its CDN; 
 	int landmark1RTT;		// RTT to landmark 1
 	int landmark2RTT;		// RTT to landmark 2
@@ -333,12 +333,35 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	}
 	
 	
-	public void setConnectedCDN(int cdnID)
-	{
-		this.connectedCDN = cdnID;
+	public void setAsCDN(int cdnID, Node n) {
+		switch(cdnID)
+		{
+				case 1: Gcp2pProtocol.CDN1 = n;
+						break;
+				case 2: Gcp2pProtocol.CDN2 = n;
+						break;
+				case 3: Gcp2pProtocol.CDN3 = n;
+						break;
+		}
+		
 	}
 	
-	public int getConnectedCDN()
+	public void setConnectedCDN(int cdnID)
+	{
+		switch(cdnID)
+		{
+			case 0: connectedCDN = null; //the node itself is the CDN
+					break;
+			case 1: connectedCDN = Gcp2pProtocol.CDN1;		//connected to CDN1
+					break;
+			case 2: connectedCDN = Gcp2pProtocol.CDN2;		//connected to CDN2
+					break;
+			case 3: connectedCDN = Gcp2pProtocol.CDN3;		//connected to CDN3
+					break;
+		}
+	}
+	
+	public Node getConnectedCDN()
 	{
 		return this.connectedCDN;
 	}
@@ -483,5 +506,5 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

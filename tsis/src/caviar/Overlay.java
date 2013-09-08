@@ -24,17 +24,24 @@ public interface Overlay
 	 */
 	public int getNodeTag ();
 	
+	/**
+	 * Set node n as one of the 3 CDNs
+	 * @param cdnID - it cdnID 1, 2 or 3
+	 * @param n - the node to act as CDN
+	 */
+	public void setAsCDN(int cdnID, Node n);
+	
 	
 	/**
-	 * set the CDN group that the node belongs to (randomized)
+	 * set the CDN node that the node is under (randomized)
 	 */
 	public void setConnectedCDN(int cdnID);
 	
 	
 	/**
-	 * the CDN group that the node belongs to 
+	 * the CDN node that the node is under
 	 */
-	public int getConnectedCDN();
+	public Node getConnectedCDN();
 	
 	/**
 	 * 

@@ -8,6 +8,7 @@ package caviar;
  */
 
 import peersim.config.Configuration;
+import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
@@ -48,15 +49,15 @@ public class Gcp2pNetworkInitializer implements Control {
 				switch(i){		//set references to the CDN in Gcp2pProtocol
 			
 					case 0: Gcp2pProtocol.CDN1 = n;
-							prot.setConnectedCDN(1);
+							prot.setConnectedCDN(0);
 							prot.setCDNRTT(0);
 							break;
 					case 1: Gcp2pProtocol.CDN2 = n;
-							prot.setConnectedCDN(2);
+							prot.setConnectedCDN(0);
 							prot.setCDNRTT(0);
 							break;
 					case 2: Gcp2pProtocol.CDN3= n;
-							prot.setConnectedCDN(3);
+							prot.setConnectedCDN(0);
 							prot.setCDNRTT(0);
 							break;
 				}//endswitch
@@ -77,8 +78,8 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot.computeBin();
 			binID = prot.getbinID();				//get its binID
 			
-			cdnID = prot.getConnectedCDN();
-			Node cdn = prot.getCDN(cdnID);			//get the CDN node its connected to
+			 ;
+			Node cdn = prot.getConnectedCDN();			//get the CDN node its connected to
 			prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
 			
 			prot2.addToBin(binID, n);				//add the node to the corresponding bin in its CDN
@@ -119,8 +120,8 @@ public class Gcp2pNetworkInitializer implements Control {
 		// Set the node as Regular 
 		prot.setNodeTag(2); 
 		
-		// Randomly set the nodes connected CDN (CDN1, CDN2, or CDN3)
-		prot.setConnectedCDN(CommonState.r.nextInt(3));
+		// Randomly set the nodes connected CDN (CDN1, CDN2, or CDN3) cdnID range [1, 3]
+		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1);  
 		
 		// Get the CDN the node is connected to and add it as its client
 		Node cdn;
@@ -130,9 +131,11 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot2.addClient(n);
 		
 		// Set the node's RTT to each of the three predefined landmarks
-		for (i=1; i<=3; i++) { prot.setLandmarkRTT(i); }
+		for (int i=1; i<=3; i++) { prot.setLandmarkRTT(i); }
 		
 		// Set the node's RTT to its CDN
+		int minLandmarkRTT = Gcp2pProtocol.minLandmarkRTT;
+		int maxLandmarkRTT = Gcp2pProtocol.maxLandmarkRTT;
 		prot.setCDNRTT(CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT);
 		
 		// Set the node's speed
