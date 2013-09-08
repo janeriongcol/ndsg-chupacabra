@@ -137,16 +137,17 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
 	public void nextCycle( Node node, int pid ){
-		for(int i = 0; i < numPeers l i++){
-			((Transport)node.getProtocol(FastConfig.getTransport(pid))).
-							send(
-								node,
-								peerList[i],
-								new ArrivedMessage(UPLOAD, node, peerSpdAlloted[i]),
-								pid);
-			
+		if(startedStreaming){
+			for(int i = 0; i < numPeers l i++){
+				((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								send(
+									node,
+									peerList[i],
+									new ArrivedMessage(UPLOAD, node, peerSpdAlloted[i]),
+									pid);
+				
+			}
 		}
-		
 		
 	}
 	
@@ -370,6 +371,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 										aem.sender,
 										new ArrivedMessage(ACCEPT_SPEED, node, aem.data, tobeAccepted),
 										pid);
+						sourcePeerList[numSource] = aem.sender;
+						numSource++;
+						startedStreaming = true;
 					}
 					else {												// if the download spd is maxed, send a REJECT message
 						((Transport)node.getProtocol(FastConfig.getTransport(pid))).

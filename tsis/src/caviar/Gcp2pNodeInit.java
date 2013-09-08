@@ -80,6 +80,8 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.videoID = CommonState.r.nextInt(category*20); // get a random video ID, each category has 20 videos each. Range [0, 19]
 		prot.categoryID = prot.videoID/20;
 		prot.computeBin();
+		prot2.addToBin(prot.binID, n);
+		prot.start(n);
 	}
 		
 
