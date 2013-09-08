@@ -68,6 +68,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	private static final int REJECT_SPEED = 18;		// sent by the requesting peer when its capacity is maxed
 	private static final int FELLOW_SP_REQUEST_FOR_PEERS = 19;
 	private static final int FIRED = 20;	//sent by a CDN to a SP when a new peer is nearer
+	private static final int YOU_ARE_SUPERPEER = 21 ;
 	/**
 	*GLOBALS
 	*/
@@ -157,23 +158,25 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					case 2:
 						int tempRTT = prot.CDN3RTT;
 				}
-				
-				if(superPeerList[aem.data] != null && tempRTT >= bestRTT[aem.data])
+				Node sp;
+				if(tempRTT < bestRTT[aem.data])
+					sp = null;
+				else sp = superPeerList[aem.data];
+				(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+							send(
+								node,
+								aem.sender,
+								new ArrivedMessage(YOUR_SUPERPEER, node, sp),
+								pid);
+				/*else {
 					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 								send(
 									node,
 									aem.sender,
-									new ArrivedMessage(YOUR_SUPERPEER, node, superPeerList[aem.data]),
+									new ArrivedMessage(YOU_ARE_SUPERPEER, node, 0),
 									pid);
-				else {
-					if(superPeerList[aem.data]!=null)
-						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
-								send(
-									node,
-									superPeerList[aem.data],
-									new ArrivedMessage(FIRED, node, 0),
-									pid);
-				}
+					
+				}*/
 					
 			}
 			else if (aem.msgType == DO_YOU_HAVE_THIS){
@@ -203,14 +206,23 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				*	a peer will only request this when the YOUR_SUPERPEER message is null
 				*/
 				Node[] temp = binList[aem.data];
-				int[][] tempIndex = binIndexPerCategory;
+				int[][] tempIndex = binIndexPerCategory[aem.data];
 				int [] tempWatching = binWatchList[aem.data];
-				 ((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+				((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
 								node,
 								aem.sender,
 								new ArrivedMessage(YOUR_CLIENTS, node, temp, tempWatching, tempIndex),
 								pid);
+				if(superPeerList[aem.data]!=null)
+						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								send(
+									node,
+									superPeerList[aem.data],
+									new ArrivedMessage(FIRED, node, 0),
+									pid);
+				superPeerList[aem.data] = aem.sender;
+				
 			}
 			
 			
@@ -348,7 +360,34 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			else if (aem.msgType == REJECT){
 					//hindi ko pa alam ano mangyayari
 			}
-			
+			else if (aem.msgType == YOUR_CLIENTS){
+				nodeType = 1;
+				clientList = aem.nodeList;
+				clientWatching = aem.peerWatching;
+				indexPerCategory = aem.index;
+				//magsend ulit ng GET_SUPERPEER
+			}
+			else if (aem.msgType == FIRED){
+				nodeType = 2;
+			}
+			else if (aem.msgTYPE == YOUR_SUPERPEER){
+				if(aem.superPeer!=null){
+					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+							send(
+								node,
+								aem.superPeer,
+								new ArrivedMessage(REQUEST_PEERS_FROM_THIS_BIN, node, categoryID, videoID),
+								pid);
+				}
+				else{
+					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+							send(
+								node,
+								aem.sender,
+								new ArrivedMessage(GET_MY_CLIENTS, node, binID),
+								pid);
+				}
+			}
 			
 		}
 
