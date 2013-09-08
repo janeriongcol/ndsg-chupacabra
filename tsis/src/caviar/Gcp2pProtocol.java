@@ -112,7 +112,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public Object clone(){
 		Gcp2pProtocol prot = null;
 		try{
-			prot = super.clone();
+			prot = (Gcp2pProtocol)super.clone();
 		}catch( CloneNotSupportedException e ) {} // never happens
 		return prot;
 	}
@@ -135,7 +135,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			*	message received requesting superpeer
 			*/
 			if (aem.msgType == GET_SUPERPEER){		
-				gcp2pProtocol prot = (gcp2pProtocol) aem.sender.getProtocol(pid);
+				Gcp2pProtocol prot = (Gcp2pProtocol) aem.sender.getProtocol(pid);
 				switch(prot.connectedCDN){
 					case 0: 
 						int tempRTT = prot.CDN1RTT;
