@@ -159,9 +159,12 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						int tempRTT = prot.CDN3RTT;
 				}
 				Node sp;
-				if(tempRTT < bestRTT[aem.data])
+				if(tempRTT < bestRTT[aem.data]){
 					sp = null;
+				}
 				else sp = superPeerList[aem.data];
+				if(sp == null)
+					bestRTT[aem.data] = tempRTT;
 				(Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
 								node,
