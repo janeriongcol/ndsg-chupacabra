@@ -13,6 +13,11 @@ import peersim.core.Node;
 public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	
 	// ------------------------------------------------------------------------
+	// Constants
+	// ------------------------------------------------------------------------
+	private static final int maxLandmarkRTT = 70;
+	private static final int minLandmarkRTT = 30;
+	// ------------------------------------------------------------------------
 	// Parameters  
 	// ------------------------------------------------------------------------
 	/**
@@ -194,9 +199,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 
 		}
 
-		else
+		else {
 			
-
+		}
 
 
 	}
@@ -305,7 +310,6 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		this.connectedCDN = cdnID;
 	}
 	
-	
 	public int getConnectedCDN()
 	{
 		return this.connectedCDN;
@@ -323,6 +327,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					break;
 			default: return null;
 		}
+	}
+	
+	public void setCDNRTT(int rtt) {
+		cdnRTT = rtt;
 	}
 	
 	public int getCDNRTT()
@@ -420,6 +428,26 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		return usedUploadSpd;
 	}
 	
+	public int setLandmarkRTT (int which){	
+		switch(which) {
+			case 1: landmark1RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
+					break;
+			case 2: landmark2RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
+					break;
+			case 3: landmark3RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
+					break;
+			
+		}	
+		
+	}
+	
+	public int getLandmarkRTT (int whichLandmark){
+		switch(landmark) {
+			case 1: return landmark1RTT;
+			case 2: return landmark2RTT;
+			case 3: return landmark3RTT;
+		}
+	}
 
 	/**
 	 * Get video list
