@@ -142,7 +142,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 							send(
 								node,
 								peerList[i],
-								new ArrivedMessage(UPLOAD, node, peerSpdAllocated[i]),
+								new ArrivedMessage(UPLOAD, node, peerSpdAlloted[i]),
 								pid);
 			
 		}
