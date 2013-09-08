@@ -137,8 +137,16 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
 	public void nextCycle( Node node, int pid ){
-	
-	
+		for(int i = 0; i < numPeers l i++){
+			((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+							send(
+								node,
+								peerList[i],
+								new ArrivedMessage(UPLOAD, node, peerSpdAllocated[i]),
+								pid);
+			
+		}
+		
 		
 	}
 	
