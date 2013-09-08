@@ -71,6 +71,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	private static final int YOU_ARE_SUPERPEER = 21 ;
 	private static final int GET_MY_CLIENTS = 22;
 	private static final int REJECT = 23;
+	private static final int UPDATE_SP = 24;		// To be sent to other SPs when a new peer is upgraded to SP
 	/**
 	*GLOBALS
 	*/
@@ -238,10 +239,18 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								send(
 									node,
 									superPeerList[aem.data],
-									new ArrivedMessage(FIRED, node, 0),
+									new ArrivedMessage(FIRED, node, aem.sender),
 									pid);
-				superPeerList[aem.data] = aem.sender;	// make the sender the SP
 				
+				for(int i = 0; i<5; i++){
+					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+									send(
+										node,
+										superPeerList[aem.data],
+										new ArrivedMessage(UPDATE_SP, node, superPeerList[aem.data], aem.sender),
+										pid);
+				}
+				superPeerList[aem.data] = aem.sender;	// make the sender the SP
 			}
 			
 			
@@ -287,6 +296,15 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 									new ArrivedMessage(YOUR_PEERS, node, null, 0),
 									pid);
 					}
+				}
+				else if (msgType == UPDATE_SP){
+					for(int i = 0; i<5; i++){
+						if(otherSP[i].equals(aem.node1)){
+							otherSP[i] = aem.node2
+							break;
+						}
+					}
+					
 				}
 
 		}

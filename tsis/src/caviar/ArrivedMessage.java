@@ -11,6 +11,8 @@ public class ArrivedMessage {
 	public Node	 superPeer;
 	public int[] peerWatching;
 	public int [][] index;
+	public Node node1;
+	public Node node2;
 	
 	public ArrivedMessage(int typeOfMsg, Node sender, int data0, int data)
 	{
