@@ -25,6 +25,13 @@ public class ArrivedMessage {
 		this.sender       = sender;
 		this.nodeList = nodeList;
 	}
+	public ArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int data)
+	{
+		this.msgType    = typeOfMsg;
+		this.sender       = sender;
+		this.nodeList = nodeList;
+		this.data 		= data;
+	}
 	public ArrivedMessage(int typeOfMsg, Node sender, Node superPeer)
 	{
 		this.msgType    = typeOfMsg;

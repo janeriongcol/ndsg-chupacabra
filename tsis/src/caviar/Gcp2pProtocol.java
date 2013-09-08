@@ -62,7 +62,12 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	private static final int REQUEST_MY_CLIENTS = 12;// new super peer asks for his clients
 	private static final int YOUR_CLIENTS = 13;		// reply to REQUEST_MY_CLIENTS
 	private static final int YOUR_PEERS = 14;
-	
+	private static final int GOODBYE_LEECHER = 15;	// sent by a leaving node to its peer leechers
+	private static final int UPLOAD_SPEED_THAT_CAN_BE_GIVEN = 16;
+	private static final int ACCEPT_SPEED = 17;
+	private static final int REJECT_SPEED = 18;		// sent by the requesting peer when its capacity is maxed
+	private static final int FELLOW_SP_REQUEST_FOR_PEERS = 19;
+	private static final int FIRED = 20;	//sent by a CDN to a SP when a new peer is nearer
 	/**
 	*GLOBALS
 	*/
@@ -76,6 +81,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int uploadSpd;			// maximum upload capacity
 	int downloadSpd;		// maximum download capacity
 	int usedUploadSpd;		// used upload speed
+	int uploadSpdBuffer;	// reserved upload spd for peers requesting connection, to be alloted when the peer accepts the upload spd
 	int usedDownloadSpd;	// used download speed
 	int videoID;			// ID of the video it is streaming
 	int videoSize;			// size of the video it is watching
@@ -86,7 +92,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int numClients;			// number of clients
 	int[] videoList;			// list of videos
 	int[] clientRTT;		// RTT of clients
-	int bestRTT;			// least RTT
+	int bestRTT[];			// least RTT
 	int category;			// number of categories
 	int[] clientWatching;	// video the client is watching
 	
@@ -94,14 +100,18 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	Node[] superPeerList;	// list of SuperPeers
 	Node[] clientList;		// applicable to CDN and SuperPeer
 	Node[] peerList;		// list of peers the node uploads to
+	int[] peerSpdAlloted;		// speed alloted to peers
+	int numPeers;			// number of peers it contributes to
 	Node[] sourcePeerList;	// list of peers that contribute to the node
+	Node[] candidatePeers;	// sent by the SuperPeer to a regular peer
+	int numSource;			// number of source peers that contribute to the node
 	int binSize[]; //binSize[i] contains the number of peers inside bin i
 	Node binList[][]; //binList[i] returns the list peers inside bin i
 	int binWatchList[][]; //binWatchList[i][j] returns the what video peer j of bin i is watching
 	int binIndexPerCategory[][][]; // CDN's copy of indexPerCategory, binIndexPerCategory[0][1][2] = 5 means that binList[0][5] watches a video with category 1
-	boolean streaming = false; // true if the node is already streaming
-	
-	
+	boolean startedStreaming = false; // true if the node is already streaming
+	boolean doneStreaming = false;	// true if videoSize<= streamedVideoSize
+	Node[] otherSP;				// 5 other superPeers
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
@@ -148,13 +158,22 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						int tempRTT = prot.CDN3RTT;
 				}
 				
-				if(superPeerList[aem.data] != null && tempRTT >= bestRTT)
+				if(superPeerList[aem.data] != null && tempRTT >= bestRTT[aem.data])
 					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 								send(
 									node,
 									aem.sender,
 									new ArrivedMessage(YOUR_SUPERPEER, node, superPeerList[aem.data]),
 									pid);
+				else {
+					if(superPeerList[aem.data]!=null)
+						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								send(
+									node,
+									superPeerList[aem.data],
+									new ArrivedMessage(FIRED, node, 0),
+									pid);
+				}
 					
 			}
 			else if (aem.msgType == DO_YOU_HAVE_THIS){
@@ -201,21 +220,135 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		else if (nodeTag == 1){
 				if (aem.msgType == REQUEST_PEERS_FROM_THIS_BIN ){
 					int temp[] = indexPerCategory[aem.data0];
-					Node[] peers = new Node[20];
-					for(i = 0; i< 20; i++)
-						peers[i] = clientList[temp[i]];
+					Node[] peers = new Node[1000];
+					int i = 0;
+					int j = 0;
+					while(temp[i] >= 0){
+						if(clientWatching[temp[i]] == aem.data){
+							peers[j] = clientList[temp[i]];
+							j++;
+						}
+					}
 					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
 								node,
 								aem.sender,
-								new ArrivedMessage(YOUR_PEERS, node, peers),
+								new ArrivedMessage(YOUR_PEERS, node, peers, j),
 								pid);
 					
+				}
+				
+				else if (aem.msgType == REQUEST_PEERS_FROM_OTHER_BINS){
+					for(int i= 0; i<5; i++){
+						
+						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+							send(
+								node,
+								otherSP[i],
+								new ArrivedMessage(REQUEST_PEERS_FROM_THIS_BIN, aem.sender, aem.data0, aem.data),
+								pid);
+					}
 				}
 
 		}
 
 		else {
+			if(aem.msgType == UPLOAD){
+				streamedVideoSize = aem.data;
+				if(streamedVideoSize>= videoSize){
+					for(int i = 0; i< numSource; i++){
+						(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								send(
+									node,
+									sourcePeer[i],
+									new ArrivedMessage(GOODBYE, node, 0),
+									pid);
+					}
+					doneStreaming = true;
+				}
+			}
+			else if (aem.msgType == YOUR_PEERS){
+				int i = 0;
+					if(aem.data == 0){
+						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+							send(
+								node,
+								aem.sender,
+								new ArrivedMessage(REQUEST_PEERS_FROM_OTHER_BINS, node, categoryID, videoID),
+								pid);
+						
+					}
+					else 
+						while(usedDownloadSpd < downloadSpd && i < aem.data){
+							(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+										send(
+											node,
+											aem.nodeList[i],
+											new ArrivedMessage(CONNECT, node, downloadSpd - usedDownloadSpd),
+											pid);
+						}
+			
+			}
+			else if (aem.msgType == UPLOAD_SPEED_THAT_CAN_BE_GIVEN){
+					int spdAvail = downloadSpd - usedDownloadSpd;
+					int tobeAccepted;
+					if (spdAvail > 0){
+						if(spdAvail >= aem.data)
+							tobeAccepted = aem.data;
+						else tobeAccepted = spdAvail;
+						usedDownloadSpd = usedDownloadSpeed + aem.data;
+						(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+									send(
+										node,
+										aem.sender,
+										new ArrivedMessage(ACCEPT_SPEED, node, aem.data, tobeAccepted),
+										pid);
+					}
+					else {
+						(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+									send(
+										node,
+										aem.sender,
+										new ArrivedMessage(REJECT_SPEED, node, aem.data),
+										pid);
+					}
+					
+			}
+			else if (aem.msgType == ACCEPT_SPEED){
+				peerList[numPeers] = aem.sender;
+				peerSpdAlloted[numPeers] = aem.data;
+				numPeers++;
+				uploadSpdBuffer = uploadSpdBuffer - aem.data0;
+				usedUploadSpd = usedUploadSpd + aem.data;
+				
+			}
+			else if (aem.msgType == REJECT_SPEED){
+				uploadSpdBuffer = uploadSpdBuffer - aem.data;
+				
+			}
+			else if (aem.msgType == CONNECT){
+				int spdAvail = uploadSpd - usedUploadSpd - uploadSpdBuffer;
+				if(spdAvail>0){
+					(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+									send(
+										node,
+										aem.sender,
+										new ArrivedMessage(UPLOAD_SPEED_THAT_CAN_BE_GIVEN, node, spdAvail),
+										pid);
+				}
+				else {
+					(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+									send(
+										node,
+										aem.sender,
+										new ArrivedMessage(REJECT, node, 0),
+										pid);
+				}
+			}
+			else if (aem.msgType == REJECT){
+					//hindi ko pa alam ano mangyayari
+			}
+			
 			
 		}
 
