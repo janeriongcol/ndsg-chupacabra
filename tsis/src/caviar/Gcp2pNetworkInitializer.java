@@ -91,15 +91,59 @@ public class Gcp2pNetworkInitializer implements Control {
 		 */
 				
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
-		prot.setSuperPeers();
+		setInitSuperPeers(prot);
 		
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN2.getProtocol(pid);
-		prot.setSuperPeers();
+		setInitSuperPeers(prot);
 		
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN3.getProtocol(pid);
-		prot.setSuperPeers();
+		setInitSuperPeers(prot);
 		
 		return false; 
+	}
+	
+	/**
+	 * Set the initial SuperPeers (the one closest to the CDN) for each bin inside the CDN's group/area
+	 * @return
+	 */
+	public void setInitSuperPeers(Gcp2pProtocol prot)
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			prot.bestRTT[i] = 101;	//set to 101 first 
+		}
+		
+		int binsize, bestRTT;
+		Gcp2pProtocol prot2;
+		for(int binID = 0; binID < 6; binID ++)
+		{
+			binsize = prot.binSize[binID];
+			bestRTT = prot.bestRTT[binID];
+			Node tempSuperpeer = null;
+			Node n;
+			
+			//Iterate through all the nodes in the bin and choose the one with the best RTT
+			for(int j = 0; j < binsize; j++)
+			{
+				n = prot.binList[binID][j];
+				prot2 = (Gcp2pProtocol) n.getProtocol(pid);
+				
+				//if better than the current bestRTT, set as the tempSuperpeer
+				if(prot2.cdnRTT < bestRTT)
+				{
+					bestRTT = prot2.cdnRTT;
+					tempSuperpeer = n;
+				}
+				
+			}//endinnerfor
+			
+			//Set as superpeer for that bin and update the cdn's bestRTT list
+			prot.bestRTT[binID] = bestRTT;
+			prot.setSuperPeer(tempSuperpeer, binID);
+			
+			prot2 = (Gcp2pProtocol) tempSuperpeer.getProtocol(pid);
+			prot2.setNodeTag(2);
+		}//endfor
 	}
 	
 	/**

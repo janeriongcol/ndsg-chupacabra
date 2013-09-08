@@ -93,7 +93,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int numClients;			// number of clients
 	int[] videoList;			// list of videos
 	int[] clientRTT;		// RTT of clients
-	int bestRTT[];			// least RTT
+	int bestRTT[];			// least RTT per bin, applicable to CDN nodes
 	int category;			// number of categories
 	int[] clientWatching;	// video the client is watching
 	
@@ -140,7 +140,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public void processEvent( Node node, int pid, Object event ) {
 		ArrivedMessage aem = (ArrivedMessage)event;
 		
-		*	CDN messages
+		/**
+		 * CDN messages
+		 */
 		
 		if (nodeTag == 0){
 			/**
@@ -148,7 +150,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			*/
 			if (aem.msgType == GET_SUPERPEER){		
 				Gcp2pProtocol prot = (Gcp2pProtocol) aem.sender.getProtocol(pid);
-				switch(prot.connectedCDN){
+				switch(prot.connectedCDN){		
 					case 0: 
 						int tempRTT = prot.CDN1RTT;
 						break;
@@ -476,23 +478,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		return true;
 	}
 	
-	public boolean setSuperPeers()
-	{
-		// TODO Auto-generated method stub
-		// which one to use clientRTT or binList?
-		int binsize;
-		for(int i = 0; i < 6; i ++)
-		{
-			binsize = binSize[i];
-			
-			for(int j = 0; j < binsize; j++)
-			{
-				//Choose the one with the best RTT
-			}//endinnerfor
-			
-			//call setSuperPeer
-		}//endfor
-	}
+	
 	
 	/*
 	*	OVERLAY overridden METHODS
@@ -506,8 +492,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public int getNodeTag() {
 		return this.nodeTag;
 	}
-	
-	
+		
 	public void setAsCDN(int cdnID, Node n) {
 		switch(cdnID)
 		{
