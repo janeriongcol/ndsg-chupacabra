@@ -28,6 +28,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	 * String name of the parameter
 	 */
 	private static final String PAR_MAXCLIENTS = "maxclients";
+	
+	private static final String PAR_CATEGORY = "category";
 	// ------------------------------------------------------------------------
 	// Static Fields
 	// ------------------------------------------------------------------------
@@ -75,6 +77,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int usedUploadSpd;		// used upload speed
 	int usedDownloadSpd;	// used download speed
 	int videoID;			// ID of the video it is streaming
+	int videoSize;			// size of the video it is watching
+	int streamedVideoSize;	// size already streamed
 	int categoryID;			// category of the video it is streaming
 	int maxClients; 		// max number of possible clients for CDNs and SuperPeers, obtained from config property {@link #PAR_MAXCLIENTS}. 
 	int maxBinSize;			// max number of peers inside a bin (same as maxClients) 
@@ -82,6 +86,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int[] videoList;			// list of videos
 	int[] clientRTT;		// RTT of clients
 	int bestRTT;			// least RTT
+	int category;			// number of categories
 	int[] clientWatching;	// video the client is watching
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
@@ -99,7 +104,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	// Constructor
 	// ------------------------------------------------------------------------
 	public Gcp2pProtocol(String prefix){
-		pid = Configuration.getPid(prefix + "." + PAR_PROT);
+		maxClients = Configuration.getPid(prefix + "." + PAR_MAXCLIENTS);
+		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 	}
 	
 		
@@ -238,6 +244,18 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		else if (landmark3RTT>=landmark2RTT && landmark2RTT >= landmark1RTT){
 			this.setBinID(5);
 		}
+	}
+	// huwag muna pansinin to :D
+	public void superpeerArrInit(){
+		clientRTT = new int[maxClients];
+		clientWatching = new int[maxClients];
+		indexPerCategory = new int[category][maxClients];
+		binSize = new int[6];
+		binList = new Node[6][maxClients];
+		binWatchList = new int[6][maxClients];
+		peerList = new Node[maxClients];
+		sourcePeerList = new Node[maxClients];
+		
 	}
 	
 	/**
