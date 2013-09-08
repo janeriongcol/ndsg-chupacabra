@@ -3,6 +3,7 @@ package caviar;
 import peersim.config.Configuration;
 import peersim.config.FastConfig;
 import peersim.core.Control;
+import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.edsim.*;
 import peersim.cdsim.*;
@@ -112,7 +113,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public Object clone(){
 		Gcp2pProtocol prot = null;
 		try{
-			prot = (Gcp2pProtocol)super.clone();
+			prot = (Gcp2pProtocol) super.clone();
 		}catch( CloneNotSupportedException e ) {} // never happens
 		return prot;
 	}
@@ -347,11 +348,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		switch(cdnID)
 		{
 			case 1: return CDN1;
-					break;
 			case 2: return CDN2;
-					break;
 			case 3: return CDN3;
-					break;
 			default: return null;
 		}
 	}
@@ -455,8 +453,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		return usedUploadSpd;
 	}
 	
-	public int setLandmarkRTT (int which){	
-		switch(which) {
+	public void setLandmarkRTT (int landmark){	
+		switch(landmark) {
 			case 1: landmark1RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
 					break;
 			case 2: landmark2RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
@@ -468,11 +466,12 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		
 	}
 	
-	public int getLandmarkRTT (int whichLandmark){
+	public int getLandmarkRTT (int landmark){
 		switch(landmark) {
 			case 1: return landmark1RTT;
 			case 2: return landmark2RTT;
 			case 3: return landmark3RTT;
+			default: return 0; 
 		}
 	}
 
