@@ -78,9 +78,11 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		 * Within each CDN group, assume 3 landmarks (basis for binning), randomize RTT values of the 
 		 * node to the landmarks
 		 */
-		prot.landmark1RTT = CommonState.r.nextInt(71) + 30; //Landmark 1, random RTT from 30-70
+		prot.landmark1RTT = CommonState.r.nextInt(71) + 30; //Landmark 1, random RTT from 30-70 QUESTION: Hindi ba yung max na lalabas dito 100 hindi 70?
 		prot.landmark2RTT = CommonState.r.nextInt(71) + 30; //Landmark 2
 		prot.landmark3RTT = CommonState.r.nextInt(71) + 30; //Landmark 3
+		
+		prot.cdnRTT = CommonState.r.nextInt(71) + 30; 	//RTT from client to CDN;
 		
 		prot.uploadSpd = CommonState.r.nextInt(1001); //Random upload speed from 0-1000Kbps
 		prot.downloadSpd = CommonState.r.nextInt(1001) + 1000; //Random download speed from 1000-2000Kbps

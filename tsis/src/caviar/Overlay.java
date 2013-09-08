@@ -36,6 +36,12 @@ public interface Overlay
 	 */
 	public int getConnectedCDN();
 	
+	/**
+	 * 
+	 * @param cdnID - which CDN to get (1, 2 or 3)
+	 * @return the CDN Node
+	 */
+	public Node getCDN (int cdnID);
 	
 	/**
 	 * Set bin ID (computed based on RTT from landmarks in the CDN group)

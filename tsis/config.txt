@@ -12,6 +12,7 @@ simulation.endtime 10^9
 simulation.logtime 10^9
 
 protocol.gcp2p caviar.Gcp2pProtocol
+protocol.gcp2p.maxclients	MAXSIZE
 
 init.0 caviar.Gcp2pNetworkInitializer
 init.0.protocol gcp2p
