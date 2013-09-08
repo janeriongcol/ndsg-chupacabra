@@ -157,7 +157,34 @@ public class Gcp2pNetworkInitializer implements Control {
 	 */
 	
 	public void setInitRegularConnection (Gcp2pProtocol prot) {
-		
+		// Iterate through all the nodes in a bin
+		for (int binID=0; binID<6; binID++) {
+			for (int i=0; i<prot.binSize[binID]; i++) {
+				Node n = prot.binList[binID][i];
+				Gcp2pProtocol prot2 = (Gcp2pProtocol) n.getProtocol(pid);
+				
+				// Initialize the global variables of the node
+				prot2.indexPerCategory = null;
+				prot2.superPeerList = null;
+				prot2.clientList = null;
+				prot2.peerList = null;
+				prot2.peerSpdAlloted = null;		
+				prot2.numPeers = 0;
+				prot2.sourcePeerList = null;
+				prot2.candidatePeers = null;
+				prot2.numSource = 0;
+				prot2.binSize = null;
+				prot2.binList = null; 
+				prot2.binWatchList = null;
+				prot2.binIndexPerCategory = null;
+				prot2.startedStreaming = true; // true if the node is already streaming
+				prot2.doneStreaming = false;	// true if videoSize<= streamedVideoSize
+				prot2.otherSP = null;
+				
+				// Set the connection
+				prot2.start(n);
+			}
+		}
 	}
 	
 	/**
