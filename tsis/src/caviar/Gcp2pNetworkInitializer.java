@@ -78,7 +78,6 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot.computeBin();
 			binID = prot.getbinID();				//get its binID
 			
-			 ;
 			Node cdn = prot.getConnectedCDN();			//get the CDN node its connected to
 			prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
 			
@@ -87,23 +86,28 @@ public class Gcp2pNetworkInitializer implements Control {
 		
 		
 		/**
-		 * For each bin in each CDN group, choose a SuperPeer (the one with the lowest RTT in the bin)
+		 * For each bin in each CDN group, choose a SuperPeer (the one with the lowest RTT in the bin).
+		 * After which, initialize the connections among the Regular peers in each bin of each CDN group.
 		 */
 				
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
 		setInitSuperPeers(prot);
+		setInitRegularConnection(prot);
 		
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN2.getProtocol(pid);
 		setInitSuperPeers(prot);
+		setInitRegularConnection(prot);
 		
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN3.getProtocol(pid);
 		setInitSuperPeers(prot);
+		setInitRegularConnection(prot);
 		
 		return false; 
 	}
 	
 	/**
 	 * Set the initial SuperPeers (the one closest to the CDN) for each bin inside the CDN's group/area
+	 * @param prot
 	 * @return
 	 */
 	public void setInitSuperPeers(Gcp2pProtocol prot)
@@ -147,12 +151,23 @@ public class Gcp2pNetworkInitializer implements Control {
 	}
 	
 	/**
+	 * Set the initial connections among the regular nodes of each bin in each
+	 * of the CDN servers.
+	 * @param prot
+	 */
+	
+	public void setInitRegularConnection (Gcp2pProtocol prot) {
+		
+	}
+	
+	/**
 	 * Initialize a regular node in the G-CP2P Network. Randomly choose among the three
 	 * CDN servers as its closest CDN. Randomly generate its RTT values for each of the three
 	 * landmarks (30-70 ms). Set the node's upload and download speed by randomly choosing
 	 * from values between 0-1000 Kbps and 1000-2000 Kbps, respectively. Set the used upload
 	 * and download speed to 0 since the node has not yet started streaming. Get a random video
-	 * the node wants to stream from a list of 20 per category then put it in a category.   
+	 * the node wants to stream from a list of 20 per category then put it in a category.  
+	 * @param n 
 	 */
 	
 	public void initialize (Node n) {
