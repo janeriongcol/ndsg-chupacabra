@@ -271,12 +271,20 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				else if (aem.msgType == REQUEST_PEERS_FROM_OTHER_BINS){	// the peers returned in REQUEST_PEERS_FROM_THIS_BIN is empty
 					for(int i= 0; i<5; i++){							// send requests to other SP and define the new peer as the sender. This will make the other SP
 																		// to send their Reply to the new peer
-						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
-							send(
-								node,
-								otherSP[i],
-								new ArrivedMessage(REQUEST_PEERS_FROM_THIS_BIN, aem.sender, aem.data0, aem.data),
-								pid);
+						if(otherSP[i] != null)
+							((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								send(
+									node,
+									otherSP[i],
+									new ArrivedMessage(REQUEST_PEERS_FROM_THIS_BIN, aem.sender, aem.data0, aem.data),
+									pid);
+						else 
+							((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								send(
+									node,
+									aem.sender,
+									new ArrivedMessage(YOUR_PEERS, node, null, 0),
+									pid);
 					}
 				}
 
@@ -337,6 +345,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 												new ArrivedMessage(CONNECT, node, downloadSpd - usedDownloadSpd),
 												pid);
 							}
+						if(highestStreamingSameVid == 0){
+							((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+											send(
+												node,
+												connectedCDN,
+												new ArrivedMessage(CONNECT, node, downloadSpd - usedDownloadSpd),
+												pid);
+						}
 					}
 			
 			}
