@@ -433,6 +433,15 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 
 	}
 	
+	public void start(Node node){
+		((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+							send(
+								node,
+								connectedCDN,
+								new ArrivedMessage(GET_SUPERPEER, node, binID),
+								pid);
+		
+	}
 	
 	/**
 	* binning technique based on position(RTT) wrt to landmarks	
