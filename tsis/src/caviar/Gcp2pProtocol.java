@@ -139,7 +139,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
 	public void nextCycle( Node node, int pid ){
 		if(startedStreaming){
-			for(int i = 0; i < numPeers l i++){
+			for(int i = 0; i < numPeers; i++){
 				((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 								send(
 									node,
@@ -297,10 +297,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 									pid);
 					}
 				}
-				else if (msgType == UPDATE_SP){
+				else if (aem.msgType == UPDATE_SP){
 					for(int i = 0; i<5; i++){
 						if(otherSP[i].equals(aem.node1)){
-							otherSP[i] = aem.node2
+							otherSP[i] = aem.node2;
 							break;
 						}
 					}
