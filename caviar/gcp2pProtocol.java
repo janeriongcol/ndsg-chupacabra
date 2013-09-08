@@ -284,18 +284,18 @@ public void setUsedUploadSpd (int bw){
 	this.usedUploadSpd = bw;
 }
 
-public int setDownloadSpd (){
+public int getDownloadSpd (){
 	return downloadSpd;
 }
 
-public int setUploadSpd (){
+public int getUploadSpd (){
 	return uploadSpd;
 }
-public int setUsedDownloadSpd (){
+public int getUsedDownloadSpd (){
 	return usedDownloadSpd;
 }
 
-public int setUsedUploadSpd (){
+public int getUsedUploadSpd (){
 	return usedUploadSpd;
 }
 
