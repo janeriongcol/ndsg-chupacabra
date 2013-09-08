@@ -97,6 +97,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int binSize[]; //binSize[i] contains the number of peers inside bin i
 	Node binList[][]; //binList[i] returns the list peers inside bin i
 	int binWatchList[][]; //binWatchList[i][j] returns the what video peer j of bin i is watching
+	int binIndexPerCategory[][][]; // CDN's copy of indexPerCategory, binIndexPerCategory[0][1][2] = 5 means that binList[0][5] watches a video with category 1
 	boolean streaming = false; // true if the node is already streaming
 	
 	
@@ -108,6 +109,13 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 	}
 	
+	public Object clone(){
+		Gcp2pProtocol prot = null;
+		try{
+			prot = super.clone();
+		}catch( CloneNotSupportedException e ) {} // never happens
+		return prot;
+	}
 		
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
 	public void nextCycle( Node node, int pid ){
@@ -175,12 +183,13 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				*	a peer will only request this when the YOUR_SUPERPEER message is null
 				*/
 				Node[] temp = binList[aem.data];
+				int[][] tempIndex = binIndexPerCategory;
 				int [] tempWatching = binWatchList[aem.data];
 				 ((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
 								node,
 								aem.sender,
-								new ArrivedMessage(YOUR_CLIENTS, node, temp, tempWatching),
+								new ArrivedMessage(YOUR_CLIENTS, node, temp, tempWatching, tempIndex),
 								pid);
 			}
 			

@@ -10,6 +10,7 @@ public class ArrivedMessage {
 	public Node[] nodeList;
 	public Node	 superPeer;
 	public int[] peerWatching;
+	public int [][] index;
 	
 	public ArrivedMessage(int typeOfMsg, Node sender, int data0, int data)
 	{
@@ -42,5 +43,13 @@ public class ArrivedMessage {
 		this.sender       = sender;
 		this.nodeList = nodeList;
 		this.peerWatching = peerWatching;
+	}
+	public ArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int[] peerWatching, int[][] index)
+	{
+		this.msgType    = typeOfMsg;
+		this.sender       = sender;
+		this.nodeList = nodeList;
+		this.peerWatching = peerWatching;
+		this.index = index;
 	}
 }
