@@ -69,11 +69,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	private static final int FELLOW_SP_REQUEST_FOR_PEERS = 19;
 	private static final int FIRED = 20;	//sent by a CDN to a SP when a new peer is nearer
 	private static final int YOU_ARE_SUPERPEER = 21 ;
+	private static final int GET_MY_CLIENTS = 22;
+	private static final int REJECT = 23;
 	/**
 	*GLOBALS
 	*/
 	int nodeTag;			// Type of node: 0 - CDN, 1 - Superpeer, 2 - Regular
 	Node connectedCDN;		// the CDN node it is closest/connected to
+	int CID;
 	int cdnRTT;				// RTT of a client to its CDN; 
 	int landmark1RTT;		// RTT to landmark 1
 	int landmark2RTT;		// RTT to landmark 2
@@ -97,7 +100,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int category;			// number of categories
 	int[] clientWatching;	// video the client is watching
 	int SPreply = 0;			// number of SP that sent YOUR_PEERS
-	int streamingSameVidPerBin[6];
+	int[] streamingSameVidPerBin = new int[6];
 	int highestStreamingSameVid;
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
@@ -143,7 +146,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public void processEvent( Node node, int pid, Object event ) {
 		ArrivedMessage aem = (ArrivedMessage)event;
 		
-		*	CDN messages
+		//CDN messages
 		
 		if (nodeTag == 0){
 			/**
@@ -151,7 +154,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			*/
 			if (aem.msgType == GET_SUPERPEER){		//new peer requests for its bin's SP. aem.data is the binID
 				Gcp2pProtocol prot = (Gcp2pProtocol) aem.sender.getProtocol(pid);
-				switch(prot.connectedCDN){			// get the new peer's RTT to compare with the current SP
+				/*switch(prot.CID){			// get the new peer's RTT to compare with the current SP
 					case 0: 
 						int tempRTT = prot.CDN1RTT;
 						break;
@@ -160,7 +163,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						break;
 					case 2:
 						int tempRTT = prot.CDN3RTT;
-				}
+				}*/
+				int tempRTT = prot.cdnRTT;
 				Node sp;
 				if(tempRTT < bestRTT[aem.data]){	// if the new peer's RTT is lower, make the SP_var to be sent null. this will force the new peer to send a GET_MY_CLIENT
 					sp = null;
@@ -168,7 +172,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				else sp = superPeerList[aem.data];
 				if(sp == null)						// update bestRTT
 					bestRTT[aem.data] = tempRTT;
-				(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+				((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
 								node,
 								aem.sender,
@@ -191,18 +195,18 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				*/
 				int i;
 				int reply = I_DONT_HAVE_IT;
-				for(i = 0; i<videoList.size(); i++){ // check if the requested video's id is in the list
+				for(i = 0; i<videoList.length; i++){ // check if the requested video's id is in the list
 					if(aem.data == videoList[i]){
 						reply = I_HAVE_IT;
 						break;
 						}
 				}
-				
+				Node temp = null;
 				((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
 								node,
 								aem.sender,
-								new ArrivedMessage(reply, node, null),
+								new ArrivedMessage(reply, node, temp),
 								pid);
 					
 			}
@@ -275,10 +279,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				streamedVideoSize = streamedVideoSize + aem.data;
 				if(streamedVideoSize>= videoSize){		// check if done streaming. if yes, send GOODBYE messages
 					for(int i = 0; i< numSource; i++){
-						(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 								send(
 									node,
-									sourcePeer[i],
+									sourcePeerList[i],
 									new ArrivedMessage(GOODBYE, node, 0),
 									pid);
 					}
@@ -300,7 +304,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					else {									// the list is not empty
 						if(SPreply == 0){					// if SPreply = 0 then the peers is from it's bin
 							while(usedDownloadSpd < downloadSpd && i < aem.data){
-								(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 											send(
 												node,
 												aem.nodeList[i],
@@ -311,14 +315,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						else {								// if the peers is not from it's bin. check if the number of peers is higher than the current candidate
 							if(aem.data > highestStreamingSameVid){
 								candidatePeers = aem.nodeList;
-								highestStreamingSameVid = aem.data
+								highestStreamingSameVid = aem.data;
 							}
 						}
 					}
 					SPreply++;
 					if(SPreply == 6){						// means that all the bins have sent its peers
 						while(usedDownloadSpd < downloadSpd && i < highestStreamingSameVid){	//send CONNECT messages to the bin with the highest number of peers
-								(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+								((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 											send(
 												node,
 												candidatePeers[i],
@@ -335,8 +339,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						if(spdAvail >= aem.data)						// if the available download speed is equal or greater than the proposed upload spd, get it all
 							tobeAccepted = aem.data;
 						else tobeAccepted = spdAvail;					// if not, get only the available download spd
-						usedDownloadSpd = usedDownloadSpeed + aem.data;
-						(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+						usedDownloadSpd = usedDownloadSpd + aem.data;
+						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 									send(
 										node,
 										aem.sender,
@@ -344,7 +348,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 										pid);
 					}
 					else {												// if the download spd is maxed, send a REJECT message
-						(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+						((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 									send(
 										node,
 										aem.sender,
@@ -368,7 +372,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			else if (aem.msgType == CONNECT){								// a peer is requesting for upload Spd
 				int spdAvail = uploadSpd - usedUploadSpd - uploadSpdBuffer;	// get the unused upload spd
 				if(spdAvail>0){												// if the spd available is not zeroed out. send the spd available
-					(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 									send(
 										node,
 										aem.sender,
@@ -376,7 +380,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 										pid);
 				}
 				else {														// if there is no available upload spd. reject the CONNECT request
-					(Transport)node.getProtocol(FastConfig.getTransport(pid))).
+					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 									send(
 										node,
 										aem.sender,
@@ -388,16 +392,16 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					//hindi ko pa alam ano mangyayari
 			}
 			else if (aem.msgType == YOUR_CLIENTS){							// the CDN sent your clients
-				nodeType = 1;
+				nodeTag = 1;
 				clientList = aem.nodeList;
 				clientWatching = aem.peerWatching;
 				indexPerCategory = aem.index;
 				//magsend ulit ng GET_SUPERPEER
 			}
 			else if (aem.msgType == FIRED){									// the peer is not a SP anymore
-				nodeType = 2;
+				nodeTag = 2;
 			}
-			else if (aem.msgTYPE == YOUR_SUPERPEER){						// not gonna happen
+			else if (aem.msgType == YOUR_SUPERPEER){						// not gonna happen
 				if(aem.superPeer!=null){
 					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
@@ -603,7 +607,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		Node[] toReturn = new Node[20];
 		//for ()
 		// TODO Auto-generated method stub
-			
+			return toReturn;
 	}
 	
 	/**
