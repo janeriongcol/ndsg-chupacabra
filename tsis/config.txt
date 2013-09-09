@@ -3,7 +3,10 @@
 #set initial network size to 100 nodes with the first 3 nodes as CDN servers
 network.size 100
 
+network.node peersim.core.GeneralNode
+
 MAXSIZE 1000
+CATEGORY 6
 
 random.seed 1234567890
 
@@ -12,10 +15,13 @@ simulation.endtime 10^9
 simulation.logtime 10^9
 
 protocol.gcp2p caviar.Gcp2pProtocol
-protocol.gcp2p.maxclients	MAXSIZE
+protocol.gcp2p.maxclients MAXSIZE
+protocol.gcp2p.category CATEGORY
 
 init.0 caviar.Gcp2pNetworkInitializer
 init.0.protocol gcp2p
+init.0.category CATEGORY
 
 control.dynamics caviar.DynamicPop
+control.dynamics.protocol gcp2p
 control.dynamics.maxsize MAXSIZE

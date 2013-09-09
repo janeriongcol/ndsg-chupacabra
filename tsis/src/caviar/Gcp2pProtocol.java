@@ -124,7 +124,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	// Constructor
 	// ------------------------------------------------------------------------
 	public Gcp2pProtocol(String prefix){
-		maxClients = Configuration.getPid(prefix + "." + PAR_MAXCLIENTS);
+		maxClients = Configuration.getInt(prefix + "." + PAR_MAXCLIENTS);
+		//pid = Configuration.getPid(prefix + "." + PAR_PROT);
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 	}
 	
