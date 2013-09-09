@@ -41,7 +41,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		Node n;
 		Gcp2pProtocol prot, prot2;
 		
-		for (int i = 0; i < Network.getCapacity(); i++) {
+		for (int i = 0; i < Network.size() ; i++) {
 			n = Network.get(i);
 			if(i < 3) {
 				prot = (Gcp2pProtocol) n.getProtocol(pid);
@@ -62,7 +62,9 @@ public class Gcp2pNetworkInitializer implements Control {
 							break;
 				}//endswitch
 			}
-			initialize(n);				
+			else{
+				initialize(n);	
+			}
 		}//endfor
 		
 		
@@ -209,13 +211,6 @@ public class Gcp2pNetworkInitializer implements Control {
 		// Randomly set the nodes connected CDN (CDN1, CDN2, or CDN3) cdnID range [1, 3]
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1);  
 		
-		// Get the CDN the node is connected to and add it as its client
-		Node cdn;
-		Gcp2pProtocol prot2;
-		cdn = prot.getConnectedCDN();
-		prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
-		prot2.addClient(n);
-		
 		// Set the node's RTT to each of the three predefined landmarks
 		for (int i=1; i<=3; i++) { prot.setLandmarkRTT(i); }
 		
@@ -223,6 +218,13 @@ public class Gcp2pNetworkInitializer implements Control {
 		int minLandmarkRTT = Gcp2pProtocol.minLandmarkRTT;
 		int maxLandmarkRTT = Gcp2pProtocol.maxLandmarkRTT;
 		prot.setCDNRTT(CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT);
+		
+		// Get the CDN the node is connected to and add it as its client
+		Node cdn;
+		Gcp2pProtocol prot2;
+		cdn = prot.getConnectedCDN();
+		prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
+		prot2.addClient(n);	
 		
 		// Set the node's speed
 		prot.setUploadSpd(CommonState.r.nextInt(1001));

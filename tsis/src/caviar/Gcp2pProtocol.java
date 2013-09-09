@@ -77,7 +77,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	*/
 	int nodeTag;			// Type of node: 0 - CDN, 1 - Superpeer, 2 - Regular
 	Node connectedCDN;		// the CDN node it is closest/connected to
-	int CID;
+	int CID;				// Which CDN range [1, 3]
 	int cdnRTT;				// RTT of a client to its CDN; 
 	int landmark1RTT;		// RTT to landmark 1
 	int landmark2RTT;		// RTT to landmark 2
@@ -94,7 +94,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int categoryID;			// category of the video it is streaming
 	int maxClients; 		// max number of possible clients for CDNs and SuperPeers, obtained from config property {@link #PAR_MAXCLIENTS}. 
 	int maxBinSize;			// max number of peers inside a bin (same as maxClients) 
-	int numClients;			// number of clients
+	int numClients = 0;			// number of clients
 	int[] videoList;			// list of videos
 	int[] clientRTT;		// RTT of clients
 	int[] bestRTT;			// least RTT
@@ -549,6 +549,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		
 		if(clientList == null){
 			clientList = new Node[maxClients];
+			clientRTT = new int[maxClients];
+			binList = new Node[6][maxClients];
+			binWatchList = new int[6][maxClients];
 		}
 		clientList[numClients] = n;
 		
@@ -595,10 +598,13 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			case 0: connectedCDN = null; //the node itself is the CDN
 					break;
 			case 1: connectedCDN = Gcp2pProtocol.CDN1;		//connected to CDN1
+					CID = 1;
 					break;
 			case 2: connectedCDN = Gcp2pProtocol.CDN2;		//connected to CDN2
+					CID = 2;
 					break;
 			case 3: connectedCDN = Gcp2pProtocol.CDN3;		//connected to CDN3
+					CID = 3;
 					break;
 		}
 	}
