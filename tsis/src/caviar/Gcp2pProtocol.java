@@ -103,6 +103,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int SPreply = 0;			// number of SP that sent YOUR_PEERS
 	int[] streamingSameVidPerBin = new int[6];
 	int highestStreamingSameVid;
+	long startTime;			// Time the node was initialized
+	long elapsedTime;		// Time it took from initialization until completion of stream
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
 	Node[] superPeerList;	// list of SuperPeers
@@ -724,13 +726,13 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		return usedUploadSpd;
 	}
 	
-	public void setLandmarkRTT (int landmark){	
+	public void setLandmarkRTT (int landmark, int max, int min){	
 		switch(landmark) {
-			case 1: landmark1RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
+			case 1: landmark1RTT = CommonState.r.nextInt((max-min)+1) + min;
 					break;
-			case 2: landmark2RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
+			case 2: landmark2RTT = CommonState.r.nextInt((max-min)+1) + min;
 					break;
-			case 3: landmark3RTT = CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT;
+			case 3: landmark3RTT = CommonState.r.nextInt((max-min)+1) + min;
 					break;
 			
 		}	
@@ -753,6 +755,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public int[] getVideoList() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public void setStartTime () {
+		startTime = System.currentTimeMillis();
+	}
+	
+	public void setTimeElapsed () {
+		elapsedTime = startTime - System.currentTimeMillis();
 	}
 
 }

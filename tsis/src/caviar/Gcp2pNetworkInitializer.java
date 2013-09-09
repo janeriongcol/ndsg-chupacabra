@@ -16,6 +16,13 @@ import peersim.core.Node;
 public class Gcp2pNetworkInitializer implements Control {
 	
 	// ------------------------------------------------------------------------
+	// Constants
+	// ------------------------------------------------------------------------
+	private static final int maxLandmarkRTT = 70;
+	private static final int minLandmarkRTT = 30;
+	private static final int maxCDNRTT = 15;
+	private static final int minCDNRTT = 0;
+	// ------------------------------------------------------------------------
 	// Parameters
 	// ------------------------------------------------------------------------
 	private static final String PAR_PROT = "protocol";
@@ -205,6 +212,9 @@ public class Gcp2pNetworkInitializer implements Control {
 		
 		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
 		
+		// Set the start time
+		prot.setStartTime();
+		
 		// Set the node as Regular 
 		prot.setNodeTag(2); 
 		
@@ -212,12 +222,10 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1);  
 		
 		// Set the node's RTT to each of the three predefined landmarks
-		for (int i=1; i<=3; i++) { prot.setLandmarkRTT(i); }
+		for (int i=1; i<=3; i++) { prot.setLandmarkRTT(i, maxLandmarkRTT, minLandmarkRTT ); }
 		
 		// Set the node's RTT to its CDN
-		int minLandmarkRTT = Gcp2pProtocol.minLandmarkRTT;
-		int maxLandmarkRTT = Gcp2pProtocol.maxLandmarkRTT;
-		prot.setCDNRTT(CommonState.r.nextInt((maxLandmarkRTT-minLandmarkRTT)+1) + minLandmarkRTT);
+		prot.setCDNRTT(CommonState.r.nextInt((maxCDNRTT-minCDNRTT)) + minCDNRTT);
 		
 		// Get the CDN the node is connected to and add it as its client
 		Node cdn;
