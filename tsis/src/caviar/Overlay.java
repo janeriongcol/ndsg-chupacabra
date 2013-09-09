@@ -28,9 +28,9 @@ public interface Overlay
 	 * Set node n as one of the 3 CDNs
 	 * @param cdnID - it cdnID 1, 2 or 3
 	 * @param n - the node to act as CDN
-	 */
+	 *//*
 	public void setAsCDN(int cdnID, Node n);
-	
+	*/
 	
 	/**
 	 * set the CDN node that the node is under (randomized)

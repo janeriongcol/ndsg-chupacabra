@@ -22,14 +22,16 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	// Parameters  
 	// ------------------------------------------------------------------------
 	/**
-	 * String name of the parameter
+	 * String name of the parameter, assigned to pid
 	 */
 	private static final String PAR_PROT = "protocol";
 	/**
-	 * String name of the parameter
+	 * String name of the parameter, assigned to maxClients
 	 */
 	private static final String PAR_MAXCLIENTS = "maxclients";
-	
+	/**
+	 * String name of the parameter, assigned to category
+	 */
 	private static final String PAR_CATEGORY = "category";
 	// ------------------------------------------------------------------------
 	// Static Fields
@@ -38,12 +40,27 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	 *  Protocol identifier, obtained from config property {@link #PAR_PROT}. 
 	 **/
 	private static int pid;	
+	/**
+	 * max number of possible clients for CDNs and SuperPeers, 
+	 * obtained from config property {@link #PAR_MAXCLIENTS}. 
+	 **/
+	public static int maxClients; 		
+	/**
+	 * Node Tags
+	 */
+	public static final int CDNTag = 0;
+	public static final int SuperPeerTag = 1;
+	public static final int RegularTag = 2;
 	/***
 	 * The nodes corresponding to the 3 CDNs in the set-up
 	 */
 	public static Node CDN1;
 	public static Node CDN2;
 	public static Node CDN3;	
+	/**
+	 * maximum number of bins inside a CDN group
+	 */
+	public static final int maxBins = 6;
 	/**
 	*	Message TYPES
 	*/
@@ -92,7 +109,6 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int videoSize;			// size of the video it is watching
 	int streamedVideoSize;	// size already streamed
 	int categoryID;			// category of the video it is streaming
-	int maxClients; 		// max number of possible clients for CDNs and SuperPeers, obtained from config property {@link #PAR_MAXCLIENTS}. 
 	int maxBinSize;			// max number of peers inside a bin (same as maxClients) 
 	int numClients = 0;			// number of clients
 	int[] videoList;			// list of videos
@@ -101,7 +117,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int category;			// number of categories
 	int[] clientWatching;	// video the client is watching
 	int SPreply = 0;			// number of SP that sent YOUR_PEERS
-	int[] streamingSameVidPerBin = new int[6];
+	int[] streamingSameVidPerBin = new int[maxBins];
 	int highestStreamingSameVid;
 	long startTime;			// Time the node was initialized
 	long elapsedTime;		// Time it took from initialization until completion of stream
@@ -358,7 +374,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						}
 					}
 					SPreply++;
-					if(SPreply == 6){						// means that all the bins have sent its peers
+					if(SPreply == maxBins){						// means that all the bins have sent its peers
 						while(usedDownloadSpd < downloadSpd && i < highestStreamingSameVid){	//send CONNECT messages to the bin with the highest number of peers
 								((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 											send(
@@ -521,9 +537,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		clientRTT = new int[maxClients];
 		clientWatching = new int[maxClients];
 		indexPerCategory = new int[category][maxClients];
-		binSize = new int[6];
-		binList = new Node[6][maxClients];
-		binWatchList = new int[6][maxClients];
+		binSize = new int[maxBins];
+		binList = new Node[maxBins][maxClients];
+		binWatchList = new int[maxBins][maxClients];
 		peerList = new Node[maxClients];
 		sourcePeerList = new Node[maxClients];
 		
@@ -548,13 +564,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public boolean addClient(Node n){
 		
 		//QUESTON: Should check first if client is alive? Else return false.
-		
-		if(clientList == null){
-			clientList = new Node[maxClients];
-			clientRTT = new int[maxClients];
-			binList = new Node[6][maxClients];
-			binWatchList = new int[6][maxClients];
+		//Check if SuperPeer, initialize, relevant lists
+		/*if(clientList == null && ){
+
 		}
+		 */		
 		clientList[numClients] = n;
 		
 		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
@@ -580,18 +594,6 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		return this.nodeTag;
 	}
 		
-	public void setAsCDN(int cdnID, Node n) {
-		switch(cdnID)
-		{
-				case 1: Gcp2pProtocol.CDN1 = n;
-						break;
-				case 2: Gcp2pProtocol.CDN2 = n;
-						break;
-				case 3: Gcp2pProtocol.CDN3 = n;
-						break;
-		}
-		
-	}
 	
 	public void setConnectedCDN(int cdnID)
 	{

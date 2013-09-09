@@ -22,6 +22,7 @@ public class Gcp2pNetworkInitializer implements Control {
 	private static final int minLandmarkRTT = 30;
 	private static final int maxCDNRTT = 15;
 	private static final int minCDNRTT = 0;
+	private static final int maxBins = Gcp2pProtocol.maxBins;
 	// ------------------------------------------------------------------------
 	// Parameters
 	// ------------------------------------------------------------------------
@@ -51,23 +52,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		for (int i = 0; i < Network.size() ; i++) {
 			n = Network.get(i);
 			if(i < 3) {
-				prot = (Gcp2pProtocol) n.getProtocol(pid);
-				prot.nodeTag = 1;	//tag as a CDN node
-				switch(i){		//set references to the CDN in Gcp2pProtocol
-			
-					case 0: Gcp2pProtocol.CDN1 = n;
-							prot.setConnectedCDN(0);
-							prot.setCDNRTT(0);
-							break;
-					case 1: Gcp2pProtocol.CDN2 = n;
-							prot.setConnectedCDN(0);
-							prot.setCDNRTT(0);
-							break;
-					case 2: Gcp2pProtocol.CDN3= n;
-							prot.setConnectedCDN(0);
-							prot.setCDNRTT(0);
-							break;
-				}//endswitch
+				setAsCDN(i + 1, n); // Note: CID range [1, 3]
 			}
 			else{
 				initialize(n);	
@@ -79,7 +64,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		 * binning for the regular nodes (Note: binning is specific to the cdn
 		 * groups and the cdn of the node is set by Gcp2pNodeInit)
 		 */
-		int binID, cdnID;
+		int binID;
 		
 		for (int i = 3; i < Network.size(); i++){
 			n = Network.get(i);
@@ -114,6 +99,45 @@ public class Gcp2pNetworkInitializer implements Control {
 		return false; 
 	}
 	
+	
+
+	/**
+	 * Set node n as one of the 3 CDNs
+	 * @param cdnID - it cdnID 1, 2 or 3
+	 * @param n - the node to act as CDN
+	 */
+	public void setAsCDN(int cdnID, Node n) {
+		
+		//other CDN properties?????
+		
+		switch(cdnID)
+		{
+				case 1: Gcp2pProtocol.CDN1 = n;
+						break;
+				case 2: Gcp2pProtocol.CDN2 = n;
+						break;
+				case 3: Gcp2pProtocol.CDN3 = n;
+						break;
+		}
+		
+		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
+		prot.setNodeTag(Gcp2pProtocol.CDNTag);
+		
+		int maxClients = Gcp2pProtocol.maxClients;
+				
+		prot.setConnectedCDN(0);
+		prot.setCDNRTT(0);
+		prot.clientList = new Node[maxClients];
+		prot.clientRTT = new int[maxClients];
+		prot.binList = new Node[maxBins][maxClients];
+		prot.binSize = new int[maxBins];
+		prot.binWatchList = new int[maxBins][maxClients];
+		prot.bestRTT = new int[maxBins];
+		prot.superPeerList = new Node[maxClients]; //tama ba?
+		
+	}
+	
+	
 	/**
 	 * Set the initial SuperPeers (the one closest to the CDN) for each bin inside the CDN's group/area
 	 * @param prot
@@ -121,14 +145,14 @@ public class Gcp2pNetworkInitializer implements Control {
 	 */
 	public void setInitSuperPeers(Gcp2pProtocol prot)
 	{
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < maxBins; i++)
 		{
 			prot.bestRTT[i] = 101;	//set to 101 first 
 		}
 		
 		int binsize, bestRTT;
 		Gcp2pProtocol prot2;
-		for(int binID = 0; binID < 6; binID ++)
+		for(int binID = 0; binID < maxBins; binID ++)
 		{
 			binsize = prot.binSize[binID];
 			bestRTT = prot.bestRTT[binID];
@@ -155,7 +179,7 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot.setSuperPeer(tempSuperpeer, binID);
 			
 			prot2 = (Gcp2pProtocol) tempSuperpeer.getProtocol(pid);
-			prot2.setNodeTag(2);
+			prot2.setNodeTag(Gcp2pProtocol.SuperPeerTag);
 		}//endfor
 	}
 	
@@ -167,7 +191,7 @@ public class Gcp2pNetworkInitializer implements Control {
 	
 	public void setInitRegularConnection (Gcp2pProtocol prot) {
 		// Iterate through all the nodes in a bin
-		for (int binID=0; binID<6; binID++) {
+		for (int binID=0; binID<maxBins; binID++) {
 			for (int i=0; i<prot.binSize[binID]; i++) {
 				Node n = prot.binList[binID][i];
 				Gcp2pProtocol prot2 = (Gcp2pProtocol) n.getProtocol(pid);
@@ -216,7 +240,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot.setStartTime();
 		
 		// Set the node as Regular 
-		prot.setNodeTag(2); 
+		prot.setNodeTag(Gcp2pProtocol.RegularTag); 
 		
 		// Randomly set the nodes connected CDN (CDN1, CDN2, or CDN3) cdnID range [1, 3]
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1);  
