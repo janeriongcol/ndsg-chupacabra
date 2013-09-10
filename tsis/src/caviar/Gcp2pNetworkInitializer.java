@@ -27,34 +27,41 @@ public class Gcp2pNetworkInitializer implements Control {
 	// Parameters
 	// ------------------------------------------------------------------------
 	private static final String PAR_PROT = "protocol";
+	private static final String PAR_TRANS = "transport";
 	private final String PAR_CATEGORY = "category";
 	// ------------------------------------------------------------------------
 	// Fields
 	// ------------------------------------------------------------------------
 	/** Protocol identifier, obtained from config property {@link #PAR_PROT}. */
 	private static int pid;
+	/** Transport Protocol identifier, obtained from config property {@link #PAR_TRANS */	
+	private static int tid;
 	private static int category;
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
 	public Gcp2pNetworkInitializer(String prefix) {
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
+		tid = Configuration.getPid(prefix + "." + PAR_TRANS);
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 	}
 	
 		
 	@Override
 	public boolean execute() {
-		// Set first 3 nodes as CDNs
+		/**
+		 * Set the first 3 nodes as the CDNs. 
+		 * Initialize values contained by the nodes.
+		 */
 		Node n;
 		Gcp2pProtocol prot, prot2;
 		
 		for (int i = 0; i < Network.size() ; i++) {
-			n = Network.get(i);
-			if(i < 3) {
+			n = Network.get(i);	//current node
+			if(i < 3) {	//CDN node
 				setAsCDN(i + 1, n); // Note: CID range [1, 3]
 			}
-			else{
+			else{	//regular node
 				initialize(n);	
 			}
 		}//endfor
@@ -62,15 +69,15 @@ public class Gcp2pNetworkInitializer implements Control {
 		
 		/**
 		 * binning for the regular nodes (Note: binning is specific to the cdn
-		 * groups and the cdn of the node is set by Gcp2pNodeInit)
+		 * groups (based on the landmark RTTs) and the cdn of the node is set by Gcp2pNodeInit)
 		 */
 		int binID;
 		
 		for (int i = 3; i < Network.size(); i++){
 			n = Network.get(i);
 			prot = (Gcp2pProtocol) n.getProtocol(pid);
-			prot.computeBin();
-			binID = prot.getbinID();				//get its binID
+			prot.computeBin();			//assign bin based on its landmark RTTS in its CDN area
+			binID = prot.getbinID();	//get its binID
 			
 			Node cdn = prot.getConnectedCDN();			//get the CDN node its connected to
 			prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
@@ -108,8 +115,11 @@ public class Gcp2pNetworkInitializer implements Control {
 	 */
 	public void setAsCDN(int cdnID, Node n) {
 		
-		//other CDN properties?????
+		//other CDN properties?????	// TODO Auto-generated method stub
 		
+		/**
+		 * Assign as either CDN1, CDN2 and CDN3 depending on its cdnID
+		 */
 		switch(cdnID)
 		{
 				case 1: Gcp2pProtocol.CDN1 = n;
@@ -121,12 +131,16 @@ public class Gcp2pNetworkInitializer implements Control {
 		}
 		
 		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
-		prot.setNodeTag(Gcp2pProtocol.CDNTag);
+		prot.setNodeTag(Gcp2pProtocol.CDNTag);	//tag as CDN
 		
 		int maxClients = Gcp2pProtocol.maxClients;
 				
-		prot.setConnectedCDN(0);
-		prot.setCDNRTT(0);
+		prot.setConnectedCDN(0);	//0 because it is the CDN istelf
+		prot.setCDNRTT(0);	//distance to itself is 0
+		
+		/**
+		 * initialize lists to be used by a CDN node
+		 */
 		prot.clientList = new Node[maxClients];
 		prot.clientRTT = new int[maxClients];
 		prot.binList = new Node[maxBins][maxClients];
@@ -140,11 +154,15 @@ public class Gcp2pNetworkInitializer implements Control {
 	
 	/**
 	 * Set the initial SuperPeers (the one closest to the CDN) for each bin inside the CDN's group/area
-	 * @param prot
+	 * @param prot	- refers to the CDN node
 	 * @return
 	 */
 	public void setInitSuperPeers(Gcp2pProtocol prot)
 	{
+		/**
+		 * Set bestRTT in each bin to 101 so that when
+		 * a lower (better) value comes it will be replaced.
+		 */
 		for (int i = 0; i < maxBins; i++)
 		{
 			prot.bestRTT[i] = 101;	//set to 101 first 
@@ -152,7 +170,8 @@ public class Gcp2pNetworkInitializer implements Control {
 		
 		int binsize, bestRTT;
 		Gcp2pProtocol prot2;
-		for(int binID = 0; binID < maxBins; binID ++)
+		
+		for(int binID = 0; binID < maxBins; binID ++)	//iterate through each bin
 		{
 			binsize = prot.binSize[binID];
 			bestRTT = prot.bestRTT[binID];
@@ -166,7 +185,7 @@ public class Gcp2pNetworkInitializer implements Control {
 				prot2 = (Gcp2pProtocol) n.getProtocol(pid);
 				
 				//if better than the current bestRTT, set as the tempSuperpeer
-				if(prot2.cdnRTT < bestRTT)
+				if(prot2.getCDNRTT() < bestRTT)
 				{
 					bestRTT = prot2.cdnRTT;
 					tempSuperpeer = n;
@@ -178,6 +197,7 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot.bestRTT[binID] = bestRTT;
 			prot.setSuperPeer(tempSuperpeer, binID);
 			
+			//Tag the node as SuperPeer
 			prot2 = (Gcp2pProtocol) tempSuperpeer.getProtocol(pid);
 			prot2.setNodeTag(Gcp2pProtocol.SuperPeerTag);
 		}//endfor
@@ -227,7 +247,7 @@ public class Gcp2pNetworkInitializer implements Control {
 	 * from values between 0-1000 Kbps and 1000-2000 Kbps, respectively. Set the used upload
 	 * and download speed to 0 since the node has not yet started streaming. Get a random video
 	 * the node wants to stream from a list of 20 per category then put it in a category.  
-	 * @param n 
+	 * @param n - the node to be initialized
 	 */
 	
 	public void initialize (Node n) {

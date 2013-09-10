@@ -147,16 +147,15 @@ public interface Overlay
 	
 	/**
 	 * Set its RTT relative to its CDN
-	 *
+	 */
 	public void setCDNRTT (int RTT);	
-	*/
+	
 	
 	/**
 	 * Get RTT relative to its CDN
-	 *
+	 */
 	public int getCDNRTT();	
-	*/
-	
+		
 	
 	/**
 	 * Get video list
