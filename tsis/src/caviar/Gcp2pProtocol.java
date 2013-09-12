@@ -152,6 +152,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
 	public void nextCycle( Node node, int pid ){
+		
 		if(startedStreaming){
 			for(int i = 0; i < numPeers; i++){
 				((Transport)node.getProtocol(tid)).
@@ -163,6 +164,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				
 			}
 		}
+		
 		
 	}
 	
@@ -176,6 +178,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			/**
 			*	message received requesting superpeer
 			*/
+			
 			if (aem.msgType == ArrivedMessage.GET_SUPERPEER){		//new peer requests for its bin's SP. aem.data is the binID
 				Gcp2pProtocol prot = (Gcp2pProtocol) aem.sender.getProtocol(pid);
 				/*switch(prot.CID){			// get the new peer's RTT to compare with the current SP
@@ -189,6 +192,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						int tempRTT = prot.CDN3RTT;
 				}*/
 				int tempRTT = prot.cdnRTT;
+				
 				Node sp;
 				if(tempRTT < bestRTT[aem.data]){	// if the new peer's RTT is lower, make the SP_var to be sent null. this will force the new peer to send a GET_MY_CLIENT
 					sp = null;
@@ -487,6 +491,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	}
 	
 	public void start(Node node){
+		
 		((Transport)node.getProtocol(tid)).
 							send(
 								node,
