@@ -77,13 +77,6 @@ public class ArrivedMessage {
 		this.sender       = sender;
 		this.superPeer = superPeer;
 	}
-	public ArrivedMessage(int typeOfMsg, Node sender, Node node1, Node node2)
-	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
-		this.node1 = node1;
-		this.node2 = node2;
-	}
 	public ArrivedMessage(int typeOfMsg, Node sender, int data)
 	{
 		this.msgType    = typeOfMsg;
