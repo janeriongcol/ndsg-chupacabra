@@ -44,14 +44,14 @@ public class ArrivedMessage {
 	public Node node1;
 	public Node node2;
 	
-	public ArrivedMessage(int typeOfMsg, Node sender, int data0, int data)
+	public ArrivedMessage(int typeOfMsg, Node sender, int data0, int data) // DO_YOU_HAVE_THIS, REQUEST_PEERS_FROM_THIS_BIN, REQUEST_PEERS_FROM_OTHER_BINS, ACCEPT_SPEED
 	{
 		this.msgType    = typeOfMsg;
 		this.sender       = sender;
 		this.data0     = data0;
 		this.data = data;
 	}
-	public ArrivedMessage(int typeOfMsg, Node sender, Node node1, Node node2)
+	public ArrivedMessage(int typeOfMsg, Node sender, Node node1, Node node2) //UPDATE_SP, 
 	{
 		this.msgType    = typeOfMsg;
 		this.sender       = sender;
@@ -64,20 +64,20 @@ public class ArrivedMessage {
 		this.sender       = sender;
 		this.nodeList = nodeList;
 	}
-	public ArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int data)
+	public ArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int data)// YOUR_PEERS, 
 	{
 		this.msgType    = typeOfMsg;
 		this.sender       = sender;
 		this.nodeList = nodeList;
 		this.data 		= data;
 	}
-	public ArrivedMessage(int typeOfMsg, Node sender, Node superPeer)
+	public ArrivedMessage(int typeOfMsg, Node sender, Node superPeer) // YOUR_SUPERPEER, I_DONT_HAVE_IT, I_HAVE_IT, FIRED
 	{
 		this.msgType    = typeOfMsg;
 		this.sender       = sender;
 		this.superPeer = superPeer;
 	}
-	public ArrivedMessage(int typeOfMsg, Node sender, int data)
+	public ArrivedMessage(int typeOfMsg, Node sender, int data) //GET_SUPERPEER,GET_MY_CLIENTS, UPLOAD, GOODBYE, CONNECT, UPLOAD_SPEED_THAT_CAN_BE_GIVEN, REJECT_SPEED
 	{
 		this.msgType    = typeOfMsg;
 		this.sender       = sender;
@@ -90,7 +90,7 @@ public class ArrivedMessage {
 		this.nodeList = nodeList;
 		this.peerWatching = peerWatching;
 	}
-	public ArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int[] peerWatching, int[][] index)
+	public ArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int[] peerWatching, int[][] index) //YOUR_CLIENTS
 	{
 		this.msgType    = typeOfMsg;
 		this.sender       = sender;
