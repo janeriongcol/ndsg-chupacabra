@@ -39,7 +39,7 @@ init.0.transport urt
 control.dynamics caviar.DynamicPop
 control.dynamics.protocol gcp2p
 control.dynamics.maxsize MAXSIZE
-control.dynamics.inits.0 Caviar.Gcp2pNodeInit
-control.dynamics.inits.0.protocol gcp2p
-control.dynamics.inits.0.category CATEGORY
+control.dynamics.init.0 caviar.Gcp2pNodeInit
+control.dynamics.init.0.protocol gcp2p
+control.dynamics.init.0.category CATEGORY
 control.dynamics.step 1
