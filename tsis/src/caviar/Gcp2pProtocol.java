@@ -175,7 +175,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		ArrivedMessage aem = (ArrivedMessage)event;
 		//System.out.println("ye");
 		//CDN messages
-		System.out.println(aem.sender.getIndex());
+		//System.out.println(aem.sender.getIndex());
 		if (nodeTag == 0){
 			/**
 			*	message received requesting superpeer
@@ -245,6 +245,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				*	A peer asks for the list of clients in a certain bin
 				*	a peer will only request this when the YOUR_SUPERPEER message is null
 				*/
+				
 				Node[] temp = binList[aem.data];
 				int[][] tempIndex = binIndexPerCategory[aem.data];
 				int [] tempWatching = binWatchList[aem.data];
@@ -279,6 +280,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		}
 		else if (nodeTag == 1){
 				if (aem.msgType == ArrivedMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
+					System.out.println(aem.data0 +"   "+ node.getIndex());
 					int temp[] = indexPerCategory[aem.data0];		// get the list of indices of the peers watching a certain category
 					Node[] peers = new Node[1000];
 					int i = 0;

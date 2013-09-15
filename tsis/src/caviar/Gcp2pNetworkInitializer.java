@@ -179,7 +179,7 @@ public class Gcp2pNetworkInitializer implements Control {
 			bestRTT = prot.bestRTT[binID];
 			Node tempSuperpeer = null;
 			Node n;
-			
+			Node best = prot.connectedCDN;
 			//Iterate through all the nodes in the bin and choose the one with the best RTT
 			for(int j = 0; j < binsize; j++)
 			{
@@ -191,6 +191,7 @@ public class Gcp2pNetworkInitializer implements Control {
 				{
 					bestRTT = prot2.cdnRTT;
 					tempSuperpeer = n;
+					best = n;
 				}
 				
 			}//endinnerfor
@@ -205,6 +206,8 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot2.clientList = prot.binList[binID];
 			prot2.indexPerCategory = prot.binIndexPerCategory[binID];
 			prot2.clientWatching = prot.binWatchList[binID];
+			System.out.println("Given " + best.getIndex());
+			
 		}//endfor
 	}
 	
