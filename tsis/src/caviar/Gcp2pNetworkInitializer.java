@@ -12,6 +12,7 @@ import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
+import peersim.edsim.EDSimulator;
 
 public class Gcp2pNetworkInitializer implements Control {
 	
@@ -55,7 +56,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		 */
 		Node n;
 		Gcp2pProtocol prot, prot2;
-		
+
 		for (int i = 0; i < Network.size() ; i++) {
 			n = Network.get(i);	//current node
 			if(i < 3) {	//CDN node
@@ -102,7 +103,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN3.getProtocol(pid);
 		setInitSuperPeers(prot);
 		setInitRegularConnection(prot);
-		
+
 		return false; 
 	}
 	
@@ -200,6 +201,7 @@ public class Gcp2pNetworkInitializer implements Control {
 			//Tag the node as SuperPeer
 			prot2 = (Gcp2pProtocol) tempSuperpeer.getProtocol(pid);
 			prot2.setNodeTag(Gcp2pProtocol.SuperPeerTag);
+			
 		}//endfor
 	}
 	
@@ -235,7 +237,8 @@ public class Gcp2pNetworkInitializer implements Control {
 				prot2.otherSP = null;
 				
 				// Set the connection
-				prot2.start(n);
+				//prot2.start(n);
+				EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);
 			}
 		}
 	}

@@ -11,9 +11,10 @@ CATEGORY 6
 random.seed 1234567890
 
 #parameters for event-driven protocol type
-simulation.endtime 10^9
-simulation.logtime 1
+simulation.endtime 100000000
+simulation.logtime 1000
 simulation.experiments 1
+simulation.step 1000
 
 
 protocol.urt UniformRandomTransport
@@ -22,14 +23,16 @@ protocol.urt.maxdelay 0
 
 protocol.gcp2p caviar.Gcp2pProtocol
 
-
+init.sch CDScheduler
+init.sch.protocol gcp2p
+init.sch.randstart
 
 protocol.gcp2p.maxclients MAXSIZE
 protocol.gcp2p.category CATEGORY
 protocol.gcp2p.protocol gcp2p
 protocol.gcp2p.transport urt
-protocol.gcp2p.step 1
-
+protocol.gcp2p.step 1000
+protocol.link peersim.core.IdleProtocol
 init.0 caviar.Gcp2pNetworkInitializer
 init.0.protocol gcp2p
 init.0.category CATEGORY
@@ -42,4 +45,4 @@ control.dynamics.maxsize MAXSIZE
 control.dynamics.init.0 caviar.Gcp2pNodeInit
 control.dynamics.init.0.protocol gcp2p
 control.dynamics.init.0.category CATEGORY
-control.dynamics.step 1
+control.dynamics.step 1000

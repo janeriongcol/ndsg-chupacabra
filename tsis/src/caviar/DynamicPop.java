@@ -4,6 +4,7 @@ import peersim.config.*;
 import peersim.core.*;
 import peersim.vector.*;
 import peersim.dynamics.*;
+import peersim.edsim.EDSimulator;
 
 public class DynamicPop implements Control{
 		private static final String PAR_PROTOCOL = "protocol";
@@ -14,7 +15,7 @@ public class DynamicPop implements Control{
 		private int pid;
 		private int maxsize;
 		protected final NodeInitializer[] inits;
-		protected int joinedPeerSize = 0;
+		protected int joinedPeerSize = 100;
 		
 		protected void add(int n)
 		{
@@ -24,6 +25,11 @@ public class DynamicPop implements Control{
 					inits[j].initialize(newnode);
 				}
 				Network.add(newnode);
+				//System.out.println(newnode.getIndex());
+				Gcp2pProtocol prot = (Gcp2pProtocol) newnode.getProtocol(pid);
+				//prot.start(newnode);
+				EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, newnode, prot.binID), prot.connectedCDN, pid);
+				
 			}
 		}
 		
@@ -51,8 +57,10 @@ public class DynamicPop implements Control{
 				if(n>maxsize-joinedPeerSize)
 					n = maxsize-joinedPeerSize;
 				add(n);
+				joinedPeerSize+=n;
 				return true;
 			}
+			
 			return false;
 		}
 		

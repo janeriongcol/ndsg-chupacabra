@@ -3,6 +3,7 @@ package caviar;
 import peersim.core.*;
 import peersim.config.Configuration;
 import peersim.dynamics.*;
+import peersim.edsim.EDSimulator;
 
 public class Gcp2pNodeInit implements NodeInitializer{
 	
@@ -82,7 +83,8 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.categoryID = prot.videoID/20;
 		prot.computeBin();
 		prot2.addToBin(prot.binID, n);
-		prot.start(n);
+		//prot.start(n);
+		//EDSimulator.add(1, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);
 	}
 		
 

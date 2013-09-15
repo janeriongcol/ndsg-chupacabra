@@ -151,8 +151,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	}
 		
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
+	
 	public void nextCycle( Node node, int pid ){
-		
+		System.out.println("next");
 		if(startedStreaming){
 			for(int i = 0; i < numPeers; i++){
 				((Transport)node.getProtocol(tid)).
@@ -169,9 +170,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	}
 	
 	//eto yung magproprocess ng messages
+	
 	public void processEvent( Node node, int pid, Object event ) {
 		ArrivedMessage aem = (ArrivedMessage)event;
-		
+		System.out.println("ye");
 		//CDN messages
 		
 		if (nodeTag == 0){
@@ -491,14 +493,17 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	}
 	
 	public void start(Node node){
-		
-		((Transport)node.getProtocol(tid)).
+		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
+		((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 							send(
 								node,
-								connectedCDN,
+								prot.connectedCDN,
 								new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, node, binID),
 								pid);
-		
+		//System.out.println(node.getIndex());
+		if(prot.connectedCDN .isUp())
+			System.out.println("up  " + node.getIndex());
+
 	}
 	
 	/**
@@ -574,7 +579,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		
 		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
 		clientRTT[numClients] = prot.getCDNRTT();
-				
+		
 		numClients++;
 		
 		return true;
