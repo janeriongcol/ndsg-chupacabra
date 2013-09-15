@@ -84,6 +84,7 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
 			
 			prot2.addToBin(binID, n);				//add the node to the corresponding bin in its CDN
+			
 		}
 		
 		
@@ -151,6 +152,10 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot.bestRTT = new int[maxBins];
 		prot.superPeerList = new Node[maxClients]; //tama ba?
 		prot.binIndexPerCategory = new int[6][category][maxClients];
+		for(int i = 0; i < 6; i++)
+			for(int j = 0; j < category; j++)
+				for(int k = 0; k < maxClients; k++)
+					prot.binIndexPerCategory[i][j][k] = -1;
 	}
 	
 	
@@ -206,6 +211,7 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot2.clientList = prot.binList[binID];
 			prot2.indexPerCategory = prot.binIndexPerCategory[binID];
 			prot2.clientWatching = prot.binWatchList[binID];
+			if(prot2.indexPerCategory[0] != null)
 			System.out.println("Given " + best.getIndex());
 			
 		}//endfor
@@ -241,7 +247,7 @@ public class Gcp2pNetworkInitializer implements Control {
 				prot2.startedStreaming = true; // true if the node is already streaming
 				prot2.doneStreaming = false;	// true if videoSize<= streamedVideoSize
 				prot2.otherSP = null;
-				
+				prot2.numSource = 0;
 				// Set the connection
 				//prot2.start(n);
 				EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);

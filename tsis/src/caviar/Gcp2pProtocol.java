@@ -194,7 +194,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						int tempRTT = prot.CDN3RTT;
 				}*/
 				int tempRTT = prot.cdnRTT;
-				
+				addToBin(aem.data, aem.sender);
 				Node sp;
 				if(tempRTT < bestRTT[aem.data]){	// if the new peer's RTT is lower, make the SP_var to be sent null. this will force the new peer to send a GET_MY_CLIENT
 					sp = null;
@@ -249,11 +249,12 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				Node[] temp = binList[aem.data];
 				int[][] tempIndex = binIndexPerCategory[aem.data];
 				int [] tempWatching = binWatchList[aem.data];
+				int tempSize = binSize[aem.data];
 				((Transport)node.getProtocol(tid)).
 							send(
 								node,
 								aem.sender,
-								new ArrivedMessage(ArrivedMessage.YOUR_CLIENTS, node, temp, tempWatching, tempIndex),
+								new ArrivedMessage(ArrivedMessage.YOUR_CLIENTS, node, temp, tempWatching, tempIndex, tempSize),
 								pid);
 				if(superPeerList[aem.data]!=null)		// send this to notify the old SP that he is fired
 						((Transport)node.getProtocol(tid)).
@@ -280,9 +281,20 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		}
 		else if (nodeTag == 1){
 				if (aem.msgType == ArrivedMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
-					System.out.println(aem.data0 +"   "+ node.getIndex());
+					System.out.println(aem.data0 +"   "+ node.getIndex() + "   "+aem.sender.getIndex());
 					int temp[] = indexPerCategory[aem.data0];		// get the list of indices of the peers watching a certain category
 					Node[] peers = new Node[1000];
+
+					Gcp2pProtocol prot = (Gcp2pProtocol)aem.sender.getProtocol(pid);
+					if(prot.binID == binID){
+						clientList[numClients] = aem.sender;
+						for(int i = 0; i < maxClients; i++)
+							if(binIndexPerCategory[prot.binID][prot.categoryID][i] == -1){
+								binIndexPerCategory[prot.binID][prot.categoryID][i] = numClients;
+							}
+						numClients++;
+						
+					}
 					int i = 0;
 					int j = 0;
 					while(temp[i] >= 0){							// get the nodes watching the video requested
@@ -465,6 +477,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				clientList = aem.nodeList;
 				clientWatching = aem.peerWatching;
 				indexPerCategory = aem.index;
+				numClients = aem.data;
 				//magsend ulit ng GET_SUPERPEER
 			}
 			else if (aem.msgType == ArrivedMessage.FIRED){									// the peer is not a SP anymore
@@ -563,6 +576,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		int size = binSize[bin];
 		binList[bin][size] = n;
 		binSize[bin]++;
+		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
+		for(int i = 0; i < maxClients; i++)
+			if(binIndexPerCategory[bin][prot.categoryID][i] == -1){
+				binIndexPerCategory[bin][prot.categoryID][i] = size;
+			}
 	}
 	
 	/**
