@@ -98,4 +98,13 @@ public class ArrivedMessage {
 		this.peerWatching = peerWatching;
 		this.index = index;
 	}
+	public ArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int[] peerWatching, int[][] index, int data) //YOUR_CLIENTS
+	{
+		this.msgType    = typeOfMsg;
+		this.sender       = sender;
+		this.nodeList = nodeList;
+		this.peerWatching = peerWatching;
+		this.index = index;
+		this.data = data;
+	}
 }
