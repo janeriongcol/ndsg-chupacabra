@@ -53,7 +53,8 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
 		
 		prot.setNodeTag(2); // initialize the node to be Regular
-		prot.setConnectedCDN(CommonState.r.nextInt(3)); //random pick a CDN group to belong to range(0-2)
+		
+		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1); //random pick a CDN group to belong to range[1-3]
 		
 		Node cdn = prot.getConnectedCDN();
 		Gcp2pProtocol prot2;
