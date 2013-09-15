@@ -104,6 +104,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		setInitSuperPeers(prot);
 		setInitRegularConnection(prot);
 
+		
 		return false; 
 	}
 	
@@ -149,7 +150,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot.binWatchList = new int[maxBins][maxClients];
 		prot.bestRTT = new int[maxBins];
 		prot.superPeerList = new Node[maxClients]; //tama ba?
-		
+		prot.binIndexPerCategory = new int[6][category][maxClients];
 	}
 	
 	
@@ -201,7 +202,9 @@ public class Gcp2pNetworkInitializer implements Control {
 			//Tag the node as SuperPeer
 			prot2 = (Gcp2pProtocol) tempSuperpeer.getProtocol(pid);
 			prot2.setNodeTag(Gcp2pProtocol.SuperPeerTag);
-			
+			prot2.clientList = prot.binList[binID];
+			prot2.indexPerCategory = prot.binIndexPerCategory[binID];
+			prot2.clientWatching = prot.binWatchList[binID];
 		}//endfor
 	}
 	

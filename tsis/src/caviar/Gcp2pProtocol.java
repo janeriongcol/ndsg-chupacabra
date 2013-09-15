@@ -153,7 +153,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
 	
 	public void nextCycle( Node node, int pid ){
-		System.out.println("next");
+		//System.out.println("next");
 		if(startedStreaming){
 			for(int i = 0; i < numPeers; i++){
 				((Transport)node.getProtocol(tid)).
@@ -173,9 +173,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	
 	public void processEvent( Node node, int pid, Object event ) {
 		ArrivedMessage aem = (ArrivedMessage)event;
-		System.out.println("ye");
+		//System.out.println("ye");
 		//CDN messages
-		
+		System.out.println(aem.sender.getIndex());
 		if (nodeTag == 0){
 			/**
 			*	message received requesting superpeer

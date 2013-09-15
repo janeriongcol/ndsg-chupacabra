@@ -58,7 +58,6 @@ public class DynamicPop implements Control{
 					n = maxsize-joinedPeerSize;
 				add(n);
 				joinedPeerSize+=n;
-				return true;
 			}
 			
 			return false;
