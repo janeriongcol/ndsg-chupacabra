@@ -148,6 +148,8 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot.clientRTT = new int[maxClients];
 		prot.binList = new Node[maxBins][maxClients];
 		prot.binSize = new int[maxBins];
+		for(int i =0;i<6;i++)
+			prot.binSize[i] = 0;
 		prot.binWatchList = new int[maxBins][maxClients];
 		prot.bestRTT = new int[maxBins];
 		prot.superPeerList = new Node[maxClients]; //tama ba?
@@ -211,8 +213,8 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot2.clientList = prot.binList[binID];
 			prot2.indexPerCategory = prot.binIndexPerCategory[binID];
 			prot2.clientWatching = prot.binWatchList[binID];
-			if(prot2.indexPerCategory[0] != null)
-			System.out.println("Given " + best.getIndex());
+			prot2.numClients = prot.binSize[binID];
+			System.out.println("Given " + best.getIndex()+ "  "+prot2.indexPerCategory[binID][0]+"   "+prot2.numClients);
 			
 		}//endfor
 	}

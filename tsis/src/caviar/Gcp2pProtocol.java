@@ -103,7 +103,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int streamedVideoSize;	// size already streamed
 	int categoryID;			// category of the video it is streaming
 	int maxBinSize;			// max number of peers inside a bin (same as maxClients) 
-	int numClients = 0;			// number of clients
+	int numClients;			// number of clients
 	int[] videoList;			// list of videos
 	int[] clientRTT;		// RTT of clients
 	int[] bestRTT;			// least RTT
@@ -281,11 +281,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		}
 		else if (nodeTag == 1){
 				if (aem.msgType == ArrivedMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
-					System.out.println(aem.data0 +"   "+ node.getIndex() + "   "+aem.sender.getIndex());
+					Gcp2pProtocol prot = (Gcp2pProtocol)aem.sender.getProtocol(pid);
+					Gcp2pProtocol prot2 = (Gcp2pProtocol)node.getProtocol(pid);
+					System.out.println(aem.data0 +"   "+ node.getIndex() + "   "+aem.sender.getIndex()+"   "+numClients);
 					int temp[] = indexPerCategory[aem.data0];		// get the list of indices of the peers watching a certain category
 					Node[] peers = new Node[1000];
-
-					Gcp2pProtocol prot = (Gcp2pProtocol)aem.sender.getProtocol(pid);
 					if(prot.binID == binID){
 						clientList[numClients] = aem.sender;
 						for(int i = 0; i < maxClients; i++)
@@ -581,6 +581,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			if(binIndexPerCategory[bin][prot.categoryID][i] == -1){
 				binIndexPerCategory[bin][prot.categoryID][i] = size;
 			}
+		//System.out.println(prot.CID+":"+bin+":"+binSize[bin]);
 	}
 	
 	/**
