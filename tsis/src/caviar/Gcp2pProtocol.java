@@ -283,7 +283,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				if (aem.msgType == ArrivedMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
 					Gcp2pProtocol prot = (Gcp2pProtocol)aem.sender.getProtocol(pid);
 					Gcp2pProtocol prot2 = (Gcp2pProtocol)node.getProtocol(pid);
-					System.out.println(aem.data0 +"   "+ node.getIndex() + "   "+aem.sender.getIndex()+"   "+numClients);
+					System.out.println("REQUEST: Category = "+aem.data0 +": SuperPeer Index = "+ node.getIndex() + ": Sender Index = "+aem.sender.getIndex()+": SP numClients = "+numClients);
 					int temp[] = indexPerCategory[aem.data0];		// get the list of indices of the peers watching a certain category
 					Node[] peers = new Node[1000];
 					if(prot.binID == binID){
@@ -794,4 +794,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		elapsedTime = startTime - System.currentTimeMillis();
 	}
 
+	public void setClientList(Node[] clientList){
+		this.clientList = clientList;
+	}
+	public void setIndexPerCategory(int[][] indexPerCategory){
+		this.indexPerCategory = indexPerCategory;
+	}
+	public void setClientWatching(int[] clientWatching){
+		this.clientWatching = clientWatching;
+		
+	}
 }

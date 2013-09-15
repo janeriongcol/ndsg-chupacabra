@@ -210,11 +210,14 @@ public class Gcp2pNetworkInitializer implements Control {
 			//Tag the node as SuperPeer
 			prot2 = (Gcp2pProtocol) tempSuperpeer.getProtocol(pid);
 			prot2.setNodeTag(Gcp2pProtocol.SuperPeerTag);
-			prot2.clientList = prot.binList[binID];
-			prot2.indexPerCategory = prot.binIndexPerCategory[binID];
-			prot2.clientWatching = prot.binWatchList[binID];
+			//prot2.clientList = prot.binList[binID];
+			prot2.setClientList(prot.binList[binID]);
+			//prot2.indexPerCategory = prot.binIndexPerCategory[binID];
+			prot2.setIndexPerCategory(prot.binIndexPerCategory[binID]);
+			//prot2.clientWatching = prot.binWatchList[binID];
+			prot2.setClientWatching(prot.binWatchList[binID]);
 			prot2.numClients = prot.binSize[binID];
-			System.out.println("Given " + best.getIndex()+ "  "+prot2.indexPerCategory[binID][0]+"   "+prot2.numClients);
+			System.out.println("SuperPeer Index:" + best.getIndex()+ ": indexPerCategory[0][0] = "+prot2.indexPerCategory[0][0]+":SuperPeer numClients = "+prot2.numClients);
 			
 		}//endfor
 	}
