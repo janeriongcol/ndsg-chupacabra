@@ -114,6 +114,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int highestStreamingSameVid;
 	long startTime;			// Time the node was initialized
 	long elapsedTime;		// Time it took from initialization until completion of stream
+	int numCandidates;
+	int candidateReplies = 0;
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
 	Node[] superPeerList;	// list of SuperPeers
@@ -153,7 +155,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	//cycle chuchu, ewan ko kung gagawin natin, feeling ko hindi
 	
 	public void nextCycle( Node node, int pid ){
-		System.out.println(node.getIndex()+" numPeers " + numPeers +": Network.size = "+Network.size());
+		//System.out.println(node.getIndex()+" numPeers " + numPeers +": Network.size = "+Network.size());
 		if(startedStreaming){
 			
 			for(int i = 0; i < numPeers; i++){
@@ -163,6 +165,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 									peerList[i],
 									new ArrivedMessage(ArrivedMessage.UPLOAD, node, peerSpdAlloted[i]),
 									pid);
+				if(CID == 0)
+					System.out.println("nagbigay si cdn");
 				
 			}
 		}
@@ -294,9 +298,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					if(prot.binID == binID){
 						clientList[numClients] = aem.sender;
 						clientWatching[numClients] = aem.data;
-						for(int i = 0; i < maxClients; i++)
-							if(indexPerCategory[prot.categoryID][i] == -1){
-								indexPerCategory[prot.categoryID][i] = numClients;
+						for(int itr = 0; itr < maxClients; itr++)
+							if(indexPerCategory[prot.categoryID][itr] == -1){
+								indexPerCategory[prot.categoryID][itr] = numClients;
 								numClients++;
 								break;
 							}
@@ -305,7 +309,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					}
 					int i = 0;
 					int j = 0;
-					while(i<maxClients && temp[i] >= 0 ){							// get the nodes watching the video requested
+					while(i<numClients-1 && temp[i] >= 0 ){							// get the nodes watching the video requested
 						//System.out.println(temp[i]);
 						if(clientWatching[temp[i]] == aem.data){
 							peers[j] = clientList[temp[i]];
@@ -389,6 +393,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 									new ArrivedMessage(ArrivedMessage.REQUEST_PEERS_FROM_OTHER_BINS, node, categoryID, videoID),
 									pid);
 						}
+						//System.out.println("Nangyari ba?");
 					}
 					else {									// the list is not empty
 						if(SPreply == 0){					// if SPreply = 0 then the peers is from it's bin
@@ -407,6 +412,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								candidatePeers = aem.nodeList;
 								highestStreamingSameVid = aem.data;
 							}
+							
 						}
 					}
 					SPreply++;
@@ -427,17 +433,18 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 												new ArrivedMessage(ArrivedMessage.CONNECT, node, downloadSpd - usedDownloadSpd),
 												pid);
 						}
+						
 					}
 			
 			}
 			else if (aem.msgType == ArrivedMessage.UPLOAD_SPEED_THAT_CAN_BE_GIVEN){	// reply to the CONNECT request. aem.data is the maximum upload spd that can be given
 					int spdAvail = downloadSpd - usedDownloadSpd;
-					int tobeAccepted;
+					int tobeAccepted = 0;
 					if (spdAvail > 0){									// check if the available download spd is not yet maxed
 						if(spdAvail >= aem.data)						// if the available download speed is equal or greater than the proposed upload spd, get it all
 							tobeAccepted = aem.data;
 						else tobeAccepted = spdAvail;					// if not, get only the available download spd
-						usedDownloadSpd = usedDownloadSpd + aem.data;
+						usedDownloadSpd = usedDownloadSpd + tobeAccepted;
 						((Transport)node.getProtocol(tid)).
 									send(
 										node,
@@ -458,16 +465,19 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 										pid);
 					}
 					
+					
 			}
 			else if (aem.msgType == ArrivedMessage.ACCEPT_SPEED){						// reply to the proposed upload spd. aem.date0 is the proposed upload spd. aem.data is the acceoted sod
 				peerList[numPeers] = aem.sender;
 				peerSpdAlloted[numPeers] = aem.data;
 				numPeers++;
-				System.out.println(node.getIndex() +" Updated numPeers " +numPeers);
+				//System.out.println(node.getIndex() +" Updated numPeers " +numPeers);
 				uploadSpdBuffer = uploadSpdBuffer - aem.data0;
 				usedUploadSpd = usedUploadSpd + aem.data;
 				startedStreaming = true;
 				//System.out.println("naging true?");
+				if(CID == 0)
+					System.out.println("CDN CONNECTED");
 			}
 			else if (aem.msgType == ArrivedMessage.REJECT_SPEED){						// if the upload spd is rejected, remove the reserved uploadSpd in the uploadSpdBuffer
 				uploadSpdBuffer = uploadSpdBuffer - aem.data;
@@ -492,6 +502,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 										pid);
 				}
 				startedStreaming = true;
+				
 			}
 			else if (aem.msgType == ArrivedMessage.REJECT){
 					//hindi ko pa alam ano mangyayari
@@ -504,6 +515,13 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				numClients = aem.data;
 				otherSP = new Node[5];
 				//magsend ulit ng GET_SUPERPEER
+				Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
+				((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+									send(
+										node,
+										prot.connectedCDN,
+										new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, node, binID),
+										pid);
 			}
 			else if (aem.msgType == ArrivedMessage.YOUR_SUPERPEER){						// not gonna happen
 				if(aem.superPeer!=null){
@@ -524,6 +542,16 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				}
 			}
 			
+			else if (aem.msgType == ArrivedMessage.GOODBYE){
+				for(int i = 0; i < maxClients; i++){
+					if(peerList[i] == aem.sender){
+						usedUploadSpd = usedUploadSpd -peerSpdAlloted[i];
+						break;
+					}
+					
+				}
+				
+			}
 		
 
 

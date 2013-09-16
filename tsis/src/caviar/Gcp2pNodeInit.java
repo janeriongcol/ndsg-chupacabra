@@ -81,6 +81,7 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.usedDownloadSpd = 0; // initialize to zero since it is not yet streaming
 		prot.videoID = CommonState.r.nextInt(category*20); // get a random video ID, each category has 20 videos each. Range [0, 19]
 		prot.categoryID = prot.videoID/20;
+		prot.videoSize = CommonState.r.nextInt(10000)+10000;
 		prot.computeBin();
 		prot.numPeers = 0;
 		prot.numSource = 0;
