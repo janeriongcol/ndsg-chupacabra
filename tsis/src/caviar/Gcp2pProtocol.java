@@ -166,6 +166,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				
 			}
 		}
+		setTimeElapsed();
 		
 		
 	}
