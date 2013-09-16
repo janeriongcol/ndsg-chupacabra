@@ -79,6 +79,7 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.downloadSpd = CommonState.r.nextInt(1001) + 1000; //Random download speed from 1000-2000Kbps
 		prot.usedUploadSpd = 0; // initialize to zero since it is not yet seeding
 		prot.usedDownloadSpd = 0; // initialize to zero since it is not yet streaming
+		prot.uploadSpdBuffer = 0;
 		prot.videoID = CommonState.r.nextInt(category*20); // get a random video ID, each category has 20 videos each. Range [0, 19]
 		prot.categoryID = prot.videoID/20;
 		prot.computeBin();
@@ -87,6 +88,7 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.sourcePeerList = new Node[prot.maxClients];
 		prot.peerList = new Node[prot.maxClients];
 		prot.peerSpdAlloted = new int [prot.maxClients];
+		prot.videoSize = CommonState.r.nextInt(100000) + 100000;
 		prot2.addToBin(prot.binID, n);
 		//prot.start(n);
 		//EDSimulator.add(1, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);
