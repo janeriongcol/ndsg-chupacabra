@@ -82,6 +82,11 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.videoID = CommonState.r.nextInt(category*20); // get a random video ID, each category has 20 videos each. Range [0, 19]
 		prot.categoryID = prot.videoID/20;
 		prot.computeBin();
+		prot.numPeers = 0;
+		prot.numSource = 0;
+		prot.sourcePeerList = new Node[prot.maxClients];
+		prot.peerList = new Node[prot.maxClients];
+		prot.peerSpdAlloted = new int [prot.maxClients];
 		prot2.addToBin(prot.binID, n);
 		//prot.start(n);
 		//EDSimulator.add(1, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);

@@ -173,7 +173,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	
 	public void processEvent( Node node, int pid, Object event ) {
 		ArrivedMessage aem = (ArrivedMessage)event;
-		//System.out.println("ye");
+		//System.out.println(aem.msgType);
 		//CDN messages
 		//System.out.println(aem.sender.getIndex());
 		if (nodeTag == 0){
@@ -245,7 +245,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				*	A peer asks for the list of clients in a certain bin
 				*	a peer will only request this when the YOUR_SUPERPEER message is null
 				*/
-				
+				System.out.println("NEW SP: "+ aem.data);
 				Node[] temp = binList[aem.data];
 				int[][] tempIndex = binIndexPerCategory[aem.data];
 				int [] tempWatching = binWatchList[aem.data];
@@ -265,10 +265,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 									pid);
 				
 				for(int i = 0; i<5; i++){
+					if(superPeerList[i] != null)
 					((Transport)node.getProtocol(tid)).
 									send(
 										node,
-										superPeerList[aem.data],
+										superPeerList[i],
 										new ArrivedMessage(ArrivedMessage.UPDATE_SP, node, superPeerList[aem.data], aem.sender),
 										pid);
 				}
@@ -289,19 +290,24 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					if(prot.binID == binID){
 						clientList[numClients] = aem.sender;
 						for(int i = 0; i < maxClients; i++)
-							if(binIndexPerCategory[prot.binID][prot.categoryID][i] == -1){
-								binIndexPerCategory[prot.binID][prot.categoryID][i] = numClients;
+							if(indexPerCategory[prot.categoryID][i] == -1){
+								indexPerCategory[prot.categoryID][i] = numClients;
+								numClients++;
+								break;
 							}
-						numClients++;
+						
 						
 					}
 					int i = 0;
 					int j = 0;
-					while(temp[i] >= 0){							// get the nodes watching the video requested
+					while(i<1000&&temp[i] >= 0 ){							// get the nodes watching the video requested
+						//System.out.println(temp[i]);
 						if(clientWatching[temp[i]] == aem.data){
 							peers[j] = clientList[temp[i]];
 							j++;
 						}
+						i++;
+						//System.out.println("Why?");
 					}
 					((Transport)node.getProtocol(tid)).
 							send(
@@ -309,6 +315,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								aem.sender,
 								new ArrivedMessage(ArrivedMessage.YOUR_PEERS, node, peers, j),
 								pid);
+					
 					
 				}
 				
@@ -333,19 +340,23 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				}
 				else if (aem.msgType == ArrivedMessage.UPDATE_SP){
 					for(int i = 0; i<5; i++){
-						if(otherSP[i].equals(aem.node1)){
+						Node temp = aem.node1;
+						if(otherSP[i]==(temp)){
 							otherSP[i] = aem.node2;
+							System.out.println("UPDATED: "+ node.getIndex());
 							break;
 						}
 					}
 					
 				}
+				
 
 		}
 		
 		// Node is a Regular Peer
 		else {
 			if(aem.msgType == ArrivedMessage.UPLOAD){					// a chunk is delivered. aem.data is the chunk
+				System.out.println("UPLOADED TO "+node.getIndex());
 				streamedVideoSize = streamedVideoSize + aem.data;
 				if(streamedVideoSize>= videoSize){		// check if done streaming. if yes, send GOODBYE messages
 					for(int i = 0; i< numSource; i++){
@@ -380,6 +391,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 												aem.nodeList[i],
 												new ArrivedMessage(ArrivedMessage.CONNECT, node, downloadSpd - usedDownloadSpd),
 												pid);
+								i++;
 							}
 						}
 						else {								// if the peers is not from it's bin. check if the number of peers is higher than the current candidate
@@ -424,6 +436,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 										aem.sender,
 										new ArrivedMessage(ArrivedMessage.ACCEPT_SPEED, node, aem.data, tobeAccepted),
 										pid);
+						//System.out.println(numSource);
 						sourcePeerList[numSource] = aem.sender;
 						numSource++;
 						startedStreaming = true;
@@ -478,6 +491,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				clientWatching = aem.peerWatching;
 				indexPerCategory = aem.index;
 				numClients = aem.data;
+				otherSP = new Node[5];
 				//magsend ulit ng GET_SUPERPEER
 			}
 			else if (aem.msgType == ArrivedMessage.FIRED){									// the peer is not a SP anymore
@@ -516,9 +530,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, node, binID),
 								pid);
 		//System.out.println(node.getIndex());
-		if(prot.connectedCDN .isUp())
+		if(prot.connectedCDN == null)
 			System.out.println("up  " + node.getIndex());
-
+		if(sourcePeerList == null)
+			sourcePeerList = new Node[prot.maxClients];
+		if(peerList == null)
+			peerList = new Node[prot.maxClients];
+		if( peerSpdAlloted == null)
+			peerSpdAlloted = new int [prot.maxClients];
 	}
 	
 	/**
@@ -580,6 +599,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		for(int i = 0; i < maxClients; i++)
 			if(binIndexPerCategory[bin][prot.categoryID][i] == -1){
 				binIndexPerCategory[bin][prot.categoryID][i] = size;
+				break;
 			}
 		//System.out.println(prot.CID+":"+bin+":"+binSize[bin]);
 	}
@@ -795,13 +815,24 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	}
 
 	public void setClientList(Node[] clientList){
-		this.clientList = clientList;
+		this.clientList = new Node[clientList.length];
+		for(int i = 0; i<clientList.length;i++)
+			this.clientList[i] = clientList[i];
+		//this.clientList = clientList;
 	}
 	public void setIndexPerCategory(int[][] indexPerCategory){
-		this.indexPerCategory = indexPerCategory;
+		//this.indexPerCategory = indexPerCategory;
+		this.indexPerCategory = new int[6][indexPerCategory[0].length];
+		for(int i = 0; i < 6; i++)
+			for(int j = 0; j < indexPerCategory[i].length; j++)
+				this.indexPerCategory[i][j] = indexPerCategory[i][j];
+		//System.arraycopy(indexPerCategory[i], 0, this.indexPerCategory[i], 0, indexPerCategory[0].length);
+
 	}
 	public void setClientWatching(int[] clientWatching){
-		this.clientWatching = clientWatching;
-		
+		//this.clientWatching = clientWatching;
+		this.clientWatching = new int[clientWatching.length];
+		for(int i = 0; i<clientWatching.length;i++)
+			this.clientWatching[i] = clientWatching[i];
 	}
 }

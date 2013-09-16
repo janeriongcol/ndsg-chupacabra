@@ -94,16 +94,16 @@ public class Gcp2pNetworkInitializer implements Control {
 		 */
 				
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
-		setInitSuperPeers(prot);
-		setInitRegularConnection(prot);
+		//setInitSuperPeers(prot);
+		//setInitRegularConnection(prot);
 		
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN2.getProtocol(pid);
-		setInitSuperPeers(prot);
-		setInitRegularConnection(prot);
+		//setInitSuperPeers(prot);
+		//setInitRegularConnection(prot);
 		
 		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN3.getProtocol(pid);
-		setInitSuperPeers(prot);
-		setInitRegularConnection(prot);
+		//setInitSuperPeers(prot);
+		//setInitRegularConnection(prot);
 
 		
 		return false; 
@@ -212,6 +212,7 @@ public class Gcp2pNetworkInitializer implements Control {
 			prot2.setNodeTag(Gcp2pProtocol.SuperPeerTag);
 			//prot2.clientList = prot.binList[binID];
 			prot2.setClientList(prot.binList[binID]);
+			//System.arraycopy(prot.binList[binID], 0, prot2.clientList, 0, prot.binList[binID].length);
 			//prot2.indexPerCategory = prot.binIndexPerCategory[binID];
 			prot2.setIndexPerCategory(prot.binIndexPerCategory[binID]);
 			//prot2.clientWatching = prot.binWatchList[binID];

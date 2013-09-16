@@ -1,7 +1,7 @@
 #config file for gcp2p
 
 #set initial network size to 100 nodes with the first 3 nodes as CDN servers
-network.size 100
+network.size 3
 
 network.node peersim.core.GeneralNode
 
@@ -25,7 +25,7 @@ protocol.gcp2p caviar.Gcp2pProtocol
 
 init.sch CDScheduler
 init.sch.protocol gcp2p
-init.sch.randstart
+#init.sch.randstart
 
 protocol.gcp2p.maxclients MAXSIZE
 protocol.gcp2p.category CATEGORY
