@@ -5,9 +5,10 @@ import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
+import peersim.core.Control;
 import peersim.dynamics.NodeInitializer;
 
-public class TraditionalDynamicPop {
+public class TraditionalDynamicPop implements Control{
 	private static final String PAR_PROTOCOL = "protocol";
 	private static final String PAR_MAXSIZE = "maxsize";
 	private static final String PAR_INIT = "init";

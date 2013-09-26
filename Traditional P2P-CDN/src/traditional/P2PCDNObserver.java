@@ -1,11 +1,12 @@
 package traditional;
 
 import peersim.config.Configuration;
+import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
 import traditional.TraditionalProtocol;
 
-public class P2PCDNObserver {
+public class P2PCDNObserver implements Control{
 
 	/**
 	 * String name of the parameter, assigned to pid
