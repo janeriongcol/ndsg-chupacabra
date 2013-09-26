@@ -1,0 +1,20 @@
+#config file for traditional p2p-cdn network
+
+#set initial network size to 100 nodes with the first 3 nodes as CDN servers
+network.size 3
+
+network.node peersim.core.GeneralNode
+
+MAXSIZE 10000
+
+random.seed 1234567890
+
+#parameters for event-driven protocol type
+simulation.endtime 100000
+simulation.logtime 1000
+simulation.experiments 1
+simulation.step 1000
+
+protocol.urt UniformRandomTransport
+protocol.urt.mindelay 0
+protocol.urt.maxdelay 0

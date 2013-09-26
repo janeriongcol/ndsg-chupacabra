@@ -3,7 +3,6 @@ package caviar;
 import peersim.core.*;
 import peersim.config.Configuration;
 import peersim.dynamics.*;
-import peersim.edsim.EDSimulator;
 
 public class Gcp2pNodeInit implements NodeInitializer{
 	
@@ -53,7 +52,7 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		if (Network.size() == 0) return; // never happens since the Network starts with CDNs as initial nodes
 		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
 		
-		prot.setNodeTag(2); // initialize the node to be Regular
+		prot.setNodeTag(Gcp2pProtocol.RegularTag); // initialize the node to be Regular
 		
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1); //random pick a CDN group to belong to range[1-3]
 		

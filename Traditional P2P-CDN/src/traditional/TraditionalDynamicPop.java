@@ -1,32 +1,24 @@
-package caviar;
+package traditional;
 
-import peersim.config.*;
-import peersim.core.*;
-import peersim.dynamics.*;
-import peersim.edsim.EDSimulator;
+import traditional.TraditionalProtocol;
+import peersim.config.Configuration;
+import peersim.core.CommonState;
+import peersim.core.Network;
+import peersim.core.Node;
+import peersim.dynamics.NodeInitializer;
 
-/*
-* @author Fatima De Villa, Janeri Ongcol, Bryan Tan
-* @version 1.0
-*/
-public class DynamicPop implements Control{
-	// ------------------------------------------------------------------------
-	// Parameters
-	// ------------------------------------------------------------------------		
+public class TraditionalDynamicPop {
 	private static final String PAR_PROTOCOL = "protocol";
 	private static final String PAR_MAXSIZE = "maxsize";
 	private static final String PAR_INIT = "init";
-	// ------------------------------------------------------------------------
-	// Fields
-	// ------------------------------------------------------------------------			
+	
+	
 	private int pid;
 	private int maxsize;
 	protected final NodeInitializer[] inits;
 	protected int joinedPeerSize = 100;
-	// ------------------------------------------------------------------------
-	// Constructor
-	// ------------------------------------------------------------------------	
-	public DynamicPop(String prefix){
+	
+	public TraditionalDynamicPop(String prefix){
 		pid = Configuration.getPid(prefix + "." + PAR_PROTOCOL);
 		maxsize = Configuration.getInt(prefix + "." + PAR_MAXSIZE);
 		Object[] tmp = Configuration.getInstanceArray(prefix + "." + PAR_INIT);
@@ -58,11 +50,11 @@ public class DynamicPop implements Control{
 			}
 			Network.add(newnode);
 			//System.out.println(newnode.getIndex());
-			Gcp2pProtocol prot = (Gcp2pProtocol) newnode.getProtocol(pid);
-			prot.start(newnode);
+			TraditionalProtocol prot = (TraditionalProtocol) newnode.getProtocol(pid);
+			//TODO prot.start(newnode); HELP
+			
 			//EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, newnode, prot.binID), prot.connectedCDN, pid);
 		}
 	}
-
-
+	
 }

@@ -1,4 +1,4 @@
-package caviar;
+package traditional;
 
 import peersim.core.*;
 
@@ -9,11 +9,11 @@ import peersim.core.*;
  * @version 1.0
  */
 
-public interface Overlay
-{
+public interface TraditionalOverlay {
+
 
 	/**
-	 * 0 = CDN; 1 = SuperPeer; 2 = Regular Peer
+	 * 0 = CDN; 1 = SupplyingPeer; 2 = Regular Peer
 	 */
 	public void setNodeTag (int tag);
 	
@@ -51,33 +51,9 @@ public interface Overlay
 	public Node getCDN (int cdnID);
 	
 	/**
-	 * Set bin ID (computed based on RTT from landmarks in the CDN group)
-	 */
-	public void setBinID (int binID);
-	
-	
-	/**
-	 * Get bin ID
-	 */
-	public int getbinID();
-	
-	
-	/**
-	*	set the number of bins (HINDI BA FIXED?) O:
-	*/
-	public void setSuperPeerSize(int size);
-	
-	
-	/**
-	*	set the superpeer of a bin, known by the CDN
-	*/
-	public void setSuperPeer (Node peer, int binID);
-	
-	
-	/**
 	 * applicable to Regular Peers
 	 */
-	public Node getSuperpeer (int binID);
+	public Node getSupplyingPeer (int connectedCDN);
 	
 	
 	/**
@@ -87,10 +63,11 @@ public interface Overlay
 	
 	
 	/**
-	 * Applicable to SuperPeers and CDN Servers
+	 * Applicable to CDN Servers
 	 */
 	public Node [] getClientList ();
 		
+	
 	/**
 	 * CDN = 100 Mbps
 	 * SupplyingPeer/Regular = 125 kbps
@@ -159,4 +136,5 @@ public interface Overlay
 	 * Get video list
 	 */
 	public int[] getVideoList(); //dunno how
+
 }
