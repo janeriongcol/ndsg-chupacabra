@@ -116,6 +116,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	long elapsedTime;		// Time it took from initialization until completion of stream
 	int numCandidates;
 	int candidateReplies = 0;
+	int uploaded = 0;
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
 	Node[] superPeerList;	// list of SuperPeers
@@ -165,6 +166,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 									peerList[i],
 									new ArrivedMessage(ArrivedMessage.UPLOAD, node, peerSpdAlloted[i]),
 									pid);
+				uploaded += peerSpdAlloted[i];
 				if(CID == 0)
 					System.out.println("nagbigay si cdn");
 				
@@ -295,18 +297,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					//System.out.println("REQUEST: Category = "+aem.data0 +": SuperPeer Index = "+ node.getIndex() + ": Sender Index = "+aem.sender.getIndex()+": SP numClients = "+numClients);
 					int temp[] = indexPerCategory[aem.data0];		// get the list of indices of the peers watching a certain category
 					Node[] peers = new Node[maxClients];
-					if(prot.binID == binID){
-						clientList[numClients] = aem.sender;
-						clientWatching[numClients] = aem.data;
-						for(int itr = 0; itr < maxClients; itr++)
-							if(indexPerCategory[prot.categoryID][itr] == -1){
-								indexPerCategory[prot.categoryID][itr] = numClients;
-								numClients++;
-								break;
-							}
-						
-						
-					}
+					
 					int i = 0;
 					int j = 0;
 					while(i<numClients-1 && temp[i] >= 0 ){							// get the nodes watching the video requested
@@ -325,7 +316,18 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								aem.sender,
 								new ArrivedMessage(ArrivedMessage.YOUR_PEERS, node, peers, j),
 								pid);
-					
+					if(prot.binID == binID){
+						clientList[numClients] = aem.sender;
+						clientWatching[numClients] = aem.data;
+						for(int itr = 0; itr < maxClients; itr++)
+							if(indexPerCategory[prot.categoryID][itr] == -1){
+								indexPerCategory[prot.categoryID][itr] = numClients;
+								numClients++;
+								break;
+							}
+						
+						
+					}
 					
 				}
 				
@@ -502,6 +504,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 										pid);
 				}
 				startedStreaming = true;
+				//if(nodeTag == 0)
+					//System.out.println("connect");
 				
 			}
 			else if (aem.msgType == ArrivedMessage.REJECT){
