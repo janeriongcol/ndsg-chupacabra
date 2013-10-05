@@ -37,40 +37,51 @@ public class OrangeObserver implements Control {
 		double networkTotalUsedUPSpeed = 0;
 		double networkTotalElapsedTime = 0;
 		int totalnodes = Network.size() - 3;
-		
+		int activeLeechers = 0;
+		int activeSources = 0;
 		long time = CommonState.getTime();
 		
 		for(int i=3; i < Network.size(); i++) {
 			Node n = Network.get(i);
 			Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
-						
-			//System.out.println("--------------"+n.getIndex()+"--------------------");
-			
-			//System.out.println("Used DL Spd: " + prot.getUsedDownloadSpd());
-			networkTotalUsedDlSpeed += prot.getUsedDownloadSpd();
-			
-			//System.out.println("DL Spd: " + prot.getDownloadSpd());
-			networkTotalDlSpeed += prot.getDownloadSpd();
-			
-			//System.out.println("Utilization %: " + (double) prot.getUsedDownloadSpd()/prot.getDownloadSpd()*100);			
-			networkTotalUtilization += (double) prot.getUsedDownloadSpd()/prot.getDownloadSpd()*100;
-			
-			//System.out.println("Used UP Spd: " + prot.getUploadSpd());
-			networkTotalUsedUPSpeed += prot.getUploadSpd();
-			
-			//System.out.println("Elapsed Time: " + prot.getTimeElapsed());
-			networkTotalElapsedTime += prot.getTimeElapsed();
-			
-			//System.out.println("----------------------------------------------");
-			
+			if(prot.startedStreaming == true){
+				//System.out.println("--------------"+n.getIndex()+"--------------------");
+				if (prot.usedDownloadSpd < 0)
+					System.out.println("What the fuck?!");
+				//System.out.println("Used DL Spd: " + prot.getUsedDownloadSpd());
+				if(!prot.doneStreaming){
+					networkTotalUsedDlSpeed += prot.getUsedDownloadSpd();
+					
+					//System.out.println("DL Spd: " + prot.getDownloadSpd());
+					networkTotalDlSpeed += prot.getDownloadSpd();
+				
+					//System.out.println("Utilization %: " + (double) prot.getUsedDownloadSpd()/prot.getDownloadSpd()*100);			
+					networkTotalUtilization += (double) prot.getUsedDownloadSpd()/prot.getDownloadSpd()*100;
+					activeLeechers++;
+				}
+				//System.out.println("Used UP Spd: " + prot.getUploadSpd());
+				networkTotalUsedUPSpeed += prot.getUploadSpd();
+				
+				//System.out.println("Elapsed Time: " + prot.getTimeElapsed());
+				networkTotalElapsedTime += prot.getTimeElapsed();
+				activeSources++;
+				//System.out.println("----------------------------------------------");
+			}
 		}
 		
-		double averageUsedDlSpd = networkTotalUsedDlSpeed / totalnodes;
-		double averageDlSpeed = networkTotalDlSpeed/ totalnodes;
-		double averageUtilization = networkTotalUtilization/totalnodes;
-		double averageUploadSpd = networkTotalUsedUPSpeed/ totalnodes;
-		double averageTimeElapsed =networkTotalElapsedTime/ totalnodes;
+			double averageUsedDlSpd = 0;
+			double averageDlSpeed = 0;
+			double averageUtilization = 0;
+			double averageUploadSpd = 0;
+			double averageTimeElapsed = 0;
 		
+		if(activeLeechers!=0){
+			averageUsedDlSpd = networkTotalUsedDlSpeed / activeLeechers;
+			averageDlSpeed = networkTotalDlSpeed/ activeLeechers;
+			averageUtilization = networkTotalUtilization/activeLeechers;
+			averageUploadSpd = networkTotalUsedUPSpeed/ activeSources;
+			averageTimeElapsed =networkTotalElapsedTime/ activeSources;
+		}
 		System.out.println("----------------------------------------------");
 		
 		System.out.println("Average Used Dl Speed: " + averageUsedDlSpd);
@@ -82,6 +93,14 @@ public class OrangeObserver implements Control {
 		System.out.println("Average Used UP Speed: " + averageUploadSpd);
 		
 		System.out.println("AverageTimeElapsed: " + averageTimeElapsed);
+		
+		System.out.println("Active Seeders: " + activeSources);
+		
+		System.out.println("Active Leechers: " + activeLeechers);
+		
+		Gcp2pProtocol prot2 = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
+		
+		//System.out.println("Used Upload Speed CDN1 " + prot2.usedUploadSpd);
 
 		System.out.println("----------------------------------------------");
 		

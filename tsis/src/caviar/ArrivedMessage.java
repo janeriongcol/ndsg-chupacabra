@@ -32,6 +32,11 @@ public class ArrivedMessage {
 	static final int GET_MY_CLIENTS = 22;
 	static final int REJECT = 23;
 	static final int UPDATE_SP = 24;		// To be sent to other SPs when a new peer is upgraded to SP
+	static final int GOODBYE_AS_SP = 25;
+	static final int GOODBYE_AS_SOURCE = 26;
+	static final int GOODBYE_AS_NORMAL = 27;
+	static final int GET_SUPERPEER_2 = 28;
+	
 	
 	final int    msgType;
 	final Node   sender;
