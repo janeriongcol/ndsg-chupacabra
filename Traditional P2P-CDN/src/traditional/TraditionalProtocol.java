@@ -99,6 +99,9 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 	int cdnID;
 	double averageRTT;
 	int maxVideoSpd = 0;
+	boolean firstConnect = false;
+	boolean firstPlayback = false;
+	long firstPlay;
 	
 	Node[] supplyingPeerList;	// list of supplying peer under the CDN
 	Node[] clientList;		// applicable to CDN (both regular and supplying are here)
@@ -469,5 +472,11 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		if( peerSpdAlloted == null)
 			peerSpdAlloted = new int [prot.maxClients];
 		
+	}
+
+	@Override
+	public Node getSupplyingPeer(int connectedCDN) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

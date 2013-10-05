@@ -55,6 +55,10 @@ public interface TraditionalOverlay {
 	 */
 	public Node getSupplyingPeer (int connectedCDN);
 	
+	/*
+	 * applicable to a CDN serving a RP's streaming request
+	 */
+	public Node[] getSupplyingPeers (int video);
 	
 	/**
 	 * Get list of peers 
