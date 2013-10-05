@@ -156,7 +156,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				//A Requesting Peer wants to connect directly to a CDN (i.e. no supplying peers for the video the node needs)
 				//Reply with a confirm connect connection message
 				int spdAvail = maxVideoSpd - videoSpdAlloted[aem.data];
-				if(spdAvail == 0)
+				if(spdAvail <= 0)
 					((Transport)node.getProtocol(tid)).
 					send(
 						node,
@@ -164,8 +164,19 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 						new TraditionalArrivedMessage(TraditionalArrivedMessage.REJECT, node),
 						pid);
 				else {
+					if(aem.data2 < spdAvail)
+						spdAvail = aem.data2;
+					((Transport)node.getProtocol(tid)).
+					send(
+						node,
+						aem.sender,
+						new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT_CONFIRM, node, spdAvail),
+						pid);
 					
-					
+					videoSpdAlloted[aem.data] += spdAvail;
+					peerList[numPeers] = aem.sender;
+					peerSpdAlloted[numPeers] = spdAvail;
+					numPeers++;
 				}
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.CDN_RP_DISCONNECT)
@@ -231,7 +242,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					send(
 						node,
 						connectedCDN,
-						new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT, node, videoID),
+						new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT, node, videoID, downloadSpd - usedDownloadSpd),
 						pid);
 					
 				}
@@ -246,6 +257,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					}
 					// may kulang pa
 				}
+			}
+			else if (aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT_CONFIRM){
+				sourcePeerList[numSource] = aem.sender;
+				numSource++;
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.CONFIRM_CONNECT)
 			{	
