@@ -33,7 +33,7 @@ public class TraditionalDynamicPop implements Control{
 	public final boolean execute(){
 		if(joinedPeerSize<maxsize){
 			int n = CommonState.r.nextInt(200);
-			System.out.println("To be added: "+n);
+			//System.out.println("To be added: "+n);
 			
 			if(n>maxsize-joinedPeerSize)
 				n = maxsize-joinedPeerSize;
@@ -57,7 +57,7 @@ public class TraditionalDynamicPop implements Control{
 			
 			//EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, newnode, prot.binID), prot.connectedCDN, pid);
 		}
-		System.out.println("Add dynamic");
+		//System.out.println("Add dynamic");
 	}
 	
 }

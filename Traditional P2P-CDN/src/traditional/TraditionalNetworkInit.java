@@ -108,6 +108,10 @@ public class TraditionalNetworkInit implements Control{
 		prot.videoSpdAlloted = new int[numVids];
 		for(int i = 0;i < numVids; i ++)
 			prot.videoSpdAlloted[i] = 0;
+		prot.numPeers = 0;
+		prot.peerList = new Node[prot.maxClients];
+		prot.peerSpdAlloted = new int [prot.maxClients];
+		prot.startedStreaming = true;
 	}
 
 	/**

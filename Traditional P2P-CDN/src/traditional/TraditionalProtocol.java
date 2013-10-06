@@ -98,7 +98,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 	int uploaded = 0;
 	int cdnID;
 	double averageRTT;
-	int maxVideoSpd = 0;
+	int maxVideoSpd = 400;
 	boolean firstConnect = false;
 	boolean firstPlayback = false;
 	long firstPlay;
@@ -134,11 +134,14 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 	@Override
 	public void nextCycle(Node node, int pid) {
 		// TODO Auto-generated method stub
-		System.out.println("Nagnext Cycle");
+		//System.out.println("Nagnext Cycle");
 		if(startedStreaming == true && !contractExpired){
+			//System.out.println("Pumasok?");
 			if(nodeTag == SupplyingPeerTag || nodeTag == CDNTag){
+				
 				for (int i = 0; i < numPeers; i++)
 					if(peerList[i] != null){
+						//System.out.println("Pumasok?");
 						((Transport)node.getProtocol(tid)).
 						send(
 							node,
@@ -185,7 +188,6 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		// TODO Auto-generated method stub
 		TraditionalArrivedMessage aem = (TraditionalArrivedMessage)event;
 		TraditionalProtocol temp = (TraditionalProtocol) node.getProtocol(pid);
-		System.out.println("Tag: "+temp.nodeTag + "    | Network Size: "+Network.size());
 		if(nodeTag == CDNTag)//messages received by the CDN
 		{
 			if (aem.msgType == TraditionalArrivedMessage.GIVE_SP_LIST)
@@ -199,12 +201,13 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					aem.sender,
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.RECEIVE_SP_LIST, node, tobeRet),
 					pid);
-				System.out.println("Received: GIVE_SP_LIST");
+				//System.out.println("Received: GIVE_SP_LIST");
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT)
 			{
 				//A Requesting Peer wants to connect directly to a CDN (i.e. no supplying peers for the video the node needs)
 				//Reply with a confirm connect connection message
+				//System.out.println("CDN connect");
 				int spdAvail = maxVideoSpd - videoSpdAlloted[aem.data];
 				if(spdAvail <= 0)
 					((Transport)node.getProtocol(tid)).
@@ -223,7 +226,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 						new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT_CONFIRM, node, spdAvail),
 						pid);
 					
-					
+					//System.out.println("Ok");
 				}
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.CDN_RP_DISCONNECT)
@@ -233,7 +236,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				int allotedSpd = 0;
 				int i;
 				for(i = 0; i < numPeers; i++){
-					if(peerList[i].equals(aem.sender)){
+					if(peerList[i]!=null && peerList[i].equals(aem.sender)){
 						allotedSpd = peerSpdAlloted[i];
 						break;
 					}
@@ -249,6 +252,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				peerList[numPeers] = aem.sender;
 				peerSpdAlloted[numPeers] = aem.data;
 				numPeers++;
+				//System.out.println("Accept");
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_CONNECT)
 			{	
@@ -289,9 +293,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
-					connectedCDN,
+					aem.sender,
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.CONTRACT_SET, node, 4),
 					pid);
+				//System.out.println("CDN: Done Streaming");
 			}
 		}
 		else if(nodeTag == SupplyingPeerTag)//messages received by the SP
@@ -393,9 +398,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 							pid);
 					}
 				}
-				System.out.println("Received: RECEIVE_SP_LIST");
+				//System.out.println("Received: RECEIVE_SP_LIST");
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT_CONFIRM){
+				//System.out.println("Confirmed");
 				sourcePeerList[numSource] = aem.sender;
 				averageRTT = (averageRTT*numSource + cdnRTT)/(numSource+1);
 				numSource++;
@@ -406,7 +412,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
-					aem.node,
+					connectedCDN,
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT_ACCEPT, node, spdAvail, videoID),
 					pid);
 			}
@@ -432,7 +438,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
-					aem.node,
+					aem.sender,
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.CONFIRM_ACCEPT, node, spdAvail, videoID),
 					pid);
 				//paano na malalaman yung mga speed cheverloo?
@@ -443,8 +449,9 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				//Remove from source peers, annyeong
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.UPLOAD){
-				uploaded += aem.data;
-				if (uploaded > videoSize){
+				//System.out.println("Upload");
+				streamedVideoSize += aem.data;
+				if (streamedVideoSize > videoSize){
 					for(int i = 0; i < numSource; i++){
 						if(!sourcePeerList[i].equals(connectedCDN))
 							((Transport)node.getProtocol(tid)).
@@ -553,8 +560,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		}
 		if (i == 0)
 			supplyingPeers = null;
-		if(supplyingPeers == null)
-			System.out.println("No Supplier");
+		//if(supplyingPeers == null)
+			//System.out.println("No Supplier");
 		return supplyingPeers;
 	}
 
