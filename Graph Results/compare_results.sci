@@ -1,7 +1,7 @@
-di = pwd() + "/Documents/CS/CS 198/ndsg-chupacabra"
+di ="C:\Users\LaBryan\Documents\GitHub\ndsg-chupacabra"
 
-trad_fn = "/Traditional P2P-CDN/data_traditional_"
-tsis_fn = "/tsis/data_gcp2p_"
+trad_fn = "\Traditional P2P-CDN\data_traditional_"
+tsis_fn = "\tsis\data_gcp2p_"
 
 fn_arr = ["Utilization.txt", "ConnectionSetUpTime.txt", "PlaybackDelayTime.txt"]
 index = ["1","2","3"]
