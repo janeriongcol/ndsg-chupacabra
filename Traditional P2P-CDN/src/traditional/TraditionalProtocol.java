@@ -151,6 +151,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 							pid);
 						uploaded += peerSpdAlloted[i];
 						if(nodeTag == SupplyingPeerTag && uploaded > contractSize){
+							
 							((Transport)node.getProtocol(tid)).
 							send(
 								node,
@@ -159,11 +160,12 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 								pid);
 							for(int j = 0; j < numPeers; j++){
 								if(peerList[j]!=null){
+									
 									((Transport)node.getProtocol(tid)).
 									send(
 										node,
 										peerList[j],
-										new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT, node, peerSpdAlloted[j]),
+										new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT_FULFILLED, node, peerSpdAlloted[j]),
 										pid);
 								}
 							}
@@ -174,6 +176,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			}
 			if(nodeTag == RegularTag){
 				if(usedDownloadSpd < downloadSpd){
+					
 					((Transport)node.getProtocol(tid)).
 					send(
 						node,
@@ -198,6 +201,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				//In the message: the videoID of the Requesting/Regular Peer
 				//send back results of getSupplyingPeers(int video) - a list of supplying peers with that video
 				Node[] tobeRet = getSupplyingPeers(aem.data);
+				
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
@@ -212,6 +216,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				//Reply with a confirm connect connection message
 				//System.out.println("CDN connect");
 				int spdAvail = maxVideoSpd - videoSpdAlloted[aem.data];
+				
 				if(spdAvail <= 0)
 					((Transport)node.getProtocol(tid)).
 					send(
@@ -268,11 +273,14 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					pid);
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT){
+				//if(aem.node == null) System.out.println("error");
+				Node tobesent = aem.node;
+				//if(tobesent != null) System.out.println("WHY?");
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
 					aem.sender,
-					new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM, node, aem.node),
+					new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM, node, tobesent),
 					pid);
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.CONTRACT_SET)
@@ -346,6 +354,9 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					pid);
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM){
+				//asda
+				if(aem.node == null) System.out.println("error");
+				if(aem.sender.equals(connectedCDN)) System.out.println("yeah");
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
@@ -418,6 +429,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					connectedCDN,
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT_ACCEPT, node, spdAvail, videoID),
 					pid);
+				usedDownloadSpd+= spdAvail;
 				startedStreaming = true;
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CONTRACT_SET){
@@ -433,7 +445,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					tobeAdded = CommonState.r.nextInt(500)+1000;
 				else
 					tobeAdded = CommonState.r.nextInt(1000);
-				averageRTT = (averageRTT*numSource + cdnRTT)/(numSource+1);
+				averageRTT = (averageRTT*numSource + tobeAdded)/(numSource+1);
 				numSource++;
 				int spdAvail = downloadSpd - usedDownloadSpd;
 				
@@ -452,12 +464,16 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.CONFIRM_ACCEPT, node, spdAvail, videoID),
 					pid);
 				//paano na malalaman yung mga speed cheverloo?
+				usedDownloadSpd+=spdAvail;
 				startedStreaming = true;
 			}
-			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT)
+			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM)
 			{	
 				//Remove from source peers, annyeong
 				usedDownloadSpd-= aem.data;
+			}
+			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT_FULFILLED){
+				usedDownloadSpd -= aem.data;
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.UPLOAD){
 				//System.out.println("Upload");
