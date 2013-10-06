@@ -409,7 +409,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			else if (aem.msgType == TraditionalArrivedMessage.CONFIRM_ACCEPT){
 				//sada
 				uploadSpdBuffer -= aem.data;
-				usedUploadSpd = uploadSpd - uploadSpdBuffer;
+				usedUploadSpd += uploadSpdBuffer;
+				uploadSpdBuffer = 0;
 				peerList[numPeers] = aem.sender;
 				peerSpdAlloted[numPeers] = aem.data;
 				numPeers++;
