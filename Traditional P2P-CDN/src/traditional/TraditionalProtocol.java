@@ -234,6 +234,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 						new TraditionalArrivedMessage(TraditionalArrivedMessage.REJECT, node),
 						pid);
 				else {
+					videoSpdAlloted[aem.data] = maxVideoSpd;
 					if(aem.data2 < spdAvail)
 						spdAvail = aem.data2;
 					((Transport)node.getProtocol(tid)).
@@ -265,7 +266,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			else if (aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT_ACCEPT){
 				uploadSpdBuffer -= aem.data;
 				usedUploadSpd -= uploadSpdBuffer;
-				videoSpdAlloted[aem.data2] += aem.data;
+				videoSpdAlloted[aem.data2] += maxVideoSpd - aem.data3;
 				peerList[numPeers] = aem.sender;
 				peerSpdAlloted[numPeers] = aem.data;
 				numPeers++;
@@ -328,15 +329,27 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				//Send a CONFIRM_CONNECT to RP to start connection
 				
 				if(aem.node != null){
-					uploadSpdBuffer += uploadSpd - usedUploadSpd;
-					TraditionalProtocol prot = (TraditionalProtocol) aem.node.getProtocol(pid);
-					if(prot.nodeTag == RegularTag)
-					((Transport)node.getProtocol(tid)).
-					send(
-						node,
-						aem.node,
-						new TraditionalArrivedMessage(TraditionalArrivedMessage.CONFIRM_CONNECT, node, uploadSpdBuffer),
-						pid);
+					if(uploadSpd-usedUploadSpd-uploadSpdBuffer > 0){
+						uploadSpdBuffer += uploadSpd - usedUploadSpd;
+						TraditionalProtocol prot = (TraditionalProtocol) aem.node.getProtocol(pid);
+						if(prot.nodeTag == RegularTag){
+							((Transport)node.getProtocol(tid)).
+							send(
+								node,
+								aem.node,
+								new TraditionalArrivedMessage(TraditionalArrivedMessage.CONFIRM_CONNECT, node, uploadSpdBuffer),
+								pid);
+						}
+					}
+					else {
+						((Transport)node.getProtocol(tid)).
+						send(
+							node,
+							aem.node,
+							new TraditionalArrivedMessage(TraditionalArrivedMessage.REJECT, node, uploadSpdBuffer),
+							pid);
+						
+					}
 				}
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_CONNECT)
@@ -393,7 +406,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CONFIRM_ACCEPT){
 				uploadSpdBuffer -= aem.data;
-				usedUploadSpd -= uploadSpdBuffer;
+				usedUploadSpd = uploadSpd - uploadSpdBuffer;
 				peerList[numPeers] = aem.sender;
 				peerSpdAlloted[numPeers] = aem.data;
 				numPeers++;
@@ -453,7 +466,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				send(
 					node,
 					connectedCDN,
-					new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT_ACCEPT, node, spdAvail, videoID),
+					new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT_ACCEPT, node, spdAvail, videoID, aem.data-spdAvail),
 					pid);
 				usedDownloadSpd+= spdAvail;
 				startedStreaming = true;
@@ -500,6 +513,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT_FULFILLED){
 				usedDownloadSpd -= aem.data;
+				//System.out.println(aem.data);
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.UPLOAD){
 				//System.out.println("Upload");
