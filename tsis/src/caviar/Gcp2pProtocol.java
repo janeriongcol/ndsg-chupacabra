@@ -117,6 +117,9 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int numCandidates;
 	int candidateReplies = 0;
 	int uploaded = 0;
+	boolean firstConnect = false;
+	boolean firstPlayback = false;
+	long firstPlay;
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
 	Node[] superPeerList;	// list of SuperPeers
@@ -223,8 +226,6 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				
 			}
 		}
-		setTimeElapsed();
-		
 		
 	}
 	
@@ -570,6 +571,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					int spdAvail = downloadSpd - usedDownloadSpd;
 					int tobeAccepted = 0;
 					if (spdAvail > 0){									// check if the available download spd is not yet maxed
+						if(!firstConnect) {
+							setTimeElapsed();
+							firstConnect = true;
+						}
+						if(!firstPlayback && streamedVideoSize >= 400) {
+							firstPlay = System.currentTimeMillis() - startTime;
+							firstPlayback = true;
+						}
 						if(spdAvail >= aem.data)						// if the available download speed is equal or greater than the proposed upload spd, get it all
 							tobeAccepted = aem.data;
 						else tobeAccepted = spdAvail;					// if not, get only the available download spd
