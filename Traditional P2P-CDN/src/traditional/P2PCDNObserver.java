@@ -29,6 +29,7 @@ public class P2PCDNObserver implements Control{
 		double networkTotalUtilization = 0;
 		long networkTotalConnect = 0;
 		long totalPlayback = 0;
+		double totalAveRTT = 0;
 		int activeLeechers = 0;
 		int activeSources = 0;
 		int totalPeersPlayback = 0;
@@ -49,6 +50,8 @@ public class P2PCDNObserver implements Control{
 					totalPeersPlayback++;
 				}
 				
+				totalAveRTT += prot.averageRTT;
+				
 				networkTotalConnect += prot.getTimeElapsed();
 				if(prot.nodeTag == 1)
 				activeSources++;
@@ -58,6 +61,7 @@ public class P2PCDNObserver implements Control{
 		double averageUtilization = 0;
 		long averageConnect = 0;
 		long averagePlayback = 0;
+		double averageRTT = 0;
 		
 		if(activeLeechers != 0){
 			averageUtilization = networkTotalUtilization/activeLeechers;
@@ -65,6 +69,7 @@ public class P2PCDNObserver implements Control{
 		
 		if(activeSources != 0){
 			averageConnect = networkTotalConnect/activeSources;
+			averageRTT = totalAveRTT/activeSources;
 		}
 		
 		if(totalPeersPlayback != 0){
@@ -78,6 +83,8 @@ public class P2PCDNObserver implements Control{
 		System.out.println("Average Connection Set-up Time: " + averageConnect);
 		
 		System.out.println("Average Playback Time: " + averagePlayback);
+		
+		System.out.println("Average RTT: " + averageRTT);
 		
 		System.out.println("Active Seeders: " + activeSources);
 		
