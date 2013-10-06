@@ -22,6 +22,7 @@ public class TraditionalNetworkInit implements Control{
 	private static final int minLandmarkRTT = 30;
 	private static final int maxCDNRTT = 15;
 	private static final int minCDNRTT = 0;
+	private static final int numVids = 160;
 	// ------------------------------------------------------------------------
 	// Parameters
 	// ------------------------------------------------------------------------
@@ -78,8 +79,6 @@ public class TraditionalNetworkInit implements Control{
 	 */
 	public void setAsCDN(int cdnID, Node n) {
 		
-		//other CDN properties?????	// TODO Auto-generated method stub
-		
 		/**
 		 * Assign as either CDN1, CDN2 and CDN3 depending on its cdnID
 		 */
@@ -105,9 +104,10 @@ public class TraditionalNetworkInit implements Control{
 		 * initialize lists to be used by a CDN node
 		 */
 		prot.clientList = new Node[maxClients];
-		
-		/*************/
-		prot.supplyingPeerList = new Node[maxClients]; //Kailangan ba ito?
+		prot.supplyingPeerList = new Node[maxClients]; 
+		prot.videoSpdAlloted = new int[numVids];
+		for(int i = 0;i < numVids; i ++)
+			prot.videoSpdAlloted[i] = 0;
 	}
 
 	/**

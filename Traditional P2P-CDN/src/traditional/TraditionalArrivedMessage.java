@@ -16,6 +16,12 @@ public class TraditionalArrivedMessage {
 	public static final int RECEIVE_SP_LIST = 9;
 	public static final int REJECT = 10;
 	public static final int CDN_RP_CONNECT_CONFIRM = 11;
+	public static final int CDN_RP_CONNECT_ACCEPT = 12;
+	public static final int CONFIRM_ACCEPT = 13;
+	public static final int UPLOAD = 14;
+	public static final int CDN_RP_DISCONNECT_CONFIRM = 15;
+	public static final int SP_RP_DISCONNECT_CONFIRM = 16;
+	public static final int RP_DONE_STREAMING = 17;
 	
 	final int    msgType;
 	final Node   sender;

@@ -32,6 +32,7 @@ public class TraditionalNodeInit implements NodeInitializer{
 		
 		prot.setNodeTag(TraditionalProtocol.RegularTag); // initialize the node to be Regular
 		
+		
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1); //random pick a CDN group to belong to range[1-3]
 		
 		Node cdn = prot.getConnectedCDN();
@@ -40,8 +41,11 @@ public class TraditionalNodeInit implements NodeInitializer{
 		//add to the clientlist of its CDN
 		prot2 = (TraditionalProtocol) cdn.getProtocol(pid);
 		prot2.addClient(n);			
+				
+		prot.cdnRTT = CommonState.r.nextInt(121) + 30; 	//RTT from client to CDN;	
+		//If same area as the CDN: 30 - 1 K
+		//If different area with the CDN: 1-1.5 K		
 		
-		prot.cdnRTT = CommonState.r.nextInt(71) + 30; 	//RTT from client to CDN;		
 		prot.uploadSpd = CommonState.r.nextInt(1001); //Random upload speed from 0-1000Kbps
 		prot.downloadSpd = CommonState.r.nextInt(1001) + 1000; //Random download speed from 1000-2000Kbps
 		prot.usedUploadSpd = 0; // initialize to zero since it is not yet seeding
