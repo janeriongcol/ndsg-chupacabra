@@ -13,12 +13,13 @@ public class P2PCDNObserver implements Control{
 	private static final String PAR_PROT = "protocol";
 	private int pid;
 	
-	private PrintWriter writer1, writer2, writer3;
-	File f1, f2, f3;
+	private PrintWriter writer1, writer2, writer3, writer4;
+	File f1, f2, f3, f4;
 	String filebase = "data_traditional_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
 	String PlaybackDelayTime = filebase + "PlaybackDelayTime" + ".txt";
+	String AverageRTT = filebase + "AverageRTT" + ".txt";
 	
 	public P2PCDNObserver(String prefix){
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
@@ -95,6 +96,7 @@ public class P2PCDNObserver implements Control{
 		writer1.println(time + " " + averageUtilization);	
 		writer2.println(time + " " + averageConnect);
 		writer3.println(time + " " + averagePlayback);
+		writer4.println(time + " " + averageRTT);
 		
 		flushAllWriters();
 		
@@ -105,11 +107,13 @@ public class P2PCDNObserver implements Control{
 		f1 = new File(UtilizationFilename);
 		f2 = new File(ConnectionSetUpTime);
 		f3 = new File(PlaybackDelayTime);
+		f4 = new File(AverageRTT);
 		
 		try {
 			writer1 = new PrintWriter(f1);
 			writer2 = new PrintWriter(f2);
 			writer3 = new PrintWriter(f3);
+			writer4 = new PrintWriter(f4);
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found.");
@@ -119,6 +123,7 @@ public class P2PCDNObserver implements Control{
 		fileHeader(writer1, "Average Utilization", "Time", "Utilization (%)");
 		fileHeader(writer2, "Average Connection Set-up Time", "Time", "Connection Set-up Time");
 		fileHeader(writer3, "Average Playback Delay Time", "Time", "Playback Delay Time");
+		fileHeader(writer4, "Average Round Trip Time", "Time", "Average RTT");
 	}
 	
 	public void fileHeader(PrintWriter w, String title, String x, String y){
@@ -133,5 +138,6 @@ public class P2PCDNObserver implements Control{
 		writer1.flush();
 		writer2.flush();
 		writer3.flush();
+		writer4.flush();
 	}
 }
