@@ -235,8 +235,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 						pid);
 				else {
 					videoSpdAlloted[aem.data] = maxVideoSpd;
-					if(aem.data2 < spdAvail)
+					if(aem.data2 < spdAvail){
+						videoSpdAlloted[aem.data] = videoSpdAlloted[aem.data] - spdAvail + aem.data2;
 						spdAvail = aem.data2;
+					}
 					((Transport)node.getProtocol(tid)).
 					send(
 						node,
@@ -264,9 +266,9 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				videoSpdAlloted[prot.videoID] -= allotedSpd;
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT_ACCEPT){
-				uploadSpdBuffer -= aem.data;
-				usedUploadSpd -= uploadSpdBuffer;
-				videoSpdAlloted[aem.data2] += maxVideoSpd - aem.data3;
+				//uploadSpdBuffer -= aem.data;
+				//usedUploadSpd -= uploadSpdBuffer;
+				videoSpdAlloted[aem.data2] -= aem.data3;
 				peerList[numPeers] = aem.sender;
 				peerSpdAlloted[numPeers] = aem.data;
 				numPeers++;
@@ -405,6 +407,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				}
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CONFIRM_ACCEPT){
+				//sada
 				uploadSpdBuffer -= aem.data;
 				usedUploadSpd = uploadSpd - uploadSpdBuffer;
 				peerList[numPeers] = aem.sender;
@@ -459,7 +462,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				averageRTT = (averageRTT*numSource + cdnRTT)/(numSource+1);
 				numSource++;
 				int spdAvail = downloadSpd - usedDownloadSpd;
-				if (spdAvail < aem.data){
+				if (spdAvail > aem.data){
 					spdAvail = aem.data;
 				}
 				((Transport)node.getProtocol(tid)).
