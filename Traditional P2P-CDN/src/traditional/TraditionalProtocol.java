@@ -194,8 +194,17 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		// TODO Auto-generated method stub
 		TraditionalArrivedMessage aem = (TraditionalArrivedMessage)event;
 		TraditionalProtocol temp = (TraditionalProtocol) node.getProtocol(pid);
+		TraditionalProtocol debuggg = (TraditionalProtocol) aem.sender.getProtocol(pid);
+		
+		//System.out.println("Sender Node Type: " + debuggg.getNodeTag());	
+		//System.out.println("Receiver Node Type: " + temp.getNodeTag());
+		//System.out.println("Message Type " + aem.msgType);
+		//System.out.println("Sender Index: " + aem.sender.getIndex());
+		//System.out.println("Receiver Index: " + node.getIndex());
+		//System.out.println("----------------------------");
 		if(nodeTag == CDNTag)//messages received by the CDN
 		{
+			
 			if (aem.msgType == TraditionalArrivedMessage.GIVE_SP_LIST)
 			{
 				//In the message: the videoID of the Requesting/Regular Peer
@@ -273,10 +282,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					pid);
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT){
-				if(aem.node == null) System.out.println("May sala");
+				//if(aem.node == null) System.out.println("May sala");
 				Node tobesent = aem.node;
 				//if(tobesent != null) System.out.println("WHY?");
-				System.out.println("eto ba yung next?");
+				//System.out.println("eto ba yung next?");
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
@@ -317,14 +326,18 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			{	
 				//CDN has approved the connection 
 				//Send a CONFIRM_CONNECT to RP to start connection
-				uploadSpdBuffer += uploadSpd - usedUploadSpd;
-				((Transport)node.getProtocol(tid)).
-				send(
-					node,
-					aem.node,
-					new TraditionalArrivedMessage(TraditionalArrivedMessage.CONFIRM_CONNECT, node, uploadSpdBuffer),
-					pid);
 				
+				if(aem.node != null){
+					uploadSpdBuffer += uploadSpd - usedUploadSpd;
+					TraditionalProtocol prot = (TraditionalProtocol) aem.node.getProtocol(pid);
+					if(prot.nodeTag == RegularTag)
+					((Transport)node.getProtocol(tid)).
+					send(
+						node,
+						aem.node,
+						new TraditionalArrivedMessage(TraditionalArrivedMessage.CONFIRM_CONNECT, node, uploadSpdBuffer),
+						pid);
+				}
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_CONNECT)
 			{	
@@ -347,7 +360,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT)
 			{	
 				//Reply SP_RP_DISCONNECT message to CDN to get its approval
-				System.out.println("twice?");
+				//System.out.println("twice?");
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
@@ -355,6 +368,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT, node, aem.sender),
 					pid);
 				for(int i = 0; i < numPeers; i++){
+					if(peerList[i]!=null)
 					if(peerList[i].equals(aem.sender)){
 						peerSpdAlloted[i] = 0;
 						peerList[i] = null;
@@ -366,15 +380,16 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM){
 				//asda
-				if(aem.node == null) System.out.println("error");
+				//if(aem.node == null) System.out.println("error");
 				//if(aem.sender.equals(connectedCDN)) System.out.println("yeah");
-				((Transport)node.getProtocol(tid)).
-				send(
-					node,
-					aem.node,
-					new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM, node),
-					pid);
-				
+				if(aem.node != null){
+					((Transport)node.getProtocol(tid)).
+					send(
+						node,
+						aem.node,
+						new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM, node),
+						pid);
+				}
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CONFIRM_ACCEPT){
 				uploadSpdBuffer -= aem.data;
