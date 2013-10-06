@@ -1,0 +1,50 @@
+#config file for orange protocol (orange + rtt peer selection)
+
+#set initial network size to 100 nodes with the first 3 nodes as CDN servers
+network.size 3
+
+network.node peersim.core.GeneralNode
+
+MAXSIZE 10000
+CATEGORY 6
+
+random.seed 1234567890
+
+#parameters for event-driven protocol type
+simulation.endtime 100000
+simulation.logtime 1000
+simulation.experiments 1
+simulation.step 1000
+
+
+protocol.urt UniformRandomTransport
+protocol.urt.mindelay 0
+protocol.urt.maxdelay 0
+
+protocol.orange orange.OrangeProtocol
+
+init.sch CDScheduler
+init.sch.protocol orange
+
+protocol.orange.maxclients MAXSIZE
+protocol.orange.category CATEGORY
+protocol.orange.protocol orange
+protocol.orange.transport urt
+protocol.orange.step 1000
+protocol.link peersim.core.IdleProtocol
+init.0 orange.OrangeNetworkInitializer
+init.0.protocol orange
+init.0.category CATEGORY
+init.0.transport urt
+
+
+control.dynamics orange.OrangeDynamicPop
+control.dynamics.protocol orange
+control.dynamics.maxsize MAXSIZE
+control.dynamics.init.0 orange.OrangeNodeInit
+control.dynamics.init.0.protocol orange
+control.dynamics.init.0.category CATEGORY
+control.dynamics.step 1000
+control.observer orange.OrangeObserver
+control.observer.protocol orange
+control.observer.step 1000
