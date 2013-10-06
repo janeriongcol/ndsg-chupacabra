@@ -39,7 +39,7 @@ public class P2PCDNObserver implements Control{
 			TraditionalProtocol prot = (TraditionalProtocol) n.getProtocol(pid);
 			
 			if(prot.startedStreaming){
-				if(!prot.doneStreaming){
+				if(prot.nodeTag == 2){
 					networkTotalUtilization += (double) prot.getUsedDownloadSpd()/prot.getDownloadSpd()*100;
 					activeLeechers++;
 				}
@@ -50,6 +50,7 @@ public class P2PCDNObserver implements Control{
 				}
 				
 				networkTotalConnect += prot.getTimeElapsed();
+				if(prot.nodeTag == 1)
 				activeSources++;
 			}
 		}
