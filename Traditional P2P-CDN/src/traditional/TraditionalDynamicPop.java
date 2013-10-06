@@ -50,12 +50,14 @@ public class TraditionalDynamicPop implements Control{
 				inits[j].initialize(newnode);
 			}
 			Network.add(newnode);
+			//System.out.println(Network.size());
 			//System.out.println(newnode.getIndex());
 			TraditionalProtocol prot = (TraditionalProtocol) newnode.getProtocol(pid);
 			prot.start(newnode); //TODO  HELP
 			
 			//EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, newnode, prot.binID), prot.connectedCDN, pid);
 		}
+		System.out.println("Add dynamic");
 	}
 	
 }

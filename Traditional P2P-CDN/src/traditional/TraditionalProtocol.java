@@ -196,7 +196,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					aem.sender,
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.RECEIVE_SP_LIST, node, getSupplyingPeers(aem.data)),
 					pid);
-				
+				System.out.println("Received: GIVE_SP_LIST");
 			}
 			else if(aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT)
 			{
@@ -390,6 +390,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 							pid);
 					}
 				}
+				System.out.println("Received: Natanggap yung list");
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT_CONFIRM){
 				sourcePeerList[numSource] = aem.sender;
@@ -533,11 +534,13 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		for(int j = 0; j < supplyingPeerList.length; j++)
 		{
 			node = supplyingPeerList[j];
-			prot = (TraditionalProtocol) node.getProtocol(pid);			
-			if (prot.videoID == video)	
-			{
-				supplyingPeers[i] = node;
-				i++;
+			if(node != null){
+				prot = (TraditionalProtocol) node.getProtocol(pid);			
+				if (prot.videoID == video)	
+				{
+					supplyingPeers[i] = node;
+					i++;
+				}
 			}
 		}
 		if (i == 0)
@@ -663,7 +666,6 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			connectedCDN,
 			new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node),
 			pid);
-		
 	}
 
 	
