@@ -115,6 +115,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 	boolean startedStreaming = false; // true if the node is already streaming
 	boolean doneStreaming = false;	// true if videoSize<= streamedVideoSize
 	int contractSize= 0;
+	boolean contractExpired = false;
 		
 	public TraditionalProtocol(String prefix){
 		maxClients = Configuration.getInt(prefix + "." + PAR_MAXCLIENTS);
@@ -131,11 +132,50 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 	}
 
 	@Override
-	public void nextCycle(Node arg0, int arg1) {
+	public void nextCycle(Node node, int pid) {
 		// TODO Auto-generated method stub
-		if(nodeTag == SupplyingPeerTag){
-			
-			
+		if(startedStreaming == true && !contractExpired){
+			if(nodeTag == SupplyingPeerTag || nodeTag == CDNTag){
+				for (int i = 0; i < numPeers; i++)
+					if(peerList[i] != null){
+						((Transport)node.getProtocol(tid)).
+						send(
+							node,
+							peerList[i],
+							new TraditionalArrivedMessage(TraditionalArrivedMessage.UPLOAD, node, peerSpdAlloted[i]),
+							pid);
+						uploaded += peerSpdAlloted[i];
+						if(nodeTag == SupplyingPeerTag && uploaded > contractSize){
+							((Transport)node.getProtocol(tid)).
+							send(
+								node,
+								connectedCDN,
+								new TraditionalArrivedMessage(TraditionalArrivedMessage.CONTRACT_EXPIRED, node),
+								pid);
+							for(int j = 0; j < numPeers; i++){
+								((Transport)node.getProtocol(tid)).
+								send(
+									node,
+									peerList[j],
+									new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT, node, peerSpdAlloted[j]),
+									pid);
+							}
+							contractExpired = true;
+							break;
+						}
+					}
+			}
+			if(nodeTag == RegularTag){
+				if(usedDownloadSpd < downloadSpd){
+					((Transport)node.getProtocol(tid)).
+					send(
+						node,
+						connectedCDN,
+						new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node),
+						pid);
+					
+				}
+			}
 		}
 	}
 
@@ -232,6 +272,13 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			else if(aem.msgType == TraditionalArrivedMessage.CONTRACT_EXPIRED)
 			{	
 				//Reply with a confirm disconnect message, supplying peer has finished serving
+				for(int i = 0; i < numSupplier; i++){
+					if(aem.sender.equals(supplyingPeerList[i])){
+						supplyingPeerList[i] = null;
+						break;
+					}
+					
+				}
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.RP_DONE_STREAMING){
 				supplyingPeerList[numSupplier] = aem.sender;
@@ -322,15 +369,26 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					
 				}
 				else {
+					int sent = 0;
 					for(int i = 0; i < aem.nodeList.length; i++){
+						if(aem.nodeList[i] != null){
+							((Transport)node.getProtocol(tid)).
+							send(
+								node,
+								aem.nodeList[i],
+								new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_CONNECT, node),
+								pid);
+							sent++;
+						}
+					}
+					if (sent == 0){
 						((Transport)node.getProtocol(tid)).
 						send(
 							node,
-							aem.node,
-							new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_CONNECT, node),
+							connectedCDN,
+							new TraditionalArrivedMessage(TraditionalArrivedMessage.CDN_RP_CONNECT, node, videoID, downloadSpd - usedDownloadSpd),
 							pid);
 					}
-					// may kulang pa
 				}
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT_CONFIRM){
