@@ -273,9 +273,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					pid);
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT){
-				//if(aem.node == null) System.out.println("error");
+				if(aem.node == null) System.out.println("May sala");
 				Node tobesent = aem.node;
 				//if(tobesent != null) System.out.println("WHY?");
+				System.out.println("eto ba yung next?");
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
@@ -346,17 +347,27 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT)
 			{	
 				//Reply SP_RP_DISCONNECT message to CDN to get its approval
+				System.out.println("twice?");
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
 					connectedCDN,
 					new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT, node, aem.sender),
 					pid);
+				for(int i = 0; i < numPeers; i++){
+					if(peerList[i].equals(aem.sender)){
+						peerSpdAlloted[i] = 0;
+						peerList[i] = null;
+						usedUploadSpd-= peerSpdAlloted[i];
+						break;
+					}
+					
+				}
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT_CONFIRM){
 				//asda
 				if(aem.node == null) System.out.println("error");
-				if(aem.sender.equals(connectedCDN)) System.out.println("yeah");
+				//if(aem.sender.equals(connectedCDN)) System.out.println("yeah");
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
@@ -485,13 +496,14 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				if (streamedVideoSize > videoSize){
 					for(int i = 0; i < numSource; i++){
 						if(!sourcePeerList[i].equals(connectedCDN)){
-							if(sourcePeerList[i]!=null)
-							((Transport)node.getProtocol(tid)).
-							send(
-								node,
-								sourcePeerList[i],
-								new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT, node),
-								pid);
+							if(sourcePeerList[i]!=null){
+								((Transport)node.getProtocol(tid)).
+								send(
+									node,
+									sourcePeerList[i],
+									new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT, node),
+									pid);
+							}
 						}
 						else
 							((Transport)node.getProtocol(tid)).
