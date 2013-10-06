@@ -496,7 +496,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					firstConnect = true;
 				}
 				
-				if (spdAvail < aem.data){
+				if (spdAvail > aem.data){
 					spdAvail = aem.data;
 				}
 				((Transport)node.getProtocol(tid)).
