@@ -403,14 +403,6 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				if (spdAvail < aem.data){
 					spdAvail = aem.data;
 				}
-				if(!firstConnect) {
-					setTimeElapsed();
-					firstConnect = true;
-				}
-				if(!firstPlayback && streamedVideoSize >= 400) {
-					firstPlay = System.currentTimeMillis() - startTime;
-					firstPlayback = true;
-				}
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
@@ -683,6 +675,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			connectedCDN,
 			new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node, videoID),
 			pid);
+		//System.out.println(Network.size());
 	}
 
 	

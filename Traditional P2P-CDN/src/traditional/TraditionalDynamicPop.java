@@ -33,6 +33,8 @@ public class TraditionalDynamicPop implements Control{
 	public final boolean execute(){
 		if(joinedPeerSize<maxsize){
 			int n = CommonState.r.nextInt(200);
+			System.out.println("To be added: "+n);
+			
 			if(n>maxsize-joinedPeerSize)
 				n = maxsize-joinedPeerSize;
 			add(n);
@@ -50,8 +52,6 @@ public class TraditionalDynamicPop implements Control{
 				inits[j].initialize(newnode);
 			}
 			Network.add(newnode);
-			//System.out.println(Network.size());
-			//System.out.println(newnode.getIndex());
 			TraditionalProtocol prot = (TraditionalProtocol) newnode.getProtocol(pid);
 			prot.start(newnode); //TODO  HELP
 			
