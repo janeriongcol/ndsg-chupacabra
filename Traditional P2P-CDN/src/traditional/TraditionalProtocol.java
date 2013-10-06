@@ -184,18 +184,20 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 	public void processEvent(Node node, int pid, Object event) {
 		// TODO Auto-generated method stub
 		TraditionalArrivedMessage aem = (TraditionalArrivedMessage)event;
-		
+		TraditionalProtocol temp = (TraditionalProtocol) node.getProtocol(pid);
+		System.out.println("Tag: "+temp.nodeTag + "    | Network Size: "+Network.size());
 		if(nodeTag == CDNTag)//messages received by the CDN
 		{
 			if (aem.msgType == TraditionalArrivedMessage.GIVE_SP_LIST)
 			{
 				//In the message: the videoID of the Requesting/Regular Peer
 				//send back results of getSupplyingPeers(int video) - a list of supplying peers with that video
+				Node[] tobeRet = getSupplyingPeers(aem.data);
 				((Transport)node.getProtocol(tid)).
 				send(
 					node,
 					aem.sender,
-					new TraditionalArrivedMessage(TraditionalArrivedMessage.RECEIVE_SP_LIST, node, getSupplyingPeers(aem.data)),
+					new TraditionalArrivedMessage(TraditionalArrivedMessage.RECEIVE_SP_LIST, node, tobeRet),
 					pid);
 				System.out.println("Received: GIVE_SP_LIST");
 			}
@@ -416,6 +418,11 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			{	
 				//Start streaming, CDN is your only source\
 				sourcePeerList[numSource] = aem.sender;
+				int tobeAdded;
+				if(cdnRTT >= 1000)
+					tobeAdded = CommonState.r.nextInt(500)+1000;
+				else
+					tobeAdded = CommonState.r.nextInt(1000);
 				averageRTT = (averageRTT*numSource + cdnRTT)/(numSource+1);
 				numSource++;
 				int spdAvail = downloadSpd - usedDownloadSpd;
