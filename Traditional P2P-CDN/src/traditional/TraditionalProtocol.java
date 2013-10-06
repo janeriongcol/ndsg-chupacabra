@@ -137,8 +137,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		//System.out.println("Nagnext Cycle");
 		if(startedStreaming == true && !contractExpired){
 			//System.out.println("Pumasok?");
-			//if(nodeTag == SupplyingPeerTag)
-				//System.out.println("Pumasok?");
+			
 			if(nodeTag == SupplyingPeerTag || nodeTag == CDNTag){
 				
 				for (int i = 0; i < numPeers; i++)
@@ -158,14 +157,15 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 								connectedCDN,
 								new TraditionalArrivedMessage(TraditionalArrivedMessage.CONTRACT_EXPIRED, node),
 								pid);
-							for(int j = 0; j < numPeers; i++){
-								if(peerList[j]!=null)
+							for(int j = 0; j < numPeers; j++){
+								if(peerList[j]!=null){
 									((Transport)node.getProtocol(tid)).
 									send(
 										node,
 										peerList[j],
 										new TraditionalArrivedMessage(TraditionalArrivedMessage.SP_RP_DISCONNECT, node, peerSpdAlloted[j]),
 										pid);
+								}
 							}
 							contractExpired = true;
 							break;
@@ -457,6 +457,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			else if(aem.msgType == TraditionalArrivedMessage.SP_RP_DISCONNECT)
 			{	
 				//Remove from source peers, annyeong
+				usedDownloadSpd-= aem.data;
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.UPLOAD){
 				//System.out.println("Upload");
