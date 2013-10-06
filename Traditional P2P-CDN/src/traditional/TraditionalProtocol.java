@@ -134,6 +134,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 	@Override
 	public void nextCycle(Node node, int pid) {
 		// TODO Auto-generated method stub
+		System.out.println("Nagnext Cycle");
 		if(startedStreaming == true && !contractExpired){
 			if(nodeTag == SupplyingPeerTag || nodeTag == CDNTag){
 				for (int i = 0; i < numPeers; i++)
@@ -171,7 +172,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 					send(
 						node,
 						connectedCDN,
-						new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node),
+						new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node, videoID),
 						pid);
 					
 				}
@@ -390,7 +391,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 							pid);
 					}
 				}
-				System.out.println("Received: Natanggap yung list");
+				System.out.println("Received: RECEIVE_SP_LIST");
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.CDN_RP_CONNECT_CONFIRM){
 				sourcePeerList[numSource] = aem.sender;
@@ -545,7 +546,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		}
 		if (i == 0)
 			supplyingPeers = null;
-		
+		if(supplyingPeers == null)
+			System.out.println("No Supplier");
 		return supplyingPeers;
 	}
 
@@ -664,7 +666,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 		send(
 			node,
 			connectedCDN,
-			new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node),
+			new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node, videoID),
 			pid);
 	}
 

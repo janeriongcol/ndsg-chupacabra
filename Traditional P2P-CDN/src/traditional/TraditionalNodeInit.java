@@ -50,7 +50,7 @@ public class TraditionalNodeInit implements NodeInitializer{
 		prot.downloadSpd = CommonState.r.nextInt(1001) + 1000; //Random download speed from 1000-2000Kbps
 		prot.usedUploadSpd = 0; // initialize to zero since it is not yet seeding
 		prot.usedDownloadSpd = 0; // initialize to zero since it is not yet streaming
-		prot.videoID = CommonState.r.nextInt(120); // Set the video the node wants to stream
+		prot.videoID = CommonState.r.nextInt(160); // Set the video the node wants to stream
 		prot.videoSize = CommonState.r.nextInt(10000)+10000;
 		prot.numPeers = 0;
 		prot.numSource = 0;
