@@ -90,7 +90,7 @@ public class P2PCDNObserver implements Control{
 		
 		flushAllWriters();
 		
-		return true;
+		return false;
 	}
 	
 	public void initFiles(){
@@ -114,10 +114,16 @@ public class P2PCDNObserver implements Control{
 	}
 	
 	public void fileHeader(PrintWriter w, String title, String x, String y){
-		
+		w.println(title);
+		w.println(x);
+		w.println(y);
+		w.println();
+		w.flush();
 	}
 	
 	public void flushAllWriters(){
-		
+		writer1.flush();
+		writer2.flush();
+		writer3.flush();
 	}
 }
