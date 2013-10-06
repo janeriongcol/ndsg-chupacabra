@@ -432,6 +432,12 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 				averageRTT = (averageRTT*numSource + cdnRTT)/(numSource+1);
 				numSource++;
 				int spdAvail = downloadSpd - usedDownloadSpd;
+				
+				if(!firstConnect) {
+					setTimeElapsed();
+					firstConnect = true;
+				}
+				
 				if (spdAvail < aem.data){
 					spdAvail = aem.data;
 				}
@@ -450,6 +456,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			}
 			else if (aem.msgType == TraditionalArrivedMessage.UPLOAD){
 				//System.out.println("Upload");
+				if(!firstPlayback && streamedVideoSize >= 400) {
+					firstPlay = System.currentTimeMillis() - startTime;
+					firstPlayback = true;
+				}
 				streamedVideoSize += aem.data;
 				if (streamedVideoSize > videoSize){
 					for(int i = 0; i < numSource; i++){
