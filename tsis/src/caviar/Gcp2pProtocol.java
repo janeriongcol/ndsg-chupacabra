@@ -576,7 +576,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 							firstConnect = true;
 						}
 						if(!firstPlayback && streamedVideoSize >= 400) {
-							firstPlay = System.currentTimeMillis() - startTime;
+							firstPlay = System.currentTimeMillis() - getTimeElapsed();
 							firstPlayback = true;
 						}
 						if(spdAvail >= aem.data)						// if the available download speed is equal or greater than the proposed upload spd, get it all

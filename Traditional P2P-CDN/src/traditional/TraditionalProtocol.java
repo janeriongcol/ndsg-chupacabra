@@ -522,7 +522,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			else if (aem.msgType == TraditionalArrivedMessage.UPLOAD){
 				//System.out.println("Upload");
 				if(!firstPlayback && streamedVideoSize >= 400) {
-					firstPlay = System.currentTimeMillis() - startTime;
+					firstPlay = System.currentTimeMillis() - getTimeElapsed();
 					firstPlayback = true;
 				}
 				streamedVideoSize += aem.data;
