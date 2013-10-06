@@ -22,6 +22,7 @@ public class TraditionalArrivedMessage {
 	public static final int CDN_RP_DISCONNECT_CONFIRM = 15;
 	public static final int SP_RP_DISCONNECT_CONFIRM = 16;
 	public static final int RP_DONE_STREAMING = 17;
+	public static final int SP_RP_DISCONNECT_FULFILLED = 18;
 	
 	final int    msgType;
 	final Node   sender;
