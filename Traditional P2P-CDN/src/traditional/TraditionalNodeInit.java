@@ -57,6 +57,7 @@ public class TraditionalNodeInit implements NodeInitializer{
 		prot.sourcePeerList = new Node[prot.maxClients];
 		prot.peerList = new Node[prot.maxClients];
 		prot.peerSpdAlloted = new int [prot.maxClients];
+		prot.start(n);
 	}
 
 }

@@ -657,6 +657,12 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol, TraditionalO
 			peerList = new Node[prot.maxClients];
 		if( peerSpdAlloted == null)
 			peerSpdAlloted = new int [prot.maxClients];
+		((Transport)node.getProtocol(tid)).
+		send(
+			node,
+			connectedCDN,
+			new TraditionalArrivedMessage(TraditionalArrivedMessage.GIVE_SP_LIST, node),
+			pid);
 		
 	}
 
