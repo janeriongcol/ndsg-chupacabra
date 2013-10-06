@@ -24,13 +24,13 @@ y_title = res(3)
 xtitle(graph_title, x_title, y_title)
 
 data_trad = fscanfMat(di+trad_fn+fn_arr(choice))
-x_arr = data(1:$,1)
-y_arr = data(1:$,2)
+x_arr = data_trad(1:$,1)
+y_arr = data_trad(1:$,2)
 plot(x_arr, y_arr, 'r')
 
 data_tsis = fscanfMar(di+tsis_fn+fn_arr(choice))
-x_arr = data(1:$,1)
-y_arr = data(1:$,2)
+x_arr = data_tsis(1:$,1)
+y_arr = data_tsis(1:$,2)
 plot(x_arr, y_arr, 'b')
 
 h1=legend(["Traditional";"Orange"])
