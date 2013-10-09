@@ -1,0 +1,120 @@
+\documentclass[letterpaper, twocolumn, twoside]{IEEEtran}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.jpeg,.png}
+\setcounter{secnumdepth}{4}
+% define authors and initial footnote
+\author{\IEEEauthorblockN{Fatima Suzanne G. De Villa}
+\IEEEauthorblockA{   Department of Computer Science\\
+ University of the Philippines-Diliman\\
+ fatimadevilla1012@gmail.com}
+\and
+\IEEEauthorblockN{ Anna Janeri B. Ongcol}
+\IEEEauthorblockA{Department of Computer Science\\
+ University of the Philippines-Diliman\\
+ annajaneriongcol@gmail.com}
+\and
+\IEEEauthorblockN{Bryan Adam B. Tan}
+\IEEEauthorblockA{
+    Department of Computer Science\\
+    University of the Philippines-Diliman\\
+    barg.tan@gmail.com
+}}
+
+
+%define title
+\title{Content and Location Aware P2P-CDN Architecture 
+with Integrated RTT-Bandwidth Based Peer 
+Selection Protocol}
+
+\begin{document}
+% create the title
+\maketitle
+%create the abstract
+
+%index terms
+\begin{IEEEkeywords}
+P2P, CDN, Hybrid Architecture, RTT-based Peer Selection, ABW-based Peer Selection
+\end{IEEEkeywords}
+
+\section{Introduction}
+\section{Review of Related Literature}
+\subsection{P2P-CDN Hybrid Architecture}
+	In order to provide streaming services that will provide satisfactory QoS (quality of service), technologies such as CDNs and P2P systems have been used to deliver and distribute content to the client side. A Content Distribution Network (CDN) structure, which uses dedicated servers to serve clients in assigned areas, provides reliability but has large costs for deployment and maintenance.[6] On the other hand, Peer-to-Peer (P2P) systems make use of the bandwidth of all connected peers therefore making it much more scalable but it also has several drawbacks like its dependency on the number of seeders, the slower rate of outgoing streaming content, etc.[6] 
+	
+Recognizing that both CDN and P2P technologies have both their respective sets of advantages and disadvantages, several papers have already explored forming P2P-CDN hybrid architectures. J. Wu et. Al[7] already proposed PeerCDN a 2-layered architecture for streaming with an upper server layer employing CDN assisted by a lower layer utilizing P2P with Strong Nodes as the intermediary between the two layers. C. Chen and F. Shen [1] recommended a system that lets high capacity peers act like CDN servers while the others serve as Content Peers in order to efficiently distribute content. Such architectures exploit the dependability of a CDN and the scalability of a P2P system in order to provide efficient and satisfactory streaming services.
+
+\subsection{Group-based CDN-P2P Architecture (G-CP2P)}
+Randomly choosing peers in a CDN-P2P could create long connection set-up time and excessive latency. This also leads to long delays and unnecessary internet traffic.  Group-Based CDN-P2P Hybrid Architecture(G-CP2P)[4] was seen to reduce the problems previously stated. G-CP2P works by choosing SuperPeers, peers that are physically close to a CDN server, and these SuperPeers maintain peer-id lists, channel information, and peer status. 
+
+Each SuperPeer maintains sub-overlays, peers streaming the same channel while a Content Addressable Network(CAN), formed by the binning technique which considers the physical location of peers, is used as a Distributed Hash Table (DHT) algorithm for locating the SuperPeers. In CAN, peers are allocated to zones randomly. G-CP2P evaluates the RTTs of the SuperPeers. In the area covered by the CDN, there are several landmarks which new peers use to estimate and know the bin it belongs to. New peers arrange the RTTs to these landmarks. After knowing the new peer's bin, it will contact the nearest SuperPeer and ask if there is a sub-overlay for the channel requested. If there such a sub-overlay exists, the SuperPeer will reply with the list of peers in it. Else, the new peer will send a request signal and other SuperPeers which have sub-overlays for the requested channel will be returned and the new peer will select the sub-overlay with the most peers.[4]
+\subsection{Adaptive and Efficient Peer Selection (AEPS)}
+An optimal peer selection scheme is integral in providing an excellent streaming service in a Peer-to-Peer network. The efficiency and quality of the media content being streamed depends on the scheme adopted in selecting peers. Hsia, Hsu, and Miao proposed a novel peer selection protocol called Adaptive and Efficient Peer Selection (AEPS) that guarantees a reduction in start-up delay and high delivery quality by combining the advantages of round trip time (RTT) based and available bandwidth (ABW) based schemes [2].
+
+RTT is measured using an ICMP (Internet Control Message Protocol) message sent by a requesting peer. The candidate peer with the shortest RTT is selected as the parent to the requesting peer. Because geographical location is involved, RTT-based schemes are more accurate than random-based ones. However, this scheme may still select incompetent peers as parents since no information regarding the ABW of the path is given.
+
+The quality of the stream hinges on the ABW of the path. [3] A high quality stream is equivalent to a large ABW value, which is why the candidate peer with the greatest ABW is chosen. Accuracy in peer selection is guaranteed though not the efficiency since ABW computation consumes a lot of time.
+AEPS is both accurate and efficient because it is a combination of RTT-based and ABW-based schemes. The basic structure of the AEPS consists of an index server, candidate peers, a streaming server, and a requesting peer. The index server carries metadata about the streamed content and peers involved. [5] The first stage of AEPS requires the requesting peer to demand from the index server a list of candidate peers. The next stage measures the RTT of each candidate peer returned by the index server. The one with the least RTT is chosen for the verification stage. The ABW between the requesting peer and the selected candidate peer is computed to verify if the latter can support the bandwidth requirement. If it is capable, then it is selected and peer connections are established. Otherwise, it is neglected and the requesting peer chooses another candidate based on the measured RTT for the verification process.
+
+\section{Methodology}
+\subsection{Overview of Architecture Model}
+\subsubsection{SuperPeers}
+Majority of the model’s architecture is in parallel with G-CP2P’s overlay construction. The peers that are geographically close to the CDN server are chosen as the SuperPeers of an overlay network. A SuperPeer maintains peer-id lists, stream information, and peer status in the overlay where it is positioned.
+\subsubsection{Overlay Network}
+A Distributed Hash Table (DHT) algorithm called Content Addressable Network (CAN) utilizes this location-aware peer selection that groups together SuperPeers that are located in the same area. Aside from physical location, RTT values, which are relative to predefined landmarks, also factor in grouping peers into an overlay similar to the binning technique in G-CP2P.
+\subsubsection{Sub-overlay Network}
+Overlay networks consist of sub-overlays that are managed by SuperPeers. Sub-overlays are group of peers that stream the same media content provided by their SuperPeer. The peers within a sub-overlay are filtered further using the AEPS scheme. Those who share similar RTT values form a group smaller than a sub-overlay. From that group, a client chooses the peer with the smallest RTT measurement and verifies if that peer can support the stream’s bandwidth.
+\subsection{Protocol}
+\subsubsection{Peer Joining}
+As previously discussed, the architecture in this study utilizes SuperPeers to do some of the workloads for the CDN server. Thus, when a new peer joins the network, the new peer needs to know which SuperPeer to contact. New peers measure their RTTs on the landmarks distributed in the coverage of the CDN server and arrange them in order. Based on the arranged RTTs, a new peer estimates its location and determines the SuperPeer which handles that certain area. In this process of new peers joining, there are two cases that must be handled which are:
+\paragraph{}
+No SuperPeer in the overlay: In this case, the new peer assumes the position of SuperPeer.
+\paragraph{}
+SuperPeer’s RTT is greater than the new peer’s RTT: It was stated before that this architecture considers the RTT of the SuperPeers. Hence, when a new peer with a lower RTT than the current SuperPeer joins the network, the new peer replaces the current SuperPeer.
+\subsubsection{Peer List Pulling}
+	After knowing the SuperPeer, new peers communicate with their respective SuperPeers to send requests for the list of peers that streams the media file being demanded. A request contains the category and unique ID of the media file. When a SuperPeer receives a request, its action falls into one of these cases:
+\paragraph{}
+The overlay contains a suboverlay for the requested category: If the suboverlay has peers streaming the same media file requested, the SuperPeer will return the list of peers to the new peer. Otherwise, the SuperPeer asks the other SuperPeers for their list of peers streaming the requested media file and chooses the suboverlay with the most peers.
+\paragraph{}
+The overlay doesn’t have a suboverlay for the requested category: When an overlay doesn’t have the suboverlay for a certain category, it means that there are no peers streaming a media file in that category. The action of the SuperPeer in this case is similar to the action in case 1 wherein there are no peers streaming the media file requested.
+\paragraph{}
+The requested mediafile has more than one category: The SuperPeer chooses the suboverlay with the most peers streaming the requested media file and returns it to the new peer.
+\paragraph{}
+There are no peers streaming the media file in the entire CDN coverage: The new peer’s source is the CDN server.
+\subsubsection{Peer Selection}
+After obtaining the list of peers streaming the same media file, the new peer will measure the RTTs of each peer and arrange them ascendingly. The new peer selects candidates with small RTTs and measures their available bandwidth. Not all the peers returned are measured because estimating the available bandwidth of a peer is time consuming. The new peer sends available bandwidth verification to the candidate peers. In return, the candidate peers will send probing packets to the new peer. The new peer will estimate the bandwidth of the candidate peers depending on the probe packets they sent. After measuring the bandwidth values of the candidate peers, the new peer selects the peers with high available bandwidth.
+\subsubsection{Leaving Peers}
+All the peers within a suboverlay periodically send a hello message to the SuperPeer to inform that they are still alive while the CDN server is updated by the SuperPeer with the changes in its list. To know if the source peers of a peer X are still alive, peer X sends hello messages to all its source peers periodically. An architecture containing peers must handle cases wherein a peer leaves with or without warning. There are several cases concerning this situation:
+\paragraph{}
+The SuperPeer left: The CDN server has a list of peers and their respective RTTs in every overlay. Thus when a SuperPeer leaves, the CDN server choose sthe peer with the lowest RTT as the new SuperPeer and sends the list of peers in the overlay. After receiving the list of peers, the new SuperPeer informs all the peers within the overlay.
+\paragraph{}
+Peer X’s source peer leaves: As said above, peers sends hello messages to their source peers to detect if they are still present. After detecting that a source peer left, peer X sends a peer list request to the SuperPeer just like in the start and performs the peer selection protocol previously discussed.
+\section{Results}
+
+\section{Conclusion}
+\begin{thebibliography}{7}
+%bib 1
+\bibitem{chen-shen}
+C. Chen, and F. Shen, ``An approach to build a P2P content distribution structure of high performance,'' \textit{2012 Sixth International Conference on Internet Computing for Science and Engineering}, 2012.
+%bib 2
+\bibitem{hsia-hsu-yiao}
+T. Hsiao, M. Hsu, and M. Yiao, ``Adaptive and efficient peer selection in peer-to-peer streaming networks,'' \textit{2011 IEEE 17th International Conference on Parallel and Distributed Systems}, 2011.
+%bib 3
+\bibitem{jain-dovrolis}
+M. Jain, and C. Dovrolis, ``End-to-end available bandwidth: Measurement methodology, dynamics, and relation with TCP and throughput,'' \textit{IEEE/ACM Transactions on Networking}, Vol. 11, Issue 4, 2003, August.
+%bib 4
+\bibitem{jeon-kim}
+T. Kim, S. Jeon, and Y. Kim, ``A CDN-P2P hybrid architecture with content/location awareness for live streaming service networks,'' \textit{2011 IEEE 15th International Symposium on Consumer Electronics}, 2011.
+%bib 5
+\bibitem{ppsp}
+Peer to Peer Streaming Protocol (PPSP), http://datatracker.ietf.org/wg/ppsp/charter/  
+%bib 6
+\bibitem{]xu-etal} 
+D. Xu, S. Kulkarni, C. Rosenberg, and H. Chai, ``Analysis of a CDN-P2P hybrid architecture for cost-effective streaming media distribution,'' \textit{Springer Multimedia Systems}, vol. 11, no. 4, pp. 383-399, 2006.  
+%bib 7
+\bibitem{wu-lu-liu-zhang}
+J. Wu, Z. Lu, B. Liu, and S. Zhang, ``PeerCDN: A novel P2P network assisted streaming content delivery network scheme,''\textit{2008 IEEE 8th International Conference on Computer and Information Technology}, 2008.
+
+\end{thebibliography}
+\end{document}
