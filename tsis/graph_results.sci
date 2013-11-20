@@ -1,11 +1,11 @@
 // [!!!] Please change di accordingly
 
-di = pwd() + "/Documents/CS/CS 198/ndsg-chupacabra/tsis/"
+di = pwd() + "/Documents/workspace/tsis/"
 
 //di = input("Please give directory address: ");
 
 //while(%t)
-    clf()
+    //clf()
     
     fn_arr = ["data_gcp2p_Utilization.txt", "data_gcp2p_ConnectionSetUpTime.txt", "data_gcp2p_PlaybackDelayTime.txt"]
     index = ["1","2","3"]
@@ -16,7 +16,7 @@ di = pwd() + "/Documents/CS/CS 198/ndsg-chupacabra/tsis/"
     
     if (choice <> 1 & choice <> 2 & choice <> 3) then
         disp("Stopping execution.");
-        break;
+        //break;
     end
     
     // Read and open the data file

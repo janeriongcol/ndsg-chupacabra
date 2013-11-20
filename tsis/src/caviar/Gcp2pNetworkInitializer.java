@@ -285,7 +285,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
 		
 		// Set the start time
-		prot.setStartTime();
+		
 		
 		// Set the node as Regular 
 		prot.setNodeTag(Gcp2pProtocol.RegularTag); 

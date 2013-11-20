@@ -15,12 +15,14 @@ public class OrangeObserver implements Control {
 	 */
 	private static final String PAR_PROT = "protocol";
 	private int pid;
-	private PrintWriter writer1, writer2, writer3;
-	File f1, f2, f3;
+	private PrintWriter writer1, writer2, writer3, writer4;
+	File f1, f2, f3, f4;
 	String filebase = "data_gcp2p_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
 	String PlaybackDelayTime = filebase + "PlaybackDelayTime" + ".txt";
+	
+	String AverageReject = filebase + "AverageReject" + ".txt";
 	
 	public OrangeObserver(String prefix)
 	{
@@ -35,7 +37,10 @@ public class OrangeObserver implements Control {
 		int activeLeechers = 0;
 		int activeSources = 0;
 		int totalPeersPlayback = 0;
+		int totalPeersConnected = 0;
 		long time = CommonState.getTime();
+		int totalConnectionsAttempted = 0;
+		int totalConnectionsRejected = 0;
 		
 		for(int i=3; i < Network.size(); i++) {
 			Node n = Network.get(i);
@@ -48,6 +53,10 @@ public class OrangeObserver implements Control {
 					networkTotalUtilization += (double) prot.getUsedDownloadSpd()/prot.getDownloadSpd()*100;
 		
 					activeLeechers++;
+					if(prot.firstConnect){
+						networkTotalConnect += prot.getTimeElapsed();
+						totalPeersConnected++;
+					}
 				}
 				
 				if(prot.firstPlayback){
@@ -55,27 +64,33 @@ public class OrangeObserver implements Control {
 					totalPeersPlayback++;
 				}
 				
-				networkTotalConnect += prot.getTimeElapsed();
-				
 				activeSources++;
 				//System.out.println("----------------------------------------------");
 			}
+			
+			totalConnectionsAttempted += prot.numConnectionsAttempted;
+			totalConnectionsRejected += prot.numConnectionsRejected;
 		}
 		
 		double averageUtilization = 0;
 		long averageConnect = 0;
 		long averagePlayback = 0;
+		double aveRejectionRate = 0;
 		
 		if(activeLeechers!=0){
 			averageUtilization = networkTotalUtilization/activeLeechers;
 		}
 		
 		if(activeSources!=0){
-			averageConnect = networkTotalConnect/activeSources;
+			averageConnect = networkTotalConnect/totalPeersConnected;
 		}
 		
 		if(totalPeersPlayback!=0){
 			averagePlayback = totalPlayback/totalPeersPlayback;
+		}
+		
+		if(totalConnectionsAttempted != 0) {
+			aveRejectionRate = (double) totalConnectionsRejected/totalConnectionsAttempted*100;
 		}
 		
 		System.out.println("----------------------------------------------");
@@ -90,6 +105,12 @@ public class OrangeObserver implements Control {
 		
 		System.out.println("Active Leechers: " + activeLeechers);
 		
+		System.out.println("Connections Attempted: " + totalConnectionsAttempted);
+		
+		System.out.println("Connections Rejected: " + totalConnectionsRejected);
+		
+		System.out.println("Rejection Rate: " + aveRejectionRate);
+		
 		Gcp2pProtocol prot2 = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
 		
 		//System.out.println("Used Upload Speed CDN1 " + prot2.usedUploadSpd);
@@ -101,7 +122,7 @@ public class OrangeObserver implements Control {
 		writer1.println(time + " " + averageUtilization);	
 		writer2.println(time + " " + averageConnect);
 		writer3.println(time + " " + averagePlayback);
-		
+		writer4.println(time + " " + aveRejectionRate);
 		
 		
 		flushAllWriters();
@@ -116,11 +137,13 @@ public class OrangeObserver implements Control {
 		f1 = new File(UtilizationFilename);
 		f2 = new File(ConnectionSetUpTime);
 		f3 = new File(PlaybackDelayTime);
+		f4 = new File(AverageReject);
 	
 		try {
 			writer1 = new PrintWriter(f1);
 			writer2 = new PrintWriter(f2);
 			writer3 = new PrintWriter(f3);
+			writer4 = new PrintWriter(f4);
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found.");
@@ -146,6 +169,7 @@ public class OrangeObserver implements Control {
 		writer1.flush();
 		writer2.flush();
 		writer3.flush();
+		writer4.flush();
 	}
 
 }

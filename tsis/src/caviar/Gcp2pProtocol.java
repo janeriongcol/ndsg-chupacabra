@@ -111,7 +111,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int[] clientWatching;	// video the client is watching
 	int SPreply = 0;			// number of SP that sent YOUR_PEERS
 	int[] streamingSameVidPerBin = new int[maxBins];
-	int highestStreamingSameVid;
+	int highestStreamingSameVid = 0;
 	long startTime;			// Time the node was initialized
 	long elapsedTime;		// Time it took from initialization until completion of stream
 	int numCandidates;
@@ -119,7 +119,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	int uploaded = 0;
 	boolean firstConnect = false;
 	boolean firstPlayback = false;
+	boolean startTimeLogged = false;
 	long firstPlay;
+	boolean binned = false;
+	int numConnectionsAttempted = 0;
+	int numConnectionsRejected = 0;
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
 	Node[] superPeerList;	// list of SuperPeers
@@ -209,18 +213,19 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			if(nodeTag != 0){
 				if(usedDownloadSpd < downloadSpd){
 					Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
-					/*((Transport)node.getProtocol(FastConfig.getTransport(pid))).
+					((Transport)node.getProtocol(FastConfig.getTransport(pid))).
 										send(
 											node,
 											prot.connectedCDN,
 											new ArrivedMessage(ArrivedMessage.GET_SUPERPEER_2, node, binID),
-											pid);*/
-					((Transport)node.getProtocol(tid)).
+											pid);
+					/*((Transport)node.getProtocol(tid)).
 					send(
 						node,
 						connectedCDN,
 						new ArrivedMessage(ArrivedMessage.CONNECT, node, downloadSpd - usedDownloadSpd),
 						pid);
+						*/
 					
 				}
 				
@@ -437,7 +442,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								aem.sender,
 								new ArrivedMessage(ArrivedMessage.YOUR_PEERS, node, peers, j),
 								pid);
-					if(prot.binID == binID){
+					if(prot.binID == binID && !prot.binned){
 						clientList[numClients] = aem.sender;
 						clientWatching[numClients] = aem.data;
 						for(int itr = 0; itr < maxClients; itr++)
@@ -446,7 +451,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								numClients++;
 								break;
 							}
-						
+						prot.binned = true;
 						
 					}
 					
@@ -493,6 +498,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			if(aem.msgType == ArrivedMessage.UPLOAD){					// a chunk is delivered. aem.data is the chunk
 				//System.out.println("UPLOADED TO "+node.getIndex());
 				streamedVideoSize = streamedVideoSize + aem.data;
+				if(!firstPlayback && streamedVideoSize >= 400) {
+					firstPlay = System.currentTimeMillis()-startTime - getTimeElapsed();
+					firstPlayback = true;
+				}
 				if(streamedVideoSize>= videoSize){		// check if done streaming. if yes, send GOODBYE messages
 					for(int i = 0; i< numSource; i++){
 						((Transport)node.getProtocol(tid)).
@@ -521,13 +530,15 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					else {									// the list is not empty
 						if(SPreply == 0){					// if SPreply = 0 then the peers is from it's bin
 							while(usedDownloadSpd < downloadSpd && i < aem.data){
-								if(aem.nodeList[i]!= null)
+								if(aem.nodeList[i]!= null) {
 								((Transport)node.getProtocol(tid)).
 											send(
 												node,
 												aem.nodeList[i],
 												new ArrivedMessage(ArrivedMessage.CONNECT, node, downloadSpd - usedDownloadSpd),
 												pid);
+								numConnectionsAttempted++;
+								}
 								i++;
 							}
 						}
@@ -544,13 +555,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					if(SPreply == maxBins){						// means that all the bins have sent its peers
 						//System.out.println(highestStreamingSameVid);
 						while(usedDownloadSpd < downloadSpd && i < highestStreamingSameVid){	//send CONNECT messages to the bin with the highest number of peers
-							if(!candidatePeers[i].equals(null))
+							if(candidatePeers[i]!=(null))
 							((Transport)node.getProtocol(tid)).
 											send(
 												node,
 												candidatePeers[i],
 												new ArrivedMessage(ArrivedMessage.CONNECT, node, downloadSpd - usedDownloadSpd),
 												pid);
+							numConnectionsAttempted++;
 							i++;
 							}
 						if(highestStreamingSameVid == 0){
@@ -560,10 +572,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 												connectedCDN,
 												new ArrivedMessage(ArrivedMessage.CONNECT, node, downloadSpd - usedDownloadSpd),
 												pid);
-							
+							numConnectionsAttempted++;				
 						}
 						//i++;
-						
+						SPreply = 0;
+						highestStreamingSameVid = 0;
 					}
 			
 			}
@@ -575,10 +588,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 							setTimeElapsed();
 							firstConnect = true;
 						}
-						if(!firstPlayback && streamedVideoSize >= 400) {
-							firstPlay = System.currentTimeMillis() - getTimeElapsed();
-							firstPlayback = true;
-						}
+						
 						if(spdAvail >= aem.data)						// if the available download speed is equal or greater than the proposed upload spd, get it all
 							tobeAccepted = aem.data;
 						else tobeAccepted = spdAvail;					// if not, get only the available download spd
@@ -656,6 +666,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			}
 			else if (aem.msgType == ArrivedMessage.REJECT){
 					//hindi ko pa alam ano mangyayari
+				numConnectionsRejected++;
 			}
 			else if (aem.msgType == ArrivedMessage.YOUR_CLIENTS){							// the CDN sent your clients
 				nodeTag = 1;
@@ -681,6 +692,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 								aem.superPeer,
 								new ArrivedMessage(ArrivedMessage.REQUEST_PEERS_FROM_THIS_BIN, node, categoryID, videoID),
 								pid);
+					if(!firstConnect && !startTimeLogged){
+						setStartTime();
+						startTimeLogged = true;
+					}
 				}
 				else{
 					((Transport)node.getProtocol(tid)).

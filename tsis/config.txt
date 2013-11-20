@@ -7,6 +7,8 @@ network.node peersim.core.GeneralNode
 
 MAXSIZE 10000
 CATEGORY 6
+MINVIDEOSIZE 10000
+RANGEVIDEOSIZE 10000
 
 random.seed 1234567890
 
@@ -44,6 +46,8 @@ control.dynamics.maxsize MAXSIZE
 control.dynamics.init.0 caviar.Gcp2pNodeInit
 control.dynamics.init.0.protocol gcp2p
 control.dynamics.init.0.category CATEGORY
+control.dynamics.init.0.minVideoSize MINVIDEOSIZE
+control.dynamics.init.0.rangeVideoSize RANGEVIDEOSIZE
 control.dynamics.step 1000
 control.observer caviar.OrangeObserver
 control.observer.protocol gcp2p

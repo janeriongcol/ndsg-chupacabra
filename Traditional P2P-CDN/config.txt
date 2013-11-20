@@ -6,6 +6,16 @@ network.size 3
 network.node peersim.core.GeneralNode
 
 MAXSIZE 10000
+MINCDNRTT 30
+MAXCDNRTT 1500
+NUMVIDS 120
+MINVIDEOSIZE 10000 #range of video size: 40000-50000
+MAXVIDEOSIZE 20000
+MAXUPSPEED 1000
+MINDLSPEED 1000 #range of dl speed: 1000-2000
+MAXDLSPEED 2000 
+
+MAXJOINSIZE 500
 
 random.seed 1234567890
 
@@ -30,13 +40,26 @@ protocol.p2pcdn.transport urt
 protocol.p2pcdn.step 1000
 
 protocol.link peersim.core.IdleProtocol
-init.0 traditional.TraditionalNetworkInit
-init.0.protocol p2pcdn
-init.0.transport urt
+
+init.0 traditional.TraditionalNetworkProperties
+init.0.maxClients MAXSIZE
+init.0.maxCdnRtt MAXCDNRTT
+init.0.minCdnRtt MINCDNRTT
+init.0.numVids NUMVIDS
+init.0.minVidSize MINVIDEOSIZE
+init.0.maxVidSize MAXVIDEOSIZE
+init.0.maxUpSpeed MAXUPSPEED
+init.0.minDlSpeed MINDLSPEED
+init.0.maxDlSpeed MAXDLSPEED
+
+init.1 traditional.TraditionalNetworkInit
+init.1.protocol p2pcdn
+init.1.transport urt
 
 control.dynamics traditional.TraditionalDynamicPop
 control.dynamics.protocol p2pcdn
 control.dynamics.maxsize MAXSIZE
+control.dynamics.maxjoinsize MAXJOINSIZE
 control.dynamics.init.0 traditional.TraditionalNodeInit
 control.dynamics.init.0.protocol p2pcdn
 control.dynamics.step 1000

@@ -20,12 +20,15 @@ public class Gcp2pNodeInit implements NodeInitializer{
 	*/
 	
 	private final String PAR_CATEGORY = "category";
-	
+	private final String PAR_MINVIDEOSIZE = "minVideoSize";
+	private final String PAR_RANGEVIDEOSIZE = "rangeVideoSize";
 	
 	
 	
 	private int pid;
 	private int category;
+	private int maxVideoSize;
+	private int rangeVideoSize;
 	/*
 	*	GLOBALS
 	*/
@@ -36,6 +39,8 @@ public class Gcp2pNodeInit implements NodeInitializer{
 	public Gcp2pNodeInit(String prefix){
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
+		maxVideoSize = Configuration.getInt(prefix + "." + PAR_MINVIDEOSIZE);
+		rangeVideoSize = Configuration.getInt(prefix + "." + PAR_RANGEVIDEOSIZE);
 	}
 	
 	/**
@@ -80,13 +85,14 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		prot.usedDownloadSpd = 0; // initialize to zero since it is not yet streaming
 		prot.videoID = CommonState.r.nextInt(category*20); // get a random video ID, each category has 20 videos each. Range [0, 19]
 		prot.categoryID = prot.videoID/20;
-		prot.videoSize = CommonState.r.nextInt(10000)+10000;
+		prot.videoSize = CommonState.r.nextInt(rangeVideoSize)+maxVideoSize;
 		prot.computeBin();
 		prot.numPeers = 0;
 		prot.numSource = 0;
 		prot.sourcePeerList = new Node[prot.maxClients];
 		prot.peerList = new Node[prot.maxClients];
 		prot.peerSpdAlloted = new int [prot.maxClients];
+		prot.setStartTime();
 		prot2.addToBin(prot.binID, n);
 		//prot.start(n);
 		//EDSimulator.add(1, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);
