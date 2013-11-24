@@ -1,0 +1,16 @@
+#!/bin/sh
+
+TRAD="/Users/janeriongcol/Documents/workspace/Traditional P2P-CDN"
+GCP2P="/Users/janeriongcol/Documents/workspace/tsis"
+
+# Compile
+javac -cp "$TRAD/jep-2.3.0.jar:$TRAD/djep-1.0.0.jar:$TRAD/peersim-1.0.5.jar" "$TRAD/src/traditional"/*.java
+javac -cp "$GCP2P/jep-2.3.0.jar:$GCP2P/djep-1.0.0.jar:$GCP2P/peersim-1.0.5.jar" "$GCP2P/src/caviar"/*.java
+
+# Create .jar
+jar cf "$TRAD"/TRAD.jar "$TRAD/src/traditional"/*.class
+jar cf "$GCP2P"/GCP2P.jar "$GCP2P/src/caviar"/*.class
+
+# Run
+java -cp "$TRAD/jep-2.3.0.jar:$TRAD/djep-1.0.0.jar:$TRAD/peersim-1.0.5.jar:$TRAD/TRAD.jar" peersim.Simulator "$TRAD/config.txt"
+java -cp "$GCP2P/jep-2.3.0.jar:$GCP2P/djep-1.0.0.jar:peersim-1.0.5.jar:$GCP2P/GCP2P.jar" peersim.Simulator "$GCP2P/config.txt"
