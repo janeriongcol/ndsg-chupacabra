@@ -22,12 +22,12 @@ simulation.step 1000
 protocol.gcp2p orange.Gcp2pProtocol
 protocol.gcp2p.protocol gcp2p
 protocol.gcp2p.transport urt
+protocol.gcp2p.network router
 protocol.gcp2p.step 1000
 
 protocol.urt UniformRandomTransport
 protocol.urt.mindelay 0
 protocol.urt.maxdelay 0
-
 
 protocol.router orange.Router
 protocol.router.protocol gcp2p

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import peersim.config.Configuration;
+import peersim.config.FastConfig;
 import peersim.core.Node;
 import peersim.transport.Transport;
 import peersim.cdsim.*;
@@ -35,14 +36,14 @@ public class Router implements CDProtocol{
 	/**
 	 * Queue representing the messages to be forwarded by the router
 	 */
-	Queue<ArrivedMessage> router;
+	Queue<OrangeMessage> router;
 	/**
 	 * The node to which the router is linked with
 	 */
 	Node node;
 	
 	public Router (String prefix) {		
-		router = new LinkedList<ArrivedMessage>();		
+		router = new LinkedList<OrangeMessage>();		
 		tid = Configuration.getPid(prefix + "." + PAR_TRANS);
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 	}
@@ -51,6 +52,11 @@ public class Router implements CDProtocol{
 	public void nextCycle(Node node, int pid) {
 		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
 		int maxUpload = prot.getUploadSpd();
+		/**
+		 * Comment out code below if only maxUpload has been set,
+		 * otherwise, an infinite loop will happen. 
+		 * You have been warned....
+		 */
 		//emptyBuffer(node, maxUpload);
 	}
 	
@@ -62,7 +68,7 @@ public class Router implements CDProtocol{
 	public void emptyBuffer (Node node, int maxUpload) {
 		int totSize = 0;
 		
-		while(totSize != maxUpload){
+		while(totSize <= maxUpload){
 			totSize += sendMsg(node);
 		}
 	}
@@ -72,12 +78,35 @@ public class Router implements CDProtocol{
 	 * before being sent
 	 * @param msg - the message to be sent
 	 */
-	public void insertMsg (ArrivedMessage msg) {
-		if(router.add(msg))
-			System.out.println("Message successfully inserted into router.");
+	public void insertMsg (OrangeMessage msg) {
+		
+		/**
+		 * This part of the code should actually be deleted once 
+		 * emptyBuffer is actually called in the nextCycle event
+		 * so that the delay due to ABW is simulated.
+		 */
+		
+		Node sender = msg.sender;
+		Node receiver = msg.receiver;
+		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
+		send(
+			sender,
+			receiver,
+			msg,
+			pid);
+		
+		/**
+		 * This part works but is commented out because emptyBuffer is not yet 
+		 * functional (maxUpload not yet set) and thus results in intense memory usage.
+		 */
+		
+		/*if(router.add(msg)){
+			//System.out.println("Message successfully inserted into router.");
+		}
 		
 		else
 			System.out.println("An error occured while inserting the message into the router.");
+		*/
 	}
 	
 	/**
@@ -87,26 +116,23 @@ public class Router implements CDProtocol{
 	 * @return the size of the message sent 
 	 */
 	public int sendMsg (Node node) {
-		ArrivedMessage msg;
-		int size;
+		OrangeMessage msg;
 		
-		msg = router.poll(); // Get head of router
+		msg = router.poll(); // Get message at the head of router
 		
-		// TODO Auto-generated method stub	Set a receiver and size attribute in ArrivedMessage, update gcp2p	
-		Node receiver = null; // msg.receiver;		
+		//Get sender and receiver to pass it to the transport layer
+		Node sender = msg.sender;
+		Node receiver = msg.receiver;
 		
-		// Send message
-		((Transport)node.getProtocol(tid)).
+		// Send message		
+		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
 		send(
-			node,
+			sender,
 			receiver,
 			msg,
 			pid);
-		
-		// TODO
-		size = 0; //msg.size; // return size of message
-		
-		return size;
+				
+		return msg.size;
 	}
 
 	/**

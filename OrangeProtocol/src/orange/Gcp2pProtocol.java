@@ -48,6 +48,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	 */
 	private static final String PAR_TRANS = "transport";
 	/**
+	 * String name of the parameter, assigned to rid
+	 */
+	private static final String PAR_NET = "network";
+	/**
 	 * String name of the parameter, assigned to maxClients
 	 */
 	private static final String PAR_MAXCLIENTS = "maxclients";
@@ -66,6 +70,10 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	 *  Transport Protocol identifier, obtained from config property {@link #PAR_TRANS}. 
 	 **/
 	private static int tid;	
+	/**
+	 *  Network Protocol identifier, obtained from config property {@link #PAR_TRANS}. 
+	 **/
+	private static int nid;	
 	
 	/**
 	 * max number of possible clients for CDNs and SuperPeers, 
@@ -150,6 +158,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public Gcp2pProtocol(String prefix){
 		maxClients = Configuration.getInt(prefix + "." + PAR_MAXCLIENTS);
 		tid = Configuration.getPid(prefix + "." + PAR_TRANS);
+		nid = Configuration.getPid(prefix + "." + PAR_NET);
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 	}
@@ -171,8 +180,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		if(!left){
 			for(int i = 0; i < numPeers; i++){
 				// TODO size of the message
-				//prot.sendMsg(new OrangeMessage(OrangeMessage.UPLOAD, node, peerList[i], 0, peerSpdAlloted[i]));
-				prot.sendMsg(new ArrivedMessage(OrangeMessage.UPLOAD, node, peerSpdAlloted[i]), peerList[i]);
+				prot.sendMsg(new OrangeMessage(OrangeMessage.UPLOAD, node, peerList[i], 0, peerSpdAlloted[i]));
 				uploaded += peerSpdAlloted[i];
 				if(nodeTag != 0)
 				if(uploaded > 4*videoSize && nodeTag!=0){
@@ -180,17 +188,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					left = true;
 					if(nodeTag == SuperPeerTag)
 						// TODO size of the message
-						//prot.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE_AS_SP, node, connectedCDN, 0, prot.binID));
-						prot.sendMsg(new ArrivedMessage(OrangeMessage.GOODBYE_AS_SP, node, prot.binID), connectedCDN);
+						prot.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE_AS_SP, node, connectedCDN, 0, prot.binID));
 					else 
 						// TODO size of the message
-						//prot.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE_AS_NORMAL, node, connectedCDN, 0, prot.binID));
-						prot.sendMsg(new ArrivedMessage(OrangeMessage.GOODBYE_AS_NORMAL, node, prot.binID), connectedCDN);
+						prot.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE_AS_NORMAL, node, connectedCDN, 0, prot.binID));
 					
 					for(int j = 0; j < numPeers; j++){
 						// TODO size of the message
-						//prot.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE_AS_SOURCE, node, peerList[j], 0, peerSpdAlloted[j]));
-						prot.sendMsg(new ArrivedMessage(OrangeMessage.GOODBYE_AS_SOURCE, node, peerSpdAlloted[j]), peerList[j]);
+						prot.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE_AS_SOURCE, node, peerList[j], 0, peerSpdAlloted[j]));
 					}
 					
 					break;
@@ -201,8 +206,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			if(nodeTag != 0){
 				if(usedDownloadSpd < downloadSpd){
 					// TODO size of the message
-					//prot.sendMsg(new OrangeMessage(OrangeMessage.GET_SUPERPEER_2, node, prot.connectedCDN, 0, binID));
-					prot.sendMsg(new ArrivedMessage(OrangeMessage.GET_SUPERPEER_2, node, binID), prot.connectedCDN);
+					prot.sendMsg(new OrangeMessage(OrangeMessage.GET_SUPERPEER_2, node, prot.connectedCDN, 0, binID));
 				}
 				
 			}
@@ -215,7 +219,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	public void processEvent( Node node, int pid, Object event ) {
 		Gcp2pProtocol p = (Gcp2pProtocol) node.getProtocol(pid);
 		
-		ArrivedMessage omsg = (ArrivedMessage)event;
+		OrangeMessage omsg = (OrangeMessage)event;
 		//System.out.println(aem.msgType);
 		//CDN messages
 		//System.out.println(aem.sender.getIndex());
@@ -224,7 +228,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			*	message received requesting superpeer
 			*/
 			
-			if (omsg.msgType == ArrivedMessage.GET_SUPERPEER){		//new peer requests for its bin's SP. aem.data is the binID
+			if (omsg.msgType == OrangeMessage.GET_SUPERPEER){		//new peer requests for its bin's SP. aem.data is the binID
 				Gcp2pProtocol prot = (Gcp2pProtocol) omsg.sender.getProtocol(pid);
 				
 				int tempRTT = prot.cdnRTT;
@@ -239,32 +243,29 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					bestRTT[omsg.data] = tempRTT;
 
 				// TODO size of the message
-				//prot.sendMsg(new OrangeMessage(OrangeMessage.YOUR_SUPERPEER, node, omsg.sender, 0, sp));
-				prot.sendMsg(new ArrivedMessage(OrangeMessage.YOUR_SUPERPEER, node, sp), omsg.sender);
+				prot.sendMsg(new OrangeMessage(OrangeMessage.YOUR_SUPERPEER, node, omsg.sender, 0, sp));
 			}
-			else if (omsg.msgType == ArrivedMessage.GET_SUPERPEER_2){
+			else if (omsg.msgType == OrangeMessage.GET_SUPERPEER_2){
 				// TODO size of the message
-				//p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_SUPERPEER, node, omsg.sender, 0, superPeerList[omsg.data]));		
-				p.sendMsg(new ArrivedMessage(OrangeMessage.YOUR_SUPERPEER, node, superPeerList[omsg.data]), omsg.sender);		
+				p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_SUPERPEER, node, omsg.sender, 0, superPeerList[omsg.data]));		
 			}
-			else if (omsg.msgType == ArrivedMessage.DO_YOU_HAVE_THIS){			// this won't happen
+			else if (omsg.msgType == OrangeMessage.DO_YOU_HAVE_THIS){			// this won't happen
 				/**
 				*	message received asking if the CDN has the video
 				*/
 				int i;
-				int reply = ArrivedMessage.I_DONT_HAVE_IT;
+				int reply = OrangeMessage.I_DONT_HAVE_IT;
 				for(i = 0; i<videoList.length; i++){ // check if the requested video's id is in the list
 					if(omsg.data == videoList[i]){
-						reply = ArrivedMessage.I_HAVE_IT;
+						reply = OrangeMessage.I_HAVE_IT;
 						break;
 						}
 				}
 				Node temp = null;
 				// TODO size of the message
-				//p.sendMsg(new OrangeMessage(reply, node, omsg.sender, 0, temp));		
-				p.sendMsg(new ArrivedMessage(reply, node, temp), omsg.sender);							
+				p.sendMsg(new OrangeMessage(reply, node, omsg.sender, 0, temp));		
 			}
-			else if (omsg.msgType == ArrivedMessage.GET_MY_CLIENTS){		// a new SuperPeer requests for its clients. aem.data is the binID
+			else if (omsg.msgType == OrangeMessage.GET_MY_CLIENTS){		// a new SuperPeer requests for its clients. aem.data is the binID
 				/**
 				*	A peer asks for the list of clients in a certain bin
 				*	a peer will only request this when the YOUR_SUPERPEER message is null
@@ -275,23 +276,20 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				int [] tempWatching = binWatchList[omsg.data];
 				int tempSize = binSize[omsg.data];
 				// TODO size of the message
-				//p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_CLIENTS, node, omsg.sender, 0, temp, tempWatching, tempIndex, tempSize));		
-				p.sendMsg(new ArrivedMessage(OrangeMessage.YOUR_CLIENTS, node, temp, tempWatching, tempIndex, tempSize), omsg.sender);		
+				p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_CLIENTS, node, omsg.sender, 0, temp, tempWatching, tempIndex, tempSize));		
 				
 				if(superPeerList[omsg.data]!=null)		// send this to notify the old SP that he is fired
 					// TODO size of the message
-					//p.sendMsg(new OrangeMessage(OrangeMessage.FIRED, node, superPeerList[omsg.data], 0, omsg.sender));		
-					p.sendMsg(new ArrivedMessage(OrangeMessage.FIRED, node, omsg.sender), superPeerList[omsg.data]);		
+					p.sendMsg(new OrangeMessage(OrangeMessage.FIRED, node, superPeerList[omsg.data], 0, omsg.sender));		
 						
 				for(int i = 0; i<5; i++){
 					if(superPeerList[i] != null)
 						// TODO size of the message
-						//p.sendMsg(new OrangeMessage(OrangeMessage.UPDATE_SP, node, superPeerList[i], 0,superPeerList[omsg.data], omsg.sender));		
-						p.sendMsg(new ArrivedMessage(OrangeMessage.UPDATE_SP, node, superPeerList[omsg.data], omsg.sender), superPeerList[i]);		
+						p.sendMsg(new OrangeMessage(OrangeMessage.UPDATE_SP, node, superPeerList[i], 0,superPeerList[omsg.data], omsg.sender));		
 				}
 				superPeerList[omsg.data] = omsg.sender;	// make the sender the SP
 			}
-			else if (omsg.msgType == ArrivedMessage.GOODBYE_AS_SP){
+			else if (omsg.msgType == OrangeMessage.GOODBYE_AS_SP){
 				for (int i = 0; i < 6; i++){
 					//remove as client
 					for(int j = 0; j < maxClients; j++){
@@ -320,15 +318,14 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						superPeerList[i] = currentBest;
 						Node sp = null;
 						// TODO size of the message
-						//p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_SUPERPEER, node, omsg.sender, 0, superPeerList[i], sp));		
-						p.sendMsg(new ArrivedMessage(OrangeMessage.YOUR_SUPERPEER, node, superPeerList[i], sp), omsg.sender);		
+						p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_SUPERPEER, node, omsg.sender, 0, superPeerList[i], sp));		
 						break;
 					}
 					
 				}
 				
 			}
-			else if (omsg.msgType == ArrivedMessage.GOODBYE_AS_NORMAL){
+			else if (omsg.msgType == OrangeMessage.GOODBYE_AS_NORMAL){
 				for (int i = 0; i < 6; i++){
 					//remove as client
 					for(int j = 0; j < maxClients; j++){
@@ -336,19 +333,13 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 							binList[i][j] = null;							
 							break;
 						}
-					}
-				
-				}
-				
-			}
-			
-			
-			
+					}				
+				}				
+			}			
 		}
 		else if (nodeTag == 1){
-				if (omsg.msgType == ArrivedMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
+				if (omsg.msgType == OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
 					Gcp2pProtocol prot = (Gcp2pProtocol)omsg.sender.getProtocol(pid);
-					Gcp2pProtocol prot2 = (Gcp2pProtocol)node.getProtocol(pid);
 					//System.out.println("REQUEST: Category = "+aem.data0 +": SuperPeer Index = "+ node.getIndex() + ": Sender Index = "+aem.sender.getIndex()+": SP numClients = "+numClients);
 					int temp[] = indexPerCategory[omsg.data0];		// get the list of indices of the peers watching a certain category
 					Node[] peers = new Node[maxClients];
@@ -365,9 +356,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						//System.out.println("Why?");
 					}
 					// TODO size of the message
-					//p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_PEERS, node, omsg.sender, 0, peers, j));		
-					p.sendMsg(new ArrivedMessage(OrangeMessage.YOUR_PEERS, node, peers, j), omsg.sender);		
-					
+					p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_PEERS, node, omsg.sender, 0, peers, j));		
+						
 					if(prot.binID == binID && !prot.binned){
 						clientList[numClients] = omsg.sender;
 						clientWatching[numClients] = omsg.data;
@@ -383,20 +373,18 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					
 				}
 				
-				else if (omsg.msgType == ArrivedMessage.REQUEST_PEERS_FROM_OTHER_BINS){	// the peers returned in REQUEST_PEERS_FROM_THIS_BIN is empty
+				else if (omsg.msgType == OrangeMessage.REQUEST_PEERS_FROM_OTHER_BINS){	// the peers returned in REQUEST_PEERS_FROM_THIS_BIN is empty
 					for(int i= 0; i<5; i++){							// send requests to other SP and define the new peer as the sender. This will make the other SP
 																		// to send their Reply to the new peer
 						if(otherSP[i] != null)
 							// TODO size of the message
-							//p.sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN, node, otherSP[i], 0, omsg.data0, omsg.data));		
-							p.sendMsg(new ArrivedMessage(OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN, node, omsg.data0, omsg.data), otherSP[i]);		
+							p.sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN, node, otherSP[i], 0, omsg.data0, omsg.data));		
 						else 
 							// TODO size of the message
-							//p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_PEERS, node, omsg.sender, 0, null, 0));		
-							p.sendMsg(new ArrivedMessage(OrangeMessage.YOUR_PEERS, node, null, 0), omsg.sender);		
+							p.sendMsg(new OrangeMessage(OrangeMessage.YOUR_PEERS, node, omsg.sender, 0, null, 0));		
 					}
 				}
-				else if (omsg.msgType == ArrivedMessage.UPDATE_SP){
+				else if (omsg.msgType == OrangeMessage.UPDATE_SP){
 					for(int i = 0; i<5; i++){
 						Node temp = omsg.node1;
 						if(otherSP[i]==(temp)){
@@ -407,7 +395,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					}
 					
 				}
-				else if (omsg.msgType == ArrivedMessage.FIRED){									// the peer is not a SP anymore
+				else if (omsg.msgType == OrangeMessage.FIRED){									// the peer is not a SP anymore
 					nodeTag = 2;
 				}
 				
@@ -415,7 +403,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		}
 		
 		// Node is a Regular Peer
-			if(omsg.msgType == ArrivedMessage.UPLOAD){					// a chunk is delivered. aem.data is the chunk
+			if(omsg.msgType == OrangeMessage.UPLOAD){					// a chunk is delivered. aem.data is the chunk
 				//System.out.println("UPLOADED TO "+node.getIndex());
 				streamedVideoSize = streamedVideoSize + omsg.data;
 				if(!firstPlayback && streamedVideoSize >= 400) {
@@ -425,20 +413,17 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				if(streamedVideoSize>= videoSize){		// check if done streaming. if yes, send GOODBYE messages
 					for(int i = 0; i< numSource; i++){
 						// TODO size of the message
-						//p.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE, node, sourcePeerList[i], 0, 0));		
-						p.sendMsg(new ArrivedMessage(OrangeMessage.GOODBYE, node, 0), sourcePeerList[i]);		
+						p.sendMsg(new OrangeMessage(OrangeMessage.GOODBYE, node, sourcePeerList[i], 0, 0));		
 					}
 					doneStreaming = true;
 				}
 			}
-			else if (omsg.msgType == ArrivedMessage.YOUR_PEERS){			// The peerList was sent by the SP
+			else if (omsg.msgType == OrangeMessage.YOUR_PEERS){			// The peerList was sent by the SP
 				int i = 0;
 					if(omsg.data == 0){						// if the list is empty, request from other bins
 						if(SPreply == 0){					// if SPreply = 0 means that it was sent from the peer's SP
 							// TODO size of the message
-							//p.sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_OTHER_BINS, node, omsg.sender, 0, categoryID, videoID));		
-							p.sendMsg(new ArrivedMessage(OrangeMessage.REQUEST_PEERS_FROM_OTHER_BINS, node, categoryID, videoID), omsg.sender);		
-							
+							p.sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_OTHER_BINS, node, omsg.sender, 0, categoryID, videoID));				
 						}
 						//System.out.println("Nangyari ba?");
 					}
@@ -447,8 +432,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 							while(usedDownloadSpd < downloadSpd && i < omsg.data){
 								if(omsg.nodeList[i]!= null) {
 									// TODO size of the message
-									//p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, omsg.nodeList[i], 0, downloadSpd - usedDownloadSpd));		
-									p.sendMsg(new ArrivedMessage(OrangeMessage.CONNECT, node, downloadSpd - usedDownloadSpd), omsg.nodeList[i]);		
+									p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, omsg.nodeList[i], 0, downloadSpd - usedDownloadSpd));		
 									numConnectionsAttempted++;
 								}
 								i++;
@@ -469,16 +453,13 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						while(usedDownloadSpd < downloadSpd && i < highestStreamingSameVid){	//send CONNECT messages to the bin with the highest number of peers
 							if(candidatePeers[i]!=(null))
 								// TODO size of the message
-								//p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, candidatePeers[i], 0, downloadSpd - usedDownloadSpd));		
-								p.sendMsg(new ArrivedMessage(OrangeMessage.CONNECT, node, downloadSpd - usedDownloadSpd), candidatePeers[i]);		
-							
-							numConnectionsAttempted++;
-							i++;
+								p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, candidatePeers[i], 0, downloadSpd - usedDownloadSpd));		
+								numConnectionsAttempted++;
+								i++;
 							}
 						if(highestStreamingSameVid == 0){
 							// TODO size of the message
-							//p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, connectedCDN, 0, downloadSpd - usedDownloadSpd));		
-							p.sendMsg(new ArrivedMessage(OrangeMessage.CONNECT, node, downloadSpd - usedDownloadSpd), connectedCDN);		
+							p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, connectedCDN, 0, downloadSpd - usedDownloadSpd));		
 							numConnectionsAttempted++;				
 						}
 						//i++;
@@ -487,7 +468,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					}
 			
 			}
-			else if (omsg.msgType == ArrivedMessage.UPLOAD_SPEED_THAT_CAN_BE_GIVEN){	// reply to the CONNECT request. aem.data is the maximum upload spd that can be given
+			else if (omsg.msgType == OrangeMessage.UPLOAD_SPEED_THAT_CAN_BE_GIVEN){	// reply to the CONNECT request. aem.data is the maximum upload spd that can be given
 					int spdAvail = downloadSpd - usedDownloadSpd;
 					int tobeAccepted = 0;
 					if (spdAvail > 0){									// check if the available download spd is not yet maxed
@@ -501,8 +482,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						else tobeAccepted = spdAvail;					// if not, get only the available download spd
 						usedDownloadSpd = usedDownloadSpd + tobeAccepted;
 						// TODO size of the message
-						//p.sendMsg(new OrangeMessage(OrangeMessage.ACCEPT_SPEED, node, omsg.sender, 0, omsg.data, tobeAccepted));		
-						p.sendMsg(new ArrivedMessage(OrangeMessage.ACCEPT_SPEED, node, omsg.data, tobeAccepted), omsg.sender);		
+						p.sendMsg(new OrangeMessage(OrangeMessage.ACCEPT_SPEED, node, omsg.sender, 0, omsg.data, tobeAccepted));		
 						
 						//System.out.println(numSource);
 						sourcePeerList[numSource] = omsg.sender;
@@ -511,13 +491,12 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					}
 					else {												// if the download spd is maxed, send a REJECT message
 						// TODO size of the message
-						//p.sendMsg(new OrangeMessage(OrangeMessage.REJECT_SPEED, node, omsg.sender, 0, omsg.data));		
-						p.sendMsg(new ArrivedMessage(OrangeMessage.REJECT_SPEED, node, omsg.data), omsg.sender);		
+						p.sendMsg(new OrangeMessage(OrangeMessage.REJECT_SPEED, node, omsg.sender, 0, omsg.data));		
 					}
 					
 					
 			}
-			else if (omsg.msgType == ArrivedMessage.ACCEPT_SPEED){						// reply to the proposed upload spd. aem.date0 is the proposed upload spd. aem.data is the acceoted sod
+			else if (omsg.msgType == OrangeMessage.ACCEPT_SPEED){						// reply to the proposed upload spd. aem.date0 is the proposed upload spd. aem.data is the acceoted sod
 				peerList[numPeers] = omsg.sender;
 				peerSpdAlloted[numPeers] = omsg.data;
 				if(nodeTag == 0){
@@ -534,11 +513,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				//if(CID == 0)
 					//System.out.println("CDN CONNECTED");
 			}
-			else if (omsg.msgType == ArrivedMessage.REJECT_SPEED){						// if the upload spd is rejected, remove the reserved uploadSpd in the uploadSpdBuffer
+			else if (omsg.msgType == OrangeMessage.REJECT_SPEED){						// if the upload spd is rejected, remove the reserved uploadSpd in the uploadSpdBuffer
 				uploadSpdBuffer = uploadSpdBuffer - omsg.data;
 				startedStreaming = true;
 			}
-			else if (omsg.msgType == ArrivedMessage.CONNECT){								// a peer is requesting for upload Spd
+			else if (omsg.msgType == OrangeMessage.CONNECT){								// a peer is requesting for upload Spd
 				int spdAvail = uploadSpd - usedUploadSpd - uploadSpdBuffer;	// get the unused upload spd
 				if(nodeTag == 0){
 					Gcp2pProtocol prot = (Gcp2pProtocol) omsg.sender.getProtocol(pid);
@@ -547,25 +526,23 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				if(spdAvail>0){		
 					// if the spd available is not zeroed out. send the spd available
 					// TODO size of the message
-					//p.sendMsg(new OrangeMessage(OrangeMessage.UPLOAD_SPEED_THAT_CAN_BE_GIVEN, node, omsg.sender, 0, spdAvail));		
-					p.sendMsg(new ArrivedMessage(OrangeMessage.UPLOAD_SPEED_THAT_CAN_BE_GIVEN, node, spdAvail), omsg.sender);		
+					p.sendMsg(new OrangeMessage(OrangeMessage.UPLOAD_SPEED_THAT_CAN_BE_GIVEN, node, omsg.sender, 0, spdAvail));		
 					uploadSpdBuffer+= spdAvail;
 				}
 				else {														// if there is no available upload spd. reject the CONNECT request
 					// TODO size of the message
-					//p.sendMsg(new OrangeMessage(OrangeMessage.REJECT, node, omsg.sender, 0, 0));		
-					p.sendMsg(new ArrivedMessage(OrangeMessage.REJECT, node, 0), omsg.sender);		
+					p.sendMsg(new OrangeMessage(OrangeMessage.REJECT, node, omsg.sender, 0, 0));		
 				}
 				//startedStreaming = true;
 				//if(nodeTag == 0)
 					//System.out.println("connect");
 				
 			}
-			else if (omsg.msgType == ArrivedMessage.REJECT){
+			else if (omsg.msgType == OrangeMessage.REJECT){
 					//hindi ko pa alam ano mangyayari
 				numConnectionsRejected++;
 			}
-			else if (omsg.msgType == ArrivedMessage.YOUR_CLIENTS){							// the CDN sent your clients
+			else if (omsg.msgType == OrangeMessage.YOUR_CLIENTS){							// the CDN sent your clients
 				nodeTag = 1;
 				clientList = omsg.nodeList;
 				clientWatching = omsg.peerWatching;
@@ -576,14 +553,12 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
 				
 				// TODO size of the message
-				//p.sendMsg(new OrangeMessage(OrangeMessage.GET_SUPERPEER, node, prot.connectedCDN, 0, binID));		
-				p.sendMsg(new ArrivedMessage(OrangeMessage.GET_SUPERPEER, node, 0, binID), prot.connectedCDN);		
+				p.sendMsg(new OrangeMessage(OrangeMessage.GET_SUPERPEER, node, prot.connectedCDN, 0, binID));		
 			}
-			else if (omsg.msgType == ArrivedMessage.YOUR_SUPERPEER){						// not gonna happen
+			else if (omsg.msgType == OrangeMessage.YOUR_SUPERPEER){						// not gonna happen
 				if(omsg.superPeer!=null){
 					// TODO size of the message
-					//p.sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN, node, omsg.superPeer, 0, categoryID, videoID));		
-					p.sendMsg(new ArrivedMessage(OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN, node, categoryID, videoID), omsg.superPeer);		
+					p.sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN, node, omsg.superPeer, 0, categoryID, videoID));		
 					if(!firstConnect && !startTimeLogged){
 						setStartTime();
 						startTimeLogged = true;
@@ -591,12 +566,11 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				}
 				else{
 					// TODO size of the message
-					//p.sendMsg(new OrangeMessage(OrangeMessage.GET_MY_CLIENTS, node, omsg.sender, 0, binID));		
-					p.sendMsg(new ArrivedMessage(OrangeMessage.GET_MY_CLIENTS, node, binID), omsg.sender);		
+					p.sendMsg(new OrangeMessage(OrangeMessage.GET_MY_CLIENTS, node, omsg.sender, 0, binID));		
 				}
 			}
 			
-			else if (omsg.msgType == ArrivedMessage.GOODBYE){
+			else if (omsg.msgType == OrangeMessage.GOODBYE){
 				for(int i = 0; i < maxClients; i++){
 					if(peerList[i] == omsg.sender){
 						usedUploadSpd = usedUploadSpd -peerSpdAlloted[i];
@@ -609,51 +583,27 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					}					
 				}				
 			}
-			else if (omsg.msgType == ArrivedMessage.GOODBYE_AS_SOURCE){
+			else if (omsg.msgType == OrangeMessage.GOODBYE_AS_SOURCE){
 				usedDownloadSpd -= omsg.data;
 				if (usedDownloadSpd < 0)
 					System.out.println("Negative Speed");
 			}
 	}
 	
-	public void sendOMsg(OrangeMessage orangeMsg)
+	public void sendMsg(OrangeMessage orangeMsg)
 	{
 		Node sender = orangeMsg.sender;
 		Node receiver = orangeMsg.receiver;
 		
-		if(receiver == null)
-		{
-			System.out.println("Message Type: " + orangeMsg.msgType);
-		}
-		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
-							send(
-								sender,
-								receiver,
-								orangeMsg,
-								pid);
+		Router router = (Router)sender.getProtocol(nid);
+		router.insertMsg(orangeMsg);		
 	}
 	
-	public void sendMsg(ArrivedMessage msg, Node receiver)
-	{
-		Node sender = msg.sender;
-		
-		if(receiver == null)
-		{
-			System.out.println("Message Type: " + msg.msgType);
-		}
-		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
-							send(
-								sender,
-								receiver,
-								msg,
-								pid);
-	}
+	
 	public void start(Node node){
 		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
 		// TODO size of the message
-		// prot.sendMsg(new OrangeMessage(OrangeMessage.GET_SUPERPEER, node, prot.connectedCDN, 0, binID));
-		
-		prot.sendMsg(new ArrivedMessage(OrangeMessage.GET_SUPERPEER, node, binID), prot.connectedCDN);
+		prot.sendMsg(new OrangeMessage(OrangeMessage.GET_SUPERPEER, node, prot.connectedCDN, 0, binID));
 				
 		//System.out.println(node.getIndex());
 		if(prot.connectedCDN == null)

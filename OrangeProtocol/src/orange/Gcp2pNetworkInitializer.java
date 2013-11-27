@@ -263,7 +263,8 @@ public class Gcp2pNetworkInitializer implements Control {
 				prot2.numSource = 0;
 				// Set the connection
 				//prot2.start(n);
-				EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);
+				// TODO size?
+				EDSimulator.add(10, new OrangeMessage(OrangeMessage.GET_SUPERPEER, n, prot2.connectedCDN, 0, prot2.binID), prot2.connectedCDN, pid);
 			}
 		}
 	}
