@@ -9,7 +9,7 @@ import peersim.edsim.EDSimulator;
 * @author Fatima De Villa, Janeri Ongcol, Bryan Tan
 * @version 1.0
 */
-public class OrangeDynamicPop implements Control{
+public class DynamicPop implements Control{
 	// ------------------------------------------------------------------------
 	// Parameters
 	// ------------------------------------------------------------------------		
@@ -26,7 +26,7 @@ public class OrangeDynamicPop implements Control{
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------	
-	public OrangeDynamicPop(String prefix){
+	public DynamicPop(String prefix){
 		pid = Configuration.getPid(prefix + "." + PAR_PROTOCOL);
 		maxsize = Configuration.getInt(prefix + "." + PAR_MAXSIZE);
 		Object[] tmp = Configuration.getInstanceArray(prefix + "." + PAR_INIT);
@@ -40,6 +40,7 @@ public class OrangeDynamicPop implements Control{
 	public final boolean execute(){
 		if(joinedPeerSize<maxsize){
 			int n = CommonState.r.nextInt(200);
+			System.out.println("To be added: "+n);
 			if(n>maxsize-joinedPeerSize)
 				n = maxsize-joinedPeerSize;
 			add(n);
@@ -57,8 +58,7 @@ public class OrangeDynamicPop implements Control{
 				inits[j].initialize(newnode);
 			}
 			Network.add(newnode);
-			//System.out.println(newnode.getIndex());
-			OrangeProtocol prot = (OrangeProtocol) newnode.getProtocol(pid);
+			Gcp2pProtocol prot = (Gcp2pProtocol) newnode.getProtocol(pid);
 			prot.start(newnode);
 			//EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, newnode, prot.binID), prot.connectedCDN, pid);
 		}

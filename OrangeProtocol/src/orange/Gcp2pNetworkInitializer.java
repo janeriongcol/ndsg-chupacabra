@@ -14,7 +14,7 @@ import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDSimulator;
 
-public class OrangeNetworkInitializer implements Control {
+public class Gcp2pNetworkInitializer implements Control {
 	
 	// ------------------------------------------------------------------------
 	// Constants
@@ -23,7 +23,7 @@ public class OrangeNetworkInitializer implements Control {
 	private static final int minLandmarkRTT = 30;
 	private static final int maxCDNRTT = 15;
 	private static final int minCDNRTT = 0;
-	private static final int maxBins = OrangeProtocol.maxBins;
+	private static final int maxBins = Gcp2pProtocol.maxBins;
 	// ------------------------------------------------------------------------
 	// Parameters
 	// ------------------------------------------------------------------------
@@ -41,7 +41,7 @@ public class OrangeNetworkInitializer implements Control {
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
-	public OrangeNetworkInitializer(String prefix) {
+	public Gcp2pNetworkInitializer(String prefix) {
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 		tid = Configuration.getPid(prefix + "." + PAR_TRANS);
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
@@ -55,7 +55,7 @@ public class OrangeNetworkInitializer implements Control {
 		 * Initialize values contained by the nodes.
 		 */
 		Node n;
-		OrangeProtocol prot, prot2;
+		Gcp2pProtocol prot, prot2;
 
 		for (int i = 0; i < Network.size() ; i++) {
 			n = Network.get(i);	//current node
@@ -76,12 +76,12 @@ public class OrangeNetworkInitializer implements Control {
 		
 		for (int i = 3; i < Network.size(); i++){
 			n = Network.get(i);
-			prot = (OrangeProtocol) n.getProtocol(pid);
+			prot = (Gcp2pProtocol) n.getProtocol(pid);
 			prot.computeBin();			//assign bin based on its landmark RTTS in its CDN area
 			binID = prot.getbinID();	//get its binID
 			
 			Node cdn = prot.getConnectedCDN();			//get the CDN node its connected to
-			prot2 = (OrangeProtocol) cdn.getProtocol(pid);
+			prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
 			
 			prot2.addToBin(binID, n);				//add the node to the corresponding bin in its CDN
 			
@@ -93,15 +93,15 @@ public class OrangeNetworkInitializer implements Control {
 		 * After which, initialize the connections among the Regular peers in each bin of each CDN group.
 		 */
 				
-		prot = (OrangeProtocol) OrangeProtocol.CDN1.getProtocol(pid);
+		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
 		//setInitSuperPeers(prot);
 		//setInitRegularConnection(prot);
 		
-		prot = (OrangeProtocol) OrangeProtocol.CDN2.getProtocol(pid);
+		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN2.getProtocol(pid);
 		//setInitSuperPeers(prot);
 		//setInitRegularConnection(prot);
 		
-		prot = (OrangeProtocol) OrangeProtocol.CDN3.getProtocol(pid);
+		prot = (Gcp2pProtocol) Gcp2pProtocol.CDN3.getProtocol(pid);
 		//setInitSuperPeers(prot);
 		//setInitRegularConnection(prot);
 
@@ -125,18 +125,18 @@ public class OrangeNetworkInitializer implements Control {
 		 */
 		switch(cdnID)
 		{
-				case 1: OrangeProtocol.CDN1 = n;
+				case 1: Gcp2pProtocol.CDN1 = n;
 						break;
-				case 2: OrangeProtocol.CDN2 = n;
+				case 2: Gcp2pProtocol.CDN2 = n;
 						break;
-				case 3: OrangeProtocol.CDN3 = n;
+				case 3: Gcp2pProtocol.CDN3 = n;
 						break;
 		}
 		
-		OrangeProtocol prot = (OrangeProtocol) n.getProtocol(pid);
-		prot.setNodeTag(OrangeProtocol.CDNTag);	//tag as CDN
+		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
+		prot.setNodeTag(Gcp2pProtocol.CDNTag);	//tag as CDN
 		
-		int maxClients = OrangeProtocol.maxClients;
+		int maxClients = Gcp2pProtocol.maxClients;
 				
 		prot.setConnectedCDN(0);	//0 because it is the CDN istelf
 		prot.setCDNRTT(0);	//distance to itself is 0
@@ -173,7 +173,7 @@ public class OrangeNetworkInitializer implements Control {
 	 * @param prot	- refers to the CDN node
 	 * @return
 	 */
-	public void setInitSuperPeers(OrangeProtocol prot)
+	public void setInitSuperPeers(Gcp2pProtocol prot)
 	{
 		/**
 		 * Set bestRTT in each bin to 101 so that when
@@ -185,7 +185,7 @@ public class OrangeNetworkInitializer implements Control {
 		}
 		
 		int binsize, bestRTT;
-		OrangeProtocol prot2;
+		Gcp2pProtocol prot2;
 		
 		for(int binID = 0; binID < maxBins; binID ++)	//iterate through each bin
 		{
@@ -198,7 +198,7 @@ public class OrangeNetworkInitializer implements Control {
 			for(int j = 0; j < binsize; j++)
 			{
 				n = prot.binList[binID][j];
-				prot2 = (OrangeProtocol) n.getProtocol(pid);
+				prot2 = (Gcp2pProtocol) n.getProtocol(pid);
 				
 				//if better than the current bestRTT, set as the tempSuperpeer
 				if(prot2.getCDNRTT() < bestRTT)
@@ -215,8 +215,8 @@ public class OrangeNetworkInitializer implements Control {
 			prot.setSuperPeer(tempSuperpeer, binID);
 			
 			//Tag the node as SuperPeer
-			prot2 = (OrangeProtocol) tempSuperpeer.getProtocol(pid);
-			prot2.setNodeTag(OrangeProtocol.SuperPeerTag);
+			prot2 = (Gcp2pProtocol) tempSuperpeer.getProtocol(pid);
+			prot2.setNodeTag(Gcp2pProtocol.SuperPeerTag);
 			//prot2.clientList = prot.binList[binID];
 			prot2.setClientList(prot.binList[binID]);
 			//System.arraycopy(prot.binList[binID], 0, prot2.clientList, 0, prot.binList[binID].length);
@@ -236,12 +236,12 @@ public class OrangeNetworkInitializer implements Control {
 	 * @param prot
 	 */
 	
-	public void setInitRegularConnection (OrangeProtocol prot) {
+	public void setInitRegularConnection (Gcp2pProtocol prot) {
 		// Iterate through all the nodes in a bin
 		for (int binID=0; binID<maxBins; binID++) {
 			for (int i=0; i<prot.binSize[binID]; i++) {
 				Node n = prot.binList[binID][i];
-				OrangeProtocol prot2 = (OrangeProtocol) n.getProtocol(pid);
+				Gcp2pProtocol prot2 = (Gcp2pProtocol) n.getProtocol(pid);
 				
 				// Initialize the global variables of the node
 				prot2.indexPerCategory = null;
@@ -263,7 +263,7 @@ public class OrangeNetworkInitializer implements Control {
 				prot2.numSource = 0;
 				// Set the connection
 				//prot2.start(n);
-				EDSimulator.add(10, new OrangeArrivedMessage(OrangeArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);
+				EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);
 			}
 		}
 	}
@@ -282,13 +282,13 @@ public class OrangeNetworkInitializer implements Control {
 		// This never happens since the Network starts with CDNs as initial nodes
 		if (Network.size() == 0) { return; }
 		
-		OrangeProtocol prot = (OrangeProtocol) n.getProtocol(pid);
+		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
 		
 		// Set the start time
-		prot.setStartTime();
+		
 		
 		// Set the node as Regular 
-		prot.setNodeTag(OrangeProtocol.RegularTag); 
+		prot.setNodeTag(Gcp2pProtocol.RegularTag); 
 		
 		// Randomly set the nodes connected CDN (CDN1, CDN2, or CDN3) cdnID range [1, 3]
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1);  
@@ -301,9 +301,9 @@ public class OrangeNetworkInitializer implements Control {
 		
 		// Get the CDN the node is connected to and add it as its client
 		Node cdn;
-		OrangeProtocol prot2;
+		Gcp2pProtocol prot2;
 		cdn = prot.getConnectedCDN();
-		prot2 = (OrangeProtocol) cdn.getProtocol(pid);
+		prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
 		prot2.addClient(n);	
 		
 		// Set the node's speed

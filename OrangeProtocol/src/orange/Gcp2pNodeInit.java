@@ -4,7 +4,7 @@ import peersim.core.*;
 import peersim.config.Configuration;
 import peersim.dynamics.*;
 
-public class OrangeNodeInit implements NodeInitializer{
+public class Gcp2pNodeInit implements NodeInitializer{
 	
 	
 	/*
@@ -20,12 +20,15 @@ public class OrangeNodeInit implements NodeInitializer{
 	*/
 	
 	private final String PAR_CATEGORY = "category";
-	
+	private final String PAR_MINVIDEOSIZE = "minVideoSize";
+	private final String PAR_RANGEVIDEOSIZE = "rangeVideoSize";
 	
 	
 	
 	private int pid;
 	private int category;
+	private int maxVideoSize;
+	private int rangeVideoSize;
 	/*
 	*	GLOBALS
 	*/
@@ -33,9 +36,11 @@ public class OrangeNodeInit implements NodeInitializer{
 	
 	
 	
-	public OrangeNodeInit(String prefix){
+	public Gcp2pNodeInit(String prefix){
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
+		maxVideoSize = Configuration.getInt(prefix + "." + PAR_MINVIDEOSIZE);
+		rangeVideoSize = Configuration.getInt(prefix + "." + PAR_RANGEVIDEOSIZE);
 	}
 	
 	/**
@@ -50,17 +55,17 @@ public class OrangeNodeInit implements NodeInitializer{
 	public void initialize(Node n)
 	{
 		if (Network.size() == 0) return; // never happens since the Network starts with CDNs as initial nodes
-		OrangeProtocol prot = (OrangeProtocol) n.getProtocol(pid);
+		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
 		
-		prot.setNodeTag(OrangeProtocol.RegularTag); // initialize the node to be Regular
+		prot.setNodeTag(Gcp2pProtocol.RegularTag); // initialize the node to be Regular
 		
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1); //random pick a CDN group to belong to range[1-3]
 		
 		Node cdn = prot.getConnectedCDN();
-		OrangeProtocol prot2;
+		Gcp2pProtocol prot2;
 		
 		//add to the clientlist of its CDN
-		prot2 = (OrangeProtocol) cdn.getProtocol(pid);
+		prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
 		prot2.addClient(n);
 			
 		
@@ -80,13 +85,14 @@ public class OrangeNodeInit implements NodeInitializer{
 		prot.usedDownloadSpd = 0; // initialize to zero since it is not yet streaming
 		prot.videoID = CommonState.r.nextInt(category*20); // get a random video ID, each category has 20 videos each. Range [0, 19]
 		prot.categoryID = prot.videoID/20;
-		prot.videoSize = CommonState.r.nextInt(10000)+10000;
+		prot.videoSize = CommonState.r.nextInt(rangeVideoSize)+maxVideoSize;
 		prot.computeBin();
 		prot.numPeers = 0;
 		prot.numSource = 0;
 		prot.sourcePeerList = new Node[prot.maxClients];
 		prot.peerList = new Node[prot.maxClients];
 		prot.peerSpdAlloted = new int [prot.maxClients];
+		prot.setStartTime();
 		prot2.addToBin(prot.binID, n);
 		//prot.start(n);
 		//EDSimulator.add(1, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, n, prot2.binID), prot2.connectedCDN, pid);

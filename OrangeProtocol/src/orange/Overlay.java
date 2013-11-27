@@ -9,7 +9,7 @@ import peersim.core.*;
  * @version 1.0
  */
 
-public interface OrangeOverlay
+public interface Overlay
 {
 
 	/**

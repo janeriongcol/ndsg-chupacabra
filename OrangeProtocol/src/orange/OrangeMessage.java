@@ -2,8 +2,7 @@ package orange;
 
 import peersim.core.Node;
 
-public class OrangeArrivedMessage {
-	
+public class OrangeMessage extends SimpleMessage{
 	/**
 	*	Message TYPES
 	*/
@@ -37,9 +36,6 @@ public class OrangeArrivedMessage {
 	static final int GOODBYE_AS_NORMAL = 27;
 	static final int GET_SUPERPEER_2 = 28;
 	
-	
-	final int    msgType;
-	final Node   sender;
 	public int    data0;
 	public int    data;
 	public Node[] nodeList;
@@ -49,67 +45,73 @@ public class OrangeArrivedMessage {
 	public Node node1;
 	public Node node2;
 	
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, int data0, int data) // DO_YOU_HAVE_THIS, REQUEST_PEERS_FROM_THIS_BIN, REQUEST_PEERS_FROM_OTHER_BINS, ACCEPT_SPEED
+	// DO_YOU_HAVE_THIS, REQUEST_PEERS_FROM_THIS_BIN, REQUEST_PEERS_FROM_OTHER_BINS, ACCEPT_SPEED
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, int data0, int data) 
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.data0     = data0;
 		this.data = data;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, Node node1, Node node2) //UPDATE_SP, 
+	
+	//UPDATE_SP
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, Node node1, Node node2) 
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.node1     = node1;
 		this.node2 = node2;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList)
+	
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size,Node[] nodeList)
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.nodeList = nodeList;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int data)// YOUR_PEERS, 
+	
+	// YOUR_PEERS
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, Node[] nodeList, int data)
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.nodeList = nodeList;
 		this.data 		= data;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, Node superPeer) // YOUR_SUPERPEER, I_DONT_HAVE_IT, I_HAVE_IT, FIRED
+	
+	// YOUR_SUPERPEER, I_DONT_HAVE_IT, I_HAVE_IT, FIRED
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, Node superPeer) 
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.superPeer = superPeer;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, int data) //GET_SUPERPEER,GET_MY_CLIENTS, UPLOAD, GOODBYE, CONNECT, UPLOAD_SPEED_THAT_CAN_BE_GIVEN, REJECT_SPEED
+	
+	//GET_SUPERPEER, GET_MY_CLIENTS, UPLOAD, GOODBYE, CONNECT, UPLOAD_SPEED_THAT_CAN_BE_GIVEN, REJECT_SPEED
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, int data) 
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.data = data;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int[] peerWatching)
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, Node[] nodeList, int[] peerWatching)
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.nodeList = nodeList;
 		this.peerWatching = peerWatching;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int[] peerWatching, int[][] index) //YOUR_CLIENTS
+	
+	//YOUR_CLIENTS
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, Node[] nodeList, int[] peerWatching, int[][] index) 
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.nodeList = nodeList;
 		this.peerWatching = peerWatching;
 		this.index = index;
 	}
-	public OrangeArrivedMessage(int typeOfMsg, Node sender, Node[] nodeList, int[] peerWatching, int[][] index, int data) //YOUR_CLIENTS
+	
+	//YOUR_CLIENTS
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, Node[] nodeList, int[] peerWatching, int[][] index, int data) 
 	{
-		this.msgType    = typeOfMsg;
-		this.sender       = sender;
+		super(typeOfMsg, sender, receiver, size);
 		this.nodeList = nodeList;
 		this.peerWatching = peerWatching;
 		this.index = index;
 		this.data = data;
 	}
+
 }
