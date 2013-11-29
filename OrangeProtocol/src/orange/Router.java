@@ -47,17 +47,19 @@ public class Router implements CDProtocol{
 		tid = Configuration.getPid(prefix + "." + PAR_TRANS);
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 	}
-	
+	int maxUpload;
 	@Override
 	public void nextCycle(Node node, int pid) {
 		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
-		int maxUpload = prot.getUploadSpd();
+		maxUpload = prot.getUploadSpd();
 		/**
 		 * Comment out code below if only maxUpload has been set,
 		 * otherwise, an infinite loop will happen. 
 		 * You have been warned....
 		 */
-		//emptyBuffer(node, maxUpload);
+		totSize = 0;
+		emptyBuffer(node, maxUpload);
+		//System.out.println("empty");
 	}
 	
 	/**
@@ -65,11 +67,17 @@ public class Router implements CDProtocol{
 	 * @param node	- this node
 	 * @param maxUpload - max upload speed of this node
 	 */
+	int totSize = 0;
 	public void emptyBuffer (Node node, int maxUpload) {
-		int totSize = 0;
 		
-		while(totSize <= maxUpload){
-			totSize += sendMsg(node);
+		
+		while(totSize <= maxUpload && !router.isEmpty()){
+			OrangeMessage peek = router.peek();
+			if(peek.size <= maxUpload - totSize){
+				totSize += sendMsg();
+			}
+			else
+				break;
 		}
 	}
 	
@@ -86,7 +94,7 @@ public class Router implements CDProtocol{
 		 * so that the delay due to ABW is simulated.
 		 */
 		
-		Node sender = msg.sender;
+		/*Node sender = msg.sender;
 		Node receiver = msg.receiver;
 		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
 		send(
@@ -94,12 +102,17 @@ public class Router implements CDProtocol{
 			receiver,
 			msg,
 			pid);
-		
+		*/
 		/**
 		 * This part works but is commented out because emptyBuffer is not yet 
 		 * functional (maxUpload not yet set) and thus results in intense memory usage.
 		 */
-		
+		router.add(msg);
+		OrangeMessage peek = router.peek();
+		if (peek.size <= maxUpload - totSize){
+			Node node;
+			totSize+= sendMsg();
+		}
 		/*if(router.add(msg)){
 			//System.out.println("Message successfully inserted into router.");
 		}
@@ -115,7 +128,7 @@ public class Router implements CDProtocol{
 	 * @param node - the node containing the protocol
 	 * @return the size of the message sent 
 	 */
-	public int sendMsg (Node node) {
+	public int sendMsg () {
 		OrangeMessage msg;
 		
 		msg = router.poll(); // Get message at the head of router

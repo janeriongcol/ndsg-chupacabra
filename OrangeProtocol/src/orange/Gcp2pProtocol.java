@@ -177,6 +177,8 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 
 		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
 		//System.out.println(node.getIndex()+" numPeers " + numPeers +": Network.size = "+Network.size());
+		Router router = (Router)node.getProtocol(nid);
+		router.nextCycle(node, pid);
 		if(!left){
 			for(int i = 0; i < numPeers; i++){
 				// TODO size of the message
