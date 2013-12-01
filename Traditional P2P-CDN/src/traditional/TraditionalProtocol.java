@@ -740,5 +740,19 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				pid);
 		// System.out.println(Network.size());
 	}
+	
+	public int sendMsg (TraditionalArrivedMessage msg) {
+		Node sender = msg.sender;
+		Node receiver = msg.receiver;
+		
+		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
+		send(
+			sender,
+			receiver,
+			msg,
+			pid);
+		
+		return msg.size;
+	}
 
 }
