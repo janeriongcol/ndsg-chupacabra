@@ -42,6 +42,7 @@ init.sch.protocol p2pcdn
 protocol.p2pcdn.maxclients MAXSIZE
 protocol.p2pcdn.protocol p2pcdn
 protocol.p2pcdn.transport urt
+protocol.p2pcdn.network router
 protocol.p2pcdn.step 1000
 
 protocol.link peersim.core.IdleProtocol
