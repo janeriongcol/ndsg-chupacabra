@@ -31,6 +31,11 @@ protocol.urt.maxdelay 0
 
 protocol.p2pcdn traditional.TraditionalProtocol
 
+protocol.router traditional.Router
+protocol.router.protocol p2pcdn
+protocol.router.transport urt
+protocol.router.step 1000
+
 init.sch CDScheduler
 init.sch.protocol p2pcdn
 
