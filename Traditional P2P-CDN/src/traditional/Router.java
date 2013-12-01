@@ -47,14 +47,9 @@ public class Router implements CDProtocol{
 	public void nextCycle(Node node, int pid) {
 		TraditionalProtocol prot = (TraditionalProtocol) node.getProtocol(pid);
 		maxUpload = prot.getUploadSpd();
-		/**
-		 * Comment out code below if only maxUpload has been set,
-		 * otherwise, an infinite loop will happen. 
-		 * You have been warned....
-		 */
 		totSize = 0;
 		emptyBuffer(node, maxUpload);
-		//System.out.println("empty");
+		//System.out.println("EMPTY");
 	}
 	
 	/**
@@ -64,7 +59,6 @@ public class Router implements CDProtocol{
 	 */
 	int totSize = 0;
 	public void emptyBuffer (Node node, int maxUpload) {
-		
 		
 		while(totSize <= maxUpload && !router.isEmpty()){
 			SimpleMessage peek = router.peek();
@@ -83,37 +77,12 @@ public class Router implements CDProtocol{
 	 */
 	public void insertMsg (SimpleMessage msg) {
 		
-		/**
-		 * This part of the code should actually be deleted once 
-		 * emptyBuffer is actually called in the nextCycle event
-		 * so that the delay due to ABW is simulated.
-		 */
-		
-		/*Node sender = msg.sender;
-		Node receiver = msg.receiver;
-		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
-		send(
-			sender,
-			receiver,
-			msg,
-			pid);
-		*/
-		/**
-		 * This part works but is commented out because emptyBuffer is not yet 
-		 * functional (maxUpload not yet set) and thus results in intense memory usage.
-		 */
 		router.add(msg);
 		SimpleMessage peek = router.peek();
 		if (peek.size <= maxUpload - totSize){
 			totSize+= sendMsg();
 		}
-		/*if(router.add(msg)){
-			//System.out.println("Message successfully inserted into router.");
-		}
-		
-		else
-			System.out.println("An error occured while inserting the message into the router.");
-		*/
+	
 	}
 	
 	/**
