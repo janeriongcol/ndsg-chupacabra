@@ -29,8 +29,6 @@ protocol.urt UniformRandomTransport
 protocol.urt.mindelay 0
 protocol.urt.maxdelay 0
 
-protocol.router orange.Router
-protocol.router.protocol gcp2p
 #config file for gcp2p
 
 #set initial network size to 100 nodes with the first 3 nodes as CDN servers

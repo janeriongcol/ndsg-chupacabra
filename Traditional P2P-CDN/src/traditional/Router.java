@@ -1,4 +1,4 @@
-package orange;
+package traditional;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -17,6 +17,10 @@ public class Router implements CDProtocol{
 	 * String name of the parameter, assigned to pid
 	 */
 	private static final String PAR_PROT = "protocol";
+	/**
+	 * String name of the parameter, assigned to tid
+	 */
+	private static final String PAR_TRANS = "transport";
 	
 	// ------------------------------------------------------------------------
 	// Static Fields
@@ -41,8 +45,13 @@ public class Router implements CDProtocol{
 	int maxUpload;
 	@Override
 	public void nextCycle(Node node, int pid) {
-		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
+		TraditionalProtocol prot = (TraditionalProtocol) node.getProtocol(pid);
 		maxUpload = prot.getUploadSpd();
+		/**
+		 * Comment out code below if only maxUpload has been set,
+		 * otherwise, an infinite loop will happen. 
+		 * You have been warned....
+		 */
 		totSize = 0;
 		emptyBuffer(node, maxUpload);
 		//System.out.println("empty");
@@ -54,7 +63,8 @@ public class Router implements CDProtocol{
 	 * @param maxUpload - max upload speed of this node
 	 */
 	int totSize = 0;
-	public void emptyBuffer (Node node, int maxUpload) {		
+	public void emptyBuffer (Node node, int maxUpload) {
+		
 		
 		while(totSize <= maxUpload && !router.isEmpty()){
 			SimpleMessage peek = router.peek();
@@ -71,12 +81,39 @@ public class Router implements CDProtocol{
 	 * before being sent
 	 * @param msg - the message to be sent
 	 */
-	public void insertMsg (SimpleMessage msg) {		
+	public void insertMsg (SimpleMessage msg) {
+		
+		/**
+		 * This part of the code should actually be deleted once 
+		 * emptyBuffer is actually called in the nextCycle event
+		 * so that the delay due to ABW is simulated.
+		 */
+		
+		/*Node sender = msg.sender;
+		Node receiver = msg.receiver;
+		((Transport)sender.getProtocol(FastConfig.getTransport(pid))).
+		send(
+			sender,
+			receiver,
+			msg,
+			pid);
+		*/
+		/**
+		 * This part works but is commented out because emptyBuffer is not yet 
+		 * functional (maxUpload not yet set) and thus results in intense memory usage.
+		 */
 		router.add(msg);
 		SimpleMessage peek = router.peek();
 		if (peek.size <= maxUpload - totSize){
 			totSize+= sendMsg();
 		}
+		/*if(router.add(msg)){
+			//System.out.println("Message successfully inserted into router.");
+		}
+		
+		else
+			System.out.println("An error occured while inserting the message into the router.");
+		*/
 	}
 	
 	/**
