@@ -1,5 +1,7 @@
 package orange;
 
+import java.util.LinkedList;
+
 import peersim.core.Node;
 
 public class OrangeMessage extends SimpleMessage{
@@ -35,6 +37,10 @@ public class OrangeMessage extends SimpleMessage{
 	static final int GOODBYE_AS_SOURCE = 26;
 	static final int GOODBYE_AS_NORMAL = 27;
 	static final int GET_SUPERPEER_2 = 28;
+	static final int ANOTHER_BIN_PEER_REQUEST = 29;
+	static final int INCOMPLETE_PEER_LIST = 30;
+	static final int COMPLETE_PEER_LIST = 31;
+	static final int OTHER_BIN_NUMBER_OF_PEERS = 32;
 	
 	public int    data0;
 	public int    data;
@@ -44,6 +50,7 @@ public class OrangeMessage extends SimpleMessage{
 	public int [][] index;
 	public Node node1;
 	public Node node2;
+	public LinkedList<Node> linkedNodeList;
 	
 	// DO_YOU_HAVE_THIS, REQUEST_PEERS_FROM_THIS_BIN, REQUEST_PEERS_FROM_OTHER_BINS, ACCEPT_SPEED
 	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, int data0, int data) 
@@ -73,6 +80,11 @@ public class OrangeMessage extends SimpleMessage{
 		super(typeOfMsg, sender, receiver, size);
 		this.nodeList = nodeList;
 		this.data 		= data;
+	}
+	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, LinkedList<Node> linkedNodeList)
+	{
+		super(typeOfMsg, sender, receiver, size);
+		this.linkedNodeList = linkedNodeList;
 	}
 	
 	// YOUR_SUPERPEER, I_DONT_HAVE_IT, I_HAVE_IT, FIRED
