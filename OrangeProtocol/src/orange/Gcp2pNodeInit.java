@@ -79,7 +79,7 @@ public class Gcp2pNodeInit implements NodeInitializer{
 		
 		prot.cdnRTT = CommonState.r.nextInt(71) + 30; 	//RTT from client to CDN;
 		
-		prot.uploadSpd = CommonState.r.nextInt(1001); //Random upload speed from 0-1000Kbps
+		prot.uploadSpd = CommonState.r.nextInt(501) + 500; //Random upload speed from 0-1000Kbps
 		prot.downloadSpd = CommonState.r.nextInt(1001) + 1000; //Random download speed from 1000-2000Kbps
 		prot.usedUploadSpd = 0; // initialize to zero since it is not yet seeding
 		prot.usedDownloadSpd = 0; // initialize to zero since it is not yet streaming

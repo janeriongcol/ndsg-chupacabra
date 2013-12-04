@@ -38,7 +38,7 @@ public class Router implements CDProtocol{
 		router = new LinkedList<SimpleMessage>();		
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 	}
-	int maxUpload;
+	double maxUpload;
 	@Override
 	public void nextCycle(Node node, int pid) {
 		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
@@ -53,13 +53,13 @@ public class Router implements CDProtocol{
 	 * @param node	- this node
 	 * @param maxUpload - max upload speed of this node
 	 */
-	int totSize = 0;
-	public void emptyBuffer (Node node, int maxUpload) {		
+	double totSize = 0;
+	public void emptyBuffer (Node node, double maxUpload) {		
 		
 		while(totSize <= maxUpload && !router.isEmpty()){
 			SimpleMessage peek = router.peek();
-			if(peek.size <= maxUpload - totSize){
-				totSize += sendMsg();
+			if((double)peek.size/1000 <= maxUpload - totSize){
+				totSize += sendMsg()/1000;
 			}
 			else
 				break;
@@ -74,7 +74,7 @@ public class Router implements CDProtocol{
 	public void insertMsg (SimpleMessage msg) {		
 		router.add(msg);
 		SimpleMessage peek = router.peek();
-		if (peek.size <= maxUpload - totSize){
+		if ((double)peek.size/1000 <= maxUpload - totSize){
 			totSize+= sendMsg();
 		}
 	}
