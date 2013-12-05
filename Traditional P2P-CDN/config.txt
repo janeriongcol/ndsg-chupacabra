@@ -14,7 +14,6 @@ MAXVIDEOSIZE 20000
 MAXUPSPEED 1000
 MINDLSPEED 1000 #range of dl speed: 1000-2000
 MAXDLSPEED 2000 
-
 MAXJOINSIZE 500
 
 random.seed 1234567890
@@ -25,27 +24,31 @@ simulation.logtime 1000
 simulation.experiments 1
 simulation.step 1000
 
+################### protocols ===========================
+protocol.link peersim.core.IdleProtocol
+
 protocol.urt UniformRandomTransport
 protocol.urt.mindelay 0
 protocol.urt.maxdelay 0
 
-protocol.p2pcdn traditional.TraditionalProtocol
+protocol.tradt traditional.TraditionalTransport
+protocol.tradt.protocol p2pcdn
 
 protocol.router traditional.Router
 protocol.router.protocol p2pcdn
-protocol.router.transport urt
+protocol.router.transport tradt
 protocol.router.step 1000
 
-init.sch CDScheduler
-init.sch.protocol p2pcdn
-
+protocol.p2pcdn traditional.TraditionalProtocol
 protocol.p2pcdn.maxclients MAXSIZE
 protocol.p2pcdn.protocol p2pcdn
-protocol.p2pcdn.transport urt
+protocol.p2pcdn.transport tradt
 protocol.p2pcdn.network router
 protocol.p2pcdn.step 1000
 
-protocol.link peersim.core.IdleProtocol
+################### initialization ======================
+init.sch CDScheduler
+init.sch.protocol p2pcdn
 
 init.0 traditional.TraditionalNetworkProperties
 init.0.maxClients MAXSIZE
@@ -62,6 +65,7 @@ init.1 traditional.TraditionalNetworkInit
 init.1.protocol p2pcdn
 init.1.transport urt
 
+################ control ==============================
 control.dynamics traditional.TraditionalDynamicPop
 control.dynamics.protocol p2pcdn
 control.dynamics.maxsize MAXSIZE

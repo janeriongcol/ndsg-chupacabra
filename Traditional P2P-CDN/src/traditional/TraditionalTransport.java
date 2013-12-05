@@ -48,7 +48,7 @@ public class TraditionalTransport implements Transport {
 		TraditionalProtocol sprot = (TraditionalProtocol) sender.getProtocol(pid);
 		TraditionalProtocol rprot = (TraditionalProtocol) receiver.getProtocol(pid);
 		
-		if(sprot.getConnectedCDN().equals(rprot.getConnectedCDN()))
+		if(sprot.CID == rprot.CID)
 			return CommonState.r.nextInt(maxDelaySameCDN - minDelaySameCDN) + minDelaySameCDN;
 		
 		return CommonState.r.nextInt(maxDelayDiffCDN - minDelayDiffCDN) + minDelayDiffCDN;

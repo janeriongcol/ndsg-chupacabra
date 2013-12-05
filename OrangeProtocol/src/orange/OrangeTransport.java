@@ -52,7 +52,7 @@ public class OrangeTransport implements Transport {
 		Gcp2pProtocol rprot = (Gcp2pProtocol) receiver.getProtocol(pid);
 		
 		// Same CDN
-		if(sprot.getConnectedCDN().equals(rprot.getConnectedCDN())) {
+		if(sprot.CID == rprot.CID) {
 			// Same CDN and Same Bin
 			if(sprot.getbinID() == rprot.getbinID())
 				return CommonState.r.nextInt(maxDelaySameCDNSameBin - minDelaySameCDNSameBin) + minDelaySameCDNSameBin;
