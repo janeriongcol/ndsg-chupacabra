@@ -13,8 +13,8 @@ public class OrangeTransport implements Transport {
     // Constants
     // ------------------------------------------------------------------------
 	private static final int minDelaySameCDNSameBin = 20;
-	private static final int maxDelaySameCDNSameBin = 1000;
-	private static final int minDelaySameCDNDiffBin = 20;
+	private static final int maxDelaySameCDNSameBin = 500;
+	private static final int minDelaySameCDNDiffBin = 500;
 	private static final int maxDelaySameCDNDiffBin = 1000;
 	private static final int minDelayDiffCDN = 1000;
 	private static final int maxDelayDiffCDN = 1500;
