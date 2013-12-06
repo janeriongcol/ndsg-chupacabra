@@ -42,7 +42,7 @@ public class Router implements CDProtocol{
 		router = new LinkedList<SimpleMessage>();		
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 	}
-	int maxUpload;
+	double maxUpload;
 	@Override
 	public void nextCycle(Node node, int pid) {
 		TraditionalProtocol prot = (TraditionalProtocol) node.getProtocol(pid);
@@ -57,12 +57,12 @@ public class Router implements CDProtocol{
 	 * @param node	- this node
 	 * @param maxUpload - max upload speed of this node
 	 */
-	int totSize = 0;
-	public void emptyBuffer (Node node, int maxUpload) {
+	double totSize = 0;
+	public void emptyBuffer (Node node, double maxUpload) {
 		
 		while(totSize <= maxUpload && !router.isEmpty()){
 			SimpleMessage peek = router.peek();
-			if(peek.size <= maxUpload - totSize){
+			if((double)peek.size <= maxUpload - totSize){
 				totSize += sendMsg();
 			}
 			else
@@ -79,7 +79,7 @@ public class Router implements CDProtocol{
 		
 		router.add(msg);
 		SimpleMessage peek = router.peek();
-		if (peek.size <= maxUpload - totSize){
+		if ((double)peek.size <= maxUpload - totSize){
 			totSize+= sendMsg();
 		}
 	

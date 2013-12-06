@@ -310,7 +310,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 						// 424 = 168 + 128bits for IP of previous SP + 128 bits for the new SP
 						p.sendMsg(new OrangeMessage(OrangeMessage.UPDATE_SP, node, superPeerList[i], 424,superPeerList[omsg.data], omsg.sender));		
 				}
-				superPeerList[omsg.data] = omsg.sender;	// make the sender the SP
+				superPeerList[omsg.data] = omsg.sender;	// make the sender the SP				
 			}
 			else if (omsg.msgType == OrangeMessage.GOODBYE_AS_SP){
 				for (int i = 0; i < 6; i++){
@@ -361,7 +361,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			}			
 		}
 		else if (nodeTag == 1){
-				if (omsg.msgType == OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
+			if (omsg.msgType == OrangeMessage.REQUEST_PEERS_FROM_THIS_BIN ){	// a Peer requests a SP for peers. aem.data0 - categoryID. aem.data - videoID
 					Gcp2pProtocol prot = (Gcp2pProtocol)omsg.sender.getProtocol(pid);
 					//System.out.println("REQUEST: Category = "+aem.data0 +": SuperPeer Index = "+ node.getIndex() + ": Sender Index = "+aem.sender.getIndex()+": SP numClients = "+numClients);
 					int temp[] = indexPerCategory[omsg.data0];		// get the list of indices of the peers watching a certain category
@@ -771,14 +771,22 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 	}
 	// huwag muna pansinin to :D
 	public void superpeerArrInit(){
-		clientRTT = new int[maxClients];
+		//clientRTT = new int[maxClients];
+		clientList = new Node[maxClients];
 		clientWatching = new int[maxClients];
 		indexPerCategory = new int[category][maxClients];
-		binSize = new int[maxBins];
-		binList = new Node[maxBins][maxClients];
-		binWatchList = new int[maxBins][maxClients];
-		peerList = new Node[maxClients];
-		sourcePeerList = new Node[maxClients];
+		for (int i = 0; i < maxClients; i ++){
+			clientList[i] = null;
+			clientWatching[i] = -1;
+		}
+		for (int i = 0; i < category; i++)
+			for (int j = 0; j < maxClients; j++)
+				indexPerCategory[i][j] = -1;
+		//binSize = new int[maxBins];
+		//binList = new Node[maxBins][maxClients];
+		//binWatchList = new int[maxBins][maxClients];
+		//peerList = new Node[maxClients];
+		//sourcePeerList = new Node[maxClients];
 		
 	}
 	

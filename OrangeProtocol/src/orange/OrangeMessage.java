@@ -41,6 +41,9 @@ public class OrangeMessage extends SimpleMessage{
 	static final int INCOMPLETE_PEER_LIST = 30;
 	static final int COMPLETE_PEER_LIST = 31;
 	static final int OTHER_BIN_NUMBER_OF_PEERS = 32;
+	static final int NUMBER_OF_CLIENTS = 33;
+	static final int INCOMPLETE_YOUR_CLIENTS = 34;
+	static final int COMPLETE_YOUR_CLIENTS = 35;
 	
 	public int    data0;
 	public int    data;
@@ -51,6 +54,7 @@ public class OrangeMessage extends SimpleMessage{
 	public Node node1;
 	public Node node2;
 	public LinkedList<Node> linkedNodeList;
+	public LinkedList <clientInterface> clients;
 	
 	// DO_YOU_HAVE_THIS, REQUEST_PEERS_FROM_THIS_BIN, REQUEST_PEERS_FROM_OTHER_BINS, ACCEPT_SPEED
 	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, int data0, int data) 
@@ -60,6 +64,10 @@ public class OrangeMessage extends SimpleMessage{
 		this.data = data;
 	}
 	
+	public OrangeMessage (int typeOfMsg, Node sender, Node receiver, LinkedList<clientInterface> clients, int size){
+		super(typeOfMsg, sender, receiver, size);
+		this.clients = clients;
+	}
 	//UPDATE_SP
 	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, Node node1, Node node2) 
 	{
@@ -127,3 +135,4 @@ public class OrangeMessage extends SimpleMessage{
 	}
 
 }
+

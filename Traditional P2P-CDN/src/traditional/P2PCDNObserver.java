@@ -114,6 +114,7 @@ public class P2PCDNObserver implements Control {
 		System.out.println("Connections Accepted: " + totalConnectionsAccepted);
 		
 		System.out.println("Rejection Rate: " + aveRejectionRate);
+		System.out.println("Network Size: "+Network.size());
 
 		System.out.println("----------------------------------------------");
 

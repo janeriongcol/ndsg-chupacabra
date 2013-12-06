@@ -1,5 +1,7 @@
 package traditional;
 
+import java.util.LinkedList;
+
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.edsim.*;
@@ -128,6 +130,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 	boolean doneStreaming = false; // true if videoSize<= streamedVideoSize
 	int contractSize = 0;
 	boolean contractExpired = false;
+	LinkedList<Node> peerPool = new LinkedList<Node>();
 
 	public TraditionalProtocol(String prefix) {
 		maxClients = Configuration.getInt(prefix + "." + PAR_MAXCLIENTS);
@@ -160,23 +163,26 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 
 				for (int i = 0; i < numPeers; i++)
 					if (peerList[i] != null) {
-
-						// TODO size
-						prot.sendMsg(new TraditionalMessage(TraditionalMessage.UPLOAD, node, peerList[i], 0,
-								peerSpdAlloted[i]));
-						
+						//if(nodeTag == SupplyingPeerTag)
+						//	System.out.println("incomplete");
+						int given = 0;
+						while (given < peerSpdAlloted[i]){
+							int toGive= 0;
+							if(peerSpdAlloted[i] - given <= 856)
+								toGive = peerSpdAlloted[i] - given + 168;
+							else toGive = 856;
+							prot.sendMsg(new TraditionalMessage(TraditionalMessage.UPLOAD, node, peerList[i], toGive+168,
+									peerSpdAlloted[i]));
+							given += toGive;
+						}
 						uploaded += peerSpdAlloted[i];
 						if (nodeTag == SupplyingPeerTag && uploaded > contractSize) {
-							
-							// TODO size
-							prot.sendMsg(new TraditionalMessage(TraditionalMessage.CONTRACT_EXPIRED, node, connectedCDN, 0));
+							prot.sendMsg(new TraditionalMessage(TraditionalMessage.CONTRACT_EXPIRED, node, connectedCDN, 168));
 							
 							for (int j = 0; j < numPeers; j++) {
-								if (peerList[j] != null) {
-
-									// TODO size									
+								if (peerList[j] != null) {								
 									prot.sendMsg(new TraditionalMessage (TraditionalMessage.SP_RP_DISCONNECT_FULFILLED,
-											node, peerList[j], 0, peerSpdAlloted[j]));
+											node, peerList[j], 296, peerSpdAlloted[j]));
 								}
 							}
 							contractExpired = true;
@@ -186,11 +192,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 			}
 			if (nodeTag == RegularTag) {
 				if (usedDownloadSpd < downloadSpd) {
-
-					// TODO size
 					prot.sendMsg(new TraditionalMessage (TraditionalMessage.GIVE_SP_LIST, 
-							node, connectedCDN, 0, videoID));
-
+							node, connectedCDN, 200, videoID));
 				}
 			}
 		}
@@ -209,11 +212,27 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				// send back results of getSupplyingPeers(int video) - a list of
 				// supplying peers with that video
 				Node[] tobeRet = getSupplyingPeers(aem.data);
-
-				// TODO size
-				prot.sendMsg(new TraditionalMessage(TraditionalMessage.RECEIVE_SP_LIST,
-						node, aem.sender, 0, tobeRet));
+				//prot.sendMsg(new TraditionalMessage(TraditionalMessage.RECEIVE_SP_LIST,
+					//	node, aem.sender, 0, tobeRet));
 				
+				LinkedList<Node> spBuffer = new LinkedList<Node>();
+				int spBatchNum = 0;
+				if (tobeRet!=null)
+				for (int i = 0; i < tobeRet.length ; i++){
+					if(tobeRet[i]!=null){
+						spBuffer.add(tobeRet[i]);
+						spBatchNum++;
+						if(spBatchNum == 6){
+							prot.sendMsg(new TraditionalMessage(TraditionalMessage.INCOMPLETE_RECEIVE_SP_LIST,
+									node, aem.sender, 936, spBuffer));
+							spBatchNum = 0;
+							spBuffer.removeAll(spBuffer);
+						}
+					}
+				}
+				prot.sendMsg(new TraditionalMessage(TraditionalMessage.COMPLETE_RECEIVE_SP_LIST,
+						node, aem.sender, spBuffer.size()*128+168, spBuffer));
+						
 				// System.out.println("Received: GIVE_SP_LIST");
 			} else if (aem.msgType == TraditionalMessage.CDN_RP_CONNECT) {
 				// A Requesting Peer wants to connect directly to a CDN (i.e. no
@@ -222,10 +241,9 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				// System.out.println("CDN connect");
 				int spdAvail = maxVideoSpd - videoSpdAlloted[aem.data];
 
-				if (spdAvail <= 0) {
-					// TODO size					
+				if (spdAvail <= 0) {				
 					prot.sendMsg(new TraditionalMessage (TraditionalMessage.REJECT, node,
-							aem.sender, 0));
+							aem.sender, 168));
 					
 				} else {
 					videoSpdAlloted[aem.data] = maxVideoSpd;
@@ -233,13 +251,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 						videoSpdAlloted[aem.data] = videoSpdAlloted[aem.data]
 								- spdAvail + aem.data2;
 						spdAvail = aem.data2;
-					}
-					
-					// TODO size					
+					}				
 					prot.sendMsg(new TraditionalMessage (TraditionalMessage.CDN_RP_CONNECT_CONFIRM,
-							node, aem.sender, 0, spdAvail));
+							node, aem.sender, 296, spdAvail));
 
-					// System.out.println("Ok");
 				}
 			} else if (aem.msgType == TraditionalMessage.CDN_RP_DISCONNECT) {
 				// Reply with a confirm disconnect message
@@ -266,17 +281,14 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				// System.out.println("Accept");
 			} else if (aem.msgType == TraditionalMessage.SP_RP_CONNECT) {
 				// Reply with a confirm connect message
-				
-				// TODO size
-				prot.sendMsg(new TraditionalMessage (TraditionalMessage.CONFIRM_CONNECT, node, aem.sender, 0, aem.node));
+				prot.sendMsg(new TraditionalMessage (TraditionalMessage.CONFIRM_CONNECT, node, aem.sender, 296, aem.node));
 			} else if (aem.msgType == TraditionalMessage.SP_RP_DISCONNECT) {
 				// if(aem.node == null) System.out.println("May sala");
 				Node tobesent = aem.node;
 				// if(tobesent != null) System.out.println("WHY?");
 				// System.out.println("eto ba yung next?");
-				// TODO size
 				prot.sendMsg(new TraditionalMessage(TraditionalMessage.SP_RP_DISCONNECT_CONFIRM, node,
-						aem.sender, 0, tobesent));
+						aem.sender, 296, tobesent));
 			} else if (aem.msgType == TraditionalMessage.CONTRACT_SET) {
 				// Reply with a message saying how long the node stays if it
 				// becomes a Supplying Peer
@@ -293,9 +305,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 			} else if (aem.msgType == TraditionalMessage.RP_DONE_STREAMING) {
 				supplyingPeerList[numSupplier] = aem.sender;
 				numSupplier++;
-				// TODO size
 				prot.sendMsg(new TraditionalMessage (TraditionalMessage.CONTRACT_SET, node,
-						aem.sender, 0, 4));
+						aem.sender, 170, 4));
 				// System.out.println("CDN: Done Streaming");
 			}
 		} else if (nodeTag == SupplyingPeerTag)// messages received by the SP
@@ -310,31 +321,26 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 						TraditionalProtocol p = (TraditionalProtocol) aem.node
 								.getProtocol(pid);
 						if (p.nodeTag == RegularTag) {
-							// TODO size
 							prot.sendMsg(new TraditionalMessage (TraditionalMessage.CONFIRM_CONNECT, node,
-									aem.node, 0, uploadSpdBuffer));
+									aem.node, 232, uploadSpdBuffer));
 						}
 					} else {
-						// TODO size
-						prot.sendMsg(new TraditionalMessage(TraditionalMessage.REJECT, node, aem.node, 0, uploadSpdBuffer));
+						prot.sendMsg(new TraditionalMessage(TraditionalMessage.REJECT, node, aem.node, 232, uploadSpdBuffer));
 
 					}
 				}
 			} else if (aem.msgType == TraditionalMessage.SP_RP_CONNECT) {
 				// Send a SP_RP_CONNECT message to CDN to get its approval
 				if (uploadSpd - usedUploadSpd - uploadSpdBuffer > 0) {
-					// TODO size
-					prot.sendMsg(new TraditionalMessage(TraditionalMessage.SP_RP_CONNECT, node, connectedCDN, 0, aem.sender));
+					prot.sendMsg(new TraditionalMessage(TraditionalMessage.SP_RP_CONNECT, node, connectedCDN, 296, aem.sender));
 				} else {
-					// TODO size
-					prot.sendMsg(new TraditionalMessage(TraditionalMessage.REJECT, node, aem.sender, 0));
+					prot.sendMsg(new TraditionalMessage(TraditionalMessage.REJECT, node, aem.sender, 168));
 				}
 			} else if (aem.msgType == TraditionalMessage.SP_RP_DISCONNECT) {
 				// Reply SP_RP_DISCONNECT message to CDN to get its approval
 				// System.out.println("twice?");
-				// TODO size
 				prot.sendMsg(new TraditionalMessage(TraditionalMessage.SP_RP_DISCONNECT, node, 
-						connectedCDN, 0, aem.sender));
+						connectedCDN, 296, aem.sender));
 				for (int i = 0; i < numPeers; i++) {
 					if (peerList[i] != null)
 						if (peerList[i].equals(aem.sender)) {
@@ -351,9 +357,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				// if(aem.sender.equals(connectedCDN))
 				// System.out.println("yeah");
 				if (aem.node != null) {
-					// TODO size
 					prot.sendMsg(new TraditionalMessage(TraditionalMessage.SP_RP_DISCONNECT_CONFIRM, node,
-							aem.node, 0));
+							aem.node, 168));
 				}
 			} else if (aem.msgType == TraditionalMessage.CONFIRM_ACCEPT) {
 				// sada
@@ -372,9 +377,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				// if not null, request connection with these Supplying Peers
 				// else request connection with CDN itself (CDN_RP_CONNECT)
 				if (aem.nodeList == null) {
-					// TODO size
 					prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN, 
-							0, videoID, downloadSpd-usedDownloadSpd));
+							264, videoID, downloadSpd-usedDownloadSpd));
 					numConnectionsAttempted++;
 
 				} else {
@@ -390,12 +394,47 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 					if (sent == 0) {
 						// TODO size
 						prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN,
-								0, videoID, downloadSpd-usedDownloadSpd));
+								264, videoID, downloadSpd-usedDownloadSpd));
 						numConnectionsAttempted++;
 					}
 				}
 				// System.out.println("Received: RECEIVE_SP_LIST");
-			} else if (aem.msgType == TraditionalMessage.CDN_RP_CONNECT_CONFIRM) {
+			} else if (aem.msgType == TraditionalMessage.INCOMPLETE_RECEIVE_SP_LIST){
+				while(!aem.spList.isEmpty()){
+					peerPool.add(aem.spList.remove());
+				}
+				
+			}else if (aem.msgType == TraditionalMessage.COMPLETE_RECEIVE_SP_LIST){
+				while(!aem.spList.isEmpty()){
+					peerPool.add(aem.spList.remove());
+					
+				}
+				if (peerPool.isEmpty()){
+					prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN, 
+							264, videoID, downloadSpd-usedDownloadSpd));
+					numConnectionsAttempted++;
+				}
+				else{
+					
+					int sent = 0;
+					Node sp;
+					while(downloadSpd-usedDownloadSpd>0&&!peerPool.isEmpty()){
+						sp = peerPool.remove();
+						if(sp!=null){
+							prot.sendMsg(new TraditionalMessage(TraditionalMessage.SP_RP_CONNECT, node, sp, 168));
+							sent++;
+							numConnectionsAttempted++;
+						}
+					}
+					if (sent == 0) {
+						prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN,
+								264, videoID, downloadSpd-usedDownloadSpd));
+						numConnectionsAttempted++;
+					}
+					//else
+						//System.out.println("incomplete");
+				}
+			}else if (aem.msgType == TraditionalMessage.CDN_RP_CONNECT_CONFIRM) {
 				// System.out.println("Confirmed");
 				sourcePeerList[numSource] = aem.sender;
 				averageRTT = (averageRTT * numSource + cdnRTT)
@@ -411,9 +450,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 					// System.out.println("elapsed: "+elapsedTime+"   |  Current: "+System.currentTimeMillis());
 					// if(spdAvail <= 0) System.out.println("MALI");
 				}
-				// TODO size
 				prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT_ACCEPT, node, connectedCDN,
-						0, spdAvail, videoID, aem.data-spdAvail));
+						328, spdAvail, videoID, aem.data-spdAvail));
 				usedDownloadSpd += spdAvail;
 				startedStreaming = true;
 				
@@ -443,9 +481,8 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 					// System.out.println("elapsed: "+elapsedTime+"   |  Current: "+System.currentTimeMillis());
 					// System.out.println("Confirm");
 				}
-				// TODO size
 				prot.sendMsg(new TraditionalMessage(TraditionalMessage.CONFIRM_ACCEPT, node, aem.sender,
-						0, spdAvail, videoID));
+						268, spdAvail, videoID));
 				// paano na malalaman yung mga speed cheverloo?
 				usedDownloadSpd += spdAvail;
 				startedStreaming = true;
@@ -469,17 +506,14 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 					for (int i = 0; i < numSource; i++) {
 						if (!sourcePeerList[i].equals(connectedCDN)) {
 							if (sourcePeerList[i] != null) {
-								// TODO size
 								prot.sendMsg(new TraditionalMessage(TraditionalMessage.SP_RP_DISCONNECT, node, 
-										sourcePeerList[i], 0));
+										sourcePeerList[i], 168));
 							}
 						} else {
-							// TODO size
-							prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_DISCONNECT, node, connectedCDN, 0));
+							prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_DISCONNECT, node, connectedCDN, 168));
 						}
 					}
-					// TODO size
-					prot.sendMsg(new TraditionalMessage(TraditionalMessage.RP_DONE_STREAMING, node, connectedCDN, 0));
+					prot.sendMsg(new TraditionalMessage(TraditionalMessage.RP_DONE_STREAMING, node, connectedCDN, 168));
 					doneStreaming = true;
 				}
 

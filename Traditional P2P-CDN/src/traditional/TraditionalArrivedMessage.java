@@ -4,7 +4,8 @@ import java.util.LinkedList;
 
 import peersim.core.Node;
 
-public class TraditionalMessage extends SimpleMessage {
+public class TraditionalArrivedMessage {
+	
 	public static final int GIVE_SP_LIST = 0;
 	public static final int CDN_RP_CONNECT = 1;
 	public static final int CDN_RP_DISCONNECT = 2;
@@ -26,51 +27,50 @@ public class TraditionalMessage extends SimpleMessage {
 	public static final int SP_RP_DISCONNECT_FULFILLED = 18;
 	public static final int INCOMPLETE_RECEIVE_SP_LIST = 19;
 	public static final int COMPLETE_RECEIVE_SP_LIST = 20;
-
-	public int data;
-	public int data2;
-	public int data3;
-	public Node nodeList[];
-	public Node node;
+	
+	final int    msgType;
+	final Node   sender;
+	public int	 data;
+	public int   data2;
+	public int 	 data3;
+	public Node	 nodeList[];
+	public Node	 node;
 	public LinkedList<Node> spList = new LinkedList<Node>();
-
-	public TraditionalMessage(int typeOfMsg, Node sender, Node receiver, int size, LinkedList<Node> nodeList) {
-		super(typeOfMsg, sender, receiver, size);
-		this.spList = nodeList;
-
-	}
-	public TraditionalMessage(int typeOfMsg, Node sender, Node receiver, int size) {
-		super(typeOfMsg, sender, receiver, size);
-	}
-
-	public TraditionalMessage(int typeOfMsg, Node sender, Node receiver, int size, int data) {
-		super(typeOfMsg, sender, receiver, size);
-		this.data = data;
+	
+	public TraditionalArrivedMessage(int msgType, Node sender){
+		this.msgType = msgType;
+		this.sender = sender;
+		
 	}
 	
-	public TraditionalMessage(int typeOfMsg, Node sender, Node receiver, int size, int data, int data2) {
-		super(typeOfMsg, sender, receiver, size);
+	public TraditionalArrivedMessage(int msgType, Node sender, int data){
+		this.msgType = msgType;
+		this.sender = sender;
+		this.data = data;
+	}
+	public TraditionalArrivedMessage(int msgType, Node sender, int data, int data2){
+		this.msgType = msgType;
+		this.sender = sender;
 		this.data = data;
 		this.data2 = data2;
 	}
-
-	public TraditionalMessage(int typeOfMsg, Node sender, Node receiver, int size, int data, int data2, int data3) {
-		super(typeOfMsg, sender, receiver, size);
+	public TraditionalArrivedMessage(int msgType, Node sender, int data, int data2, int data3){
+		this.msgType = msgType;
+		this.sender = sender;
 		this.data = data;
 		this.data2 = data2;
 		this.data3 = data3;
 	}
-
-	public TraditionalMessage(int typeOfMsg, Node sender, Node receiver, int size, Node[] nodeList) {
-		super(typeOfMsg, sender, receiver, size);
+	public TraditionalArrivedMessage(int msgType, Node sender, Node[] nodeList){
+		this.msgType = msgType;
+		this.sender = sender;
 		this.nodeList = nodeList;
-
+		
 	}
-
-	public TraditionalMessage(int typeOfMsg, Node sender, Node receiver, int size, Node node) {
-		super(typeOfMsg, sender, receiver, size);
+	public TraditionalArrivedMessage(int msgType, Node sender, Node node){
+		this.msgType = msgType;
+		this.sender = sender;
 		this.node = node;
-
+		
 	}
-
 }
