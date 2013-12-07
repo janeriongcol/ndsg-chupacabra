@@ -46,8 +46,6 @@ public class Router implements CDProtocol{
 		totSize = 0;
 		emptyBuffer(node, maxUpload);
 		//System.out.println("empty");
-		if (prot.nodeTag == prot.CDNTag)
-			System.out.println(maxUpload);
 	}
 	
 	/**

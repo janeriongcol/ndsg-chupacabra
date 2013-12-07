@@ -535,8 +535,26 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 			else if (omsg.msgType == OrangeMessage.COMPLETE_PEER_LIST){
 				boolean connectedAtleastOnce = false;
 				while (!omsg.linkedNodeList.isEmpty()){
-					peerPool.add(omsg.linkedNodeList.remove());
+					if(omsg.linkedNodeList.peek()!=null)
+						peerPool.add(omsg.linkedNodeList.remove());
+					else omsg.linkedNodeList.remove();
 				}
+				Node[] list = new Node[peerPool.size()];
+				for(int i = 0; i < peerPool.size(); i++){
+					list[i] = peerPool.get(i);;
+				}
+				int[] RTTs = randomRTTs(list);
+				for (int i = 0; i < list.length -1; i++)
+					for (int j = 0; j < list.length - 1; j++){
+						if(RTTs[j] > RTTs[j+1]){
+							int tempInt = RTTs[j];
+							RTTs[j] = RTTs[j+1];
+							RTTs[j+1] = tempInt;
+							Node tempNode = list[j];
+							list[j] = list[j+1];
+							list[j+1] = tempNode;
+						}
+					}
 				if (peerPool.isEmpty() && spSent == 5){
 					// 232 = 168 + 64bits for speed
 					sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, connectedCDN, 232, downloadSpd - usedDownloadSpd));
@@ -548,7 +566,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					//232 = 168 + 32 bits for category + 32bits for videoID
 					sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_OTHER_BINS, node, omsg.sender, 232, categoryID, videoID));				
 				}
-				while(usedDownloadSpd < downloadSpd && !peerPool.isEmpty()){
+				/*while(usedDownloadSpd < downloadSpd && !peerPool.isEmpty()){
 						// TODO size of the message
 					if(peerPool.getFirst() != null){
 						// 232 = 168 + 64 bits for speed
@@ -558,6 +576,23 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 					}
 					else
 						peerPool.remove();
+				}
+				if (!connectedAtleastOnce){
+					if(spSent == 5){
+						//232 = 168 + 64bits for speed
+						sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, connectedCDN, 232, downloadSpd - usedDownloadSpd));
+						numConnectionsAttempted++;
+					}
+				}*/
+				int iterate = list.length;
+				if(iterate>100)
+					iterate = 100;
+				for (int i = 0; i < iterate && usedDownloadSpd < downloadSpd; i++){
+					if(list[i]!=null){
+						p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, list[i], 232, downloadSpd - usedDownloadSpd));		
+						numConnectionsAttempted++;
+						connectedAtleastOnce = true;
+					}
 				}
 				if (!connectedAtleastOnce){
 					if(spSent == 5){
@@ -1043,5 +1078,26 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 		this.clientWatching = new int[clientWatching.length];
 		for(int i = 0; i<clientWatching.length;i++)
 			this.clientWatching[i] = clientWatching[i];
+	}
+	public int[] randomRTTs(Node[] list){
+		int length = list.length;
+		int[] RTTs = new int[length];
+		for (int i = 0; i < length; i++){
+			if (list[i]!= null){
+				Gcp2pProtocol prot = (Gcp2pProtocol) list[i].getProtocol(pid);
+				if(prot.CID == CID){
+					if(prot.getbinID() == binID){
+						RTTs[i] = CommonState.r.nextInt(480) + 2;
+					}
+					else{
+						RTTs[i] = CommonState.r.nextInt(980) + 2;
+					}
+				}
+				else{
+					RTTs[i] = CommonState.r.nextInt(500) + 1000;
+				}
+			}
+		}
+		return RTTs;
 	}
 }
