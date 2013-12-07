@@ -149,6 +149,7 @@ public class Gcp2pNetworkInitializer implements Control {
 		prot.binList = new Node[maxBins][maxClients];
 		prot.startedStreaming = true;
 		prot.binSize = new int[maxBins];
+		prot.peerRTT = new int[maxClients];
 		for(int i =0;i<6;i++)
 			prot.binSize[i] = 0;
 		prot.binWatchList = new int[maxBins][maxClients];

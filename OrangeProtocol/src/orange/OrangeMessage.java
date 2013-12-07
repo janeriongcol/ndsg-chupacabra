@@ -51,6 +51,7 @@ public class OrangeMessage extends SimpleMessage{
 	public Node	 superPeer;
 	public int[] peerWatching;
 	public int [][] index;
+	public int delay;
 	public Node node1;
 	public Node node2;
 	public LinkedList<Node> linkedNodeList;
@@ -132,6 +133,9 @@ public class OrangeMessage extends SimpleMessage{
 		this.peerWatching = peerWatching;
 		this.index = index;
 		this.data = data;
+	}
+	public void setDelay(int delay){
+		this.delay = delay;
 	}
 
 }

@@ -41,6 +41,14 @@ public class OrangeObserver implements Control {
 		long time = CommonState.getTime();
 		int totalConnectionsAttempted = 0;
 		int totalConnectionsRejected = 0;
+		int totalSupplying = 0;
+		int totalAverage = 0;
+		for(int i = 0; i < 3; i++){
+			Node n = Network.get(i);
+			Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
+			totalAverage += prot.averageRTT;
+			totalSupplying++;
+		}
 		
 		for(int i=3; i < Network.size(); i++) {
 			Node n = Network.get(i);
@@ -58,7 +66,10 @@ public class OrangeObserver implements Control {
 						totalPeersConnected++;
 					}
 				}
-				
+				if(prot.averageRTT != 0){
+					totalAverage += prot.averageRTT;
+					totalSupplying++;
+				}
 				if(prot.firstPlayback){
 					totalPlayback += prot.firstPlay;
 					totalPeersPlayback++;
@@ -76,6 +87,7 @@ public class OrangeObserver implements Control {
 		long averageConnect = 0;
 		long averagePlayback = 0;
 		double aveRejectionRate = 0;
+		double averageRTT = totalAverage/totalSupplying;
 		
 		if(activeLeechers!=0){
 			averageUtilization = networkTotalUtilization/activeLeechers;
@@ -110,6 +122,7 @@ public class OrangeObserver implements Control {
 		System.out.println("Connections Rejected: " + totalConnectionsRejected);
 		
 		System.out.println("Rejection Rate: " + aveRejectionRate);
+		System.out.println("Average RTT: "+ averageRTT);
 		
 		Gcp2pProtocol prot2 = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
 		
