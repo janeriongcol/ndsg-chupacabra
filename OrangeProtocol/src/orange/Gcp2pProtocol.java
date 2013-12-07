@@ -543,6 +543,7 @@ public class Gcp2pProtocol implements Overlay, CDProtocol, EDProtocol{
 				for(int i = 0; i < peerPool.size(); i++){
 					list[i] = peerPool.get(i);;
 				}
+				peerPool.removeAll(peerPool);
 				int[] RTTs = randomRTTs(list);
 				for (int i = 0; i < list.length -1; i++)
 					for (int j = 0; j < list.length - 1; j++){
