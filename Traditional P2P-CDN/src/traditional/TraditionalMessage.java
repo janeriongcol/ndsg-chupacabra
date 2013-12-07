@@ -30,6 +30,7 @@ public class TraditionalMessage extends SimpleMessage {
 	public int data;
 	public int data2;
 	public int data3;
+	public int delay;
 	public Node nodeList[];
 	public Node node;
 	public LinkedList<Node> spList = new LinkedList<Node>();
@@ -72,5 +73,7 @@ public class TraditionalMessage extends SimpleMessage {
 		this.node = node;
 
 	}
-
+	public void addDelay(int delay){
+		this.delay = delay;
+	}
 }

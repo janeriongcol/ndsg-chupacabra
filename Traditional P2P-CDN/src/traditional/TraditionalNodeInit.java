@@ -61,8 +61,12 @@ public class TraditionalNodeInit implements NodeInitializer {
 		// add to the clientlist of its CDN
 		prot2 = (TraditionalProtocol) cdn.getProtocol(pid);
 		prot2.addClient(n);
-
-		prot.cdnRTT = CommonState.r.nextInt(maxCDNRTT - minCDNRTT+ 1) + minCDNRTT; // RTT from client to
+		int rtt;
+		if (CommonState.r.nextInt(3) == 1)
+			rtt = CommonState.r.nextInt(970) + 30;
+		else 
+			rtt = CommonState.r.nextInt(500) + 1000;
+		prot.cdnRTT = rtt;// RTT from client to
 														// CDN;
 		// If same area as the CDN: 30 - 1 K
 		// If different area with the CDN: 1-1.5 K
@@ -86,6 +90,7 @@ public class TraditionalNodeInit implements NodeInitializer {
 		prot.sourcePeerList = new Node[maxClients];
 		prot.peerList = new Node[maxClients];
 		prot.peerSpdAlloted = new int[maxClients];
+		prot.peerRTT = new int[maxClients];
 	}
 
 }

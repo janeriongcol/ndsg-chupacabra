@@ -32,14 +32,14 @@ public class Router implements CDProtocol{
 	/**
 	 * Queue representing the messages to be forwarded by the router
 	 */
-	Queue<SimpleMessage> router;
+	Queue<TraditionalMessage> router;
 	/**
 	 * The node to which the router is linked with
 	 */
 	Node node;
 	
 	public Router (String prefix) {		
-		router = new LinkedList<SimpleMessage>();		
+		router = new LinkedList<TraditionalMessage>();		
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 	}
 	double maxUpload;
@@ -61,7 +61,7 @@ public class Router implements CDProtocol{
 	public void emptyBuffer (Node node, double maxUpload) {
 		
 		while(totSize <= maxUpload && !router.isEmpty()){
-			SimpleMessage peek = router.peek();
+			TraditionalMessage peek = router.peek();
 			if((double)peek.size <= maxUpload - totSize){
 				totSize += sendMsg();
 			}
@@ -75,10 +75,10 @@ public class Router implements CDProtocol{
 	 * before being sent
 	 * @param msg - the message to be sent
 	 */
-	public void insertMsg (SimpleMessage msg) {
+	public void insertMsg (TraditionalMessage msg) {
 		
 		router.add(msg);
-		SimpleMessage peek = router.peek();
+		TraditionalMessage peek = router.peek();
 		if ((double)peek.size <= maxUpload - totSize){
 			totSize+= sendMsg();
 		}
@@ -92,7 +92,7 @@ public class Router implements CDProtocol{
 	 * @return the size of the message sent 
 	 */
 	public int sendMsg () {
-		SimpleMessage msg;
+		TraditionalMessage msg;
 		
 		msg = router.poll(); // Get message at the head of router
 		

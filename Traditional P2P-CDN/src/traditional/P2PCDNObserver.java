@@ -40,6 +40,13 @@ public class P2PCDNObserver implements Control {
 		long time = CommonState.getTime();
 		int totalConnectionsAttempted = 0;
 		int totalConnectionsAccepted = 0;
+		int numSuppliers = 0;
+		for(int i = 0; i < 3; i++){
+			Node n = Network.get(i);
+			TraditionalProtocol prot = (TraditionalProtocol) n.getProtocol(pid);
+			totalAveRTT += prot.averageRTT;
+			numSuppliers++;
+		}
 
 		for (int i = 3; i < Network.size(); i++) {
 			Node n = Network.get(i);
@@ -60,10 +67,16 @@ public class P2PCDNObserver implements Control {
 					}
 				}
 
-				totalAveRTT += prot.averageRTT;
+				
 
-				if (prot.nodeTag == 1)
+				if (prot.nodeTag == 1){
 					activeSources++;
+					if(prot.averageRTT!=0){
+						//System.out.println(prot.averageRTT);
+						totalAveRTT += prot.averageRTT;
+						numSuppliers++;
+					}
+				}
 			}
 			
 			totalConnectionsAttempted += prot.numConnectionsAttempted;
@@ -83,7 +96,7 @@ public class P2PCDNObserver implements Control {
 		}
 		if (activeSources != 0) {
 
-			averageRTT = totalAveRTT / (activeSources + activeLeechers);
+			averageRTT = totalAveRTT / (numSuppliers);
 			averageConnect = networkTotalConnect / (totalPeersConnected);
 		}
 

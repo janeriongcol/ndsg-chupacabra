@@ -58,10 +58,19 @@ public class TraditionalTransport implements Transport {
 	public void send(Node sender, Node receiver, Object msg, int pid) {
 		// TODO Auto-generated method stub
 
-		long delay = getLatency (sender, receiver);
+		/*long delay = getLatency (sender, receiver);
 		EDSimulator.add(delay, msg, receiver, pid);
+		*/
+		int delay = getDelayFluctuation();
+		int initial = ((TraditionalMessage) msg).delay;
+		EDSimulator.add(delay + initial, msg, receiver, pid);
 	}
 	
-	
-
+	public void send(Node sender, Node receiver, Object msg, int pid, int initial) {
+		int delay = getDelayFluctuation();
+		EDSimulator.add(delay + initial, msg, receiver, pid);
+	}
+	public int getDelayFluctuation (){
+		return CommonState.r.nextInt(100);
+	}
 }
