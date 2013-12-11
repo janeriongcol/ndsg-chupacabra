@@ -41,7 +41,7 @@ public class Router implements CDProtocol{
 	double maxUpload;
 	@Override
 	public void nextCycle(Node node, int pid) {
-		Gcp2pProtocol prot = (Gcp2pProtocol) node.getProtocol(pid);
+		OrangeProtocol prot = (OrangeProtocol) node.getProtocol(pid);
 		maxUpload = prot.getUploadSpd();
 		totSize = 0;
 		emptyBuffer(node, maxUpload);

@@ -4,7 +4,7 @@ import peersim.cdsim.CDProtocol;
 import peersim.edsim.CDScheduler;
 import peersim.edsim.EDSimulator;
 import peersim.edsim.NextCycleEvent;
-public class Gcp2pNextCycleEvent extends NextCycleEvent{
+public class OrangeNextCycleEvent extends NextCycleEvent{
 
 
 	// =============================== initialization ======================
@@ -16,7 +16,7 @@ public class Gcp2pNextCycleEvent extends NextCycleEvent{
 	* have a constructor with the same signature, often as simple as
 	* <code>super(n)</code>.
 	*/
-	public Gcp2pNextCycleEvent(String n) {
+	public OrangeNextCycleEvent(String n) {
 		super(n);
 		
 	}

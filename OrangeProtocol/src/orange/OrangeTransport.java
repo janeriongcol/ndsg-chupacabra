@@ -5,7 +5,7 @@ import peersim.core.CommonState;
 import peersim.core.Node;
 import peersim.edsim.EDSimulator;
 import peersim.transport.Transport;
-import orange.Gcp2pProtocol;
+import orange.OrangeProtocol;
 
 public class OrangeTransport implements Transport {
 	
@@ -48,8 +48,8 @@ public class OrangeTransport implements Transport {
 	public long getLatency(Node sender, Node receiver) {
 		// TODO Auto-generated method stub
 		
-		Gcp2pProtocol sprot = (Gcp2pProtocol) sender.getProtocol(pid);
-		Gcp2pProtocol rprot = (Gcp2pProtocol) receiver.getProtocol(pid);
+		OrangeProtocol sprot = (OrangeProtocol) sender.getProtocol(pid);
+		OrangeProtocol rprot = (OrangeProtocol) receiver.getProtocol(pid);
 		
 		// Same CDN
 		if(sprot.CID == rprot.CID) {

@@ -58,7 +58,7 @@ public class DynamicPop implements Control{
 				inits[j].initialize(newnode);
 			}
 			Network.add(newnode);
-			Gcp2pProtocol prot = (Gcp2pProtocol) newnode.getProtocol(pid);
+			OrangeProtocol prot = (OrangeProtocol) newnode.getProtocol(pid);
 			prot.start(newnode);
 			//EDSimulator.add(10, new ArrivedMessage(ArrivedMessage.GET_SUPERPEER, newnode, prot.binID), prot.connectedCDN, pid);
 		}

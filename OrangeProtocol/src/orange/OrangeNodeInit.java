@@ -4,7 +4,7 @@ import peersim.core.*;
 import peersim.config.Configuration;
 import peersim.dynamics.*;
 
-public class Gcp2pNodeInit implements NodeInitializer{
+public class OrangeNodeInit implements NodeInitializer{
 	
 	
 	/*
@@ -36,7 +36,7 @@ public class Gcp2pNodeInit implements NodeInitializer{
 	
 	
 	
-	public Gcp2pNodeInit(String prefix){
+	public OrangeNodeInit(String prefix){
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 		maxVideoSize = Configuration.getInt(prefix + "." + PAR_MINVIDEOSIZE);
@@ -55,17 +55,17 @@ public class Gcp2pNodeInit implements NodeInitializer{
 	public void initialize(Node n)
 	{
 		if (Network.size() == 0) return; // never happens since the Network starts with CDNs as initial nodes
-		Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
+		OrangeProtocol prot = (OrangeProtocol) n.getProtocol(pid);
 		
-		prot.setNodeTag(Gcp2pProtocol.RegularTag); // initialize the node to be Regular
+		prot.setNodeTag(OrangeProtocol.RegularTag); // initialize the node to be Regular
 		
 		prot.setConnectedCDN(CommonState.r.nextInt(3) + 1); //random pick a CDN group to belong to range[1-3]
 		
 		Node cdn = prot.getConnectedCDN();
-		Gcp2pProtocol prot2;
+		OrangeProtocol prot2;
 		
 		//add to the clientlist of its CDN
-		prot2 = (Gcp2pProtocol) cdn.getProtocol(pid);
+		prot2 = (OrangeProtocol) cdn.getProtocol(pid);
 		prot2.addClient(n);
 			
 		

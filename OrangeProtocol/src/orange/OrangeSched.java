@@ -7,7 +7,7 @@ import peersim.edsim.EDSimulator;
 import peersim.edsim.NextCycleEvent;
 
 
-public class Gcp2pSched implements Control, NodeInitializer{
+public class OrangeSched implements Control, NodeInitializer{
 
 	// ============================== fields ==============================
 	// ====================================================================
@@ -80,7 +80,7 @@ public class Gcp2pSched implements Control, NodeInitializer{
 	/**
 	* Initialization based on configuration parameters.
 	*/
-	public Gcp2pSched(String n) {
+	public OrangeSched(String n) {
 
 		String[] prots=Configuration.getString(n+"."+PAR_PROTOCOL).split("\\s");
 		pid = new int[prots.length];

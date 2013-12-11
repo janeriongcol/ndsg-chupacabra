@@ -17,7 +17,7 @@ public class OrangeObserver implements Control {
 	private int pid;
 	private PrintWriter writer1, writer2, writer3, writer4;
 	File f1, f2, f3, f4;
-	String filebase = "data_gcp2p_";
+	String filebase = "data_orange_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
 	String PlaybackDelayTime = filebase + "PlaybackDelayTime" + ".txt";
@@ -45,14 +45,14 @@ public class OrangeObserver implements Control {
 		int totalAverage = 0;
 		for(int i = 0; i < 3; i++){
 			Node n = Network.get(i);
-			Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
+			OrangeProtocol prot = (OrangeProtocol) n.getProtocol(pid);
 			totalAverage += prot.averageRTT;
 			totalSupplying++;
 		}
 		
 		for(int i=3; i < Network.size(); i++) {
 			Node n = Network.get(i);
-			Gcp2pProtocol prot = (Gcp2pProtocol) n.getProtocol(pid);
+			OrangeProtocol prot = (OrangeProtocol) n.getProtocol(pid);
 			if(prot.startedStreaming){
 				//System.out.println("--------------"+n.getIndex()+"--------------------");
 				
@@ -124,7 +124,7 @@ public class OrangeObserver implements Control {
 		System.out.println("Rejection Rate: " + aveRejectionRate);
 		System.out.println("Average RTT: "+ averageRTT);
 		
-		Gcp2pProtocol prot2 = (Gcp2pProtocol) Gcp2pProtocol.CDN1.getProtocol(pid);
+		OrangeProtocol prot2 = (OrangeProtocol) OrangeProtocol.CDN1.getProtocol(pid);
 		
 		//System.out.println("Used Upload Speed CDN1 " + prot2.usedUploadSpd);
 
