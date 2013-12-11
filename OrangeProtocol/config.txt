@@ -32,7 +32,7 @@ protocol.router orange.Router
 protocol.router.protocol gcp2p
 protocol.router.step 1000
 
-protocol.gcp2p orange.Gcp2pProtocol
+protocol.gcp2p orange.OrangeProtocol
 protocol.gcp2p.maxclients MAXSIZE
 protocol.gcp2p.category CATEGORY
 protocol.gcp2p.protocol gcp2p
@@ -43,7 +43,7 @@ protocol.gcp2p.step 1000
 init.sch CDScheduler
 init.sch.protocol gcp2p
 
-init.0 orange.Gcp2pNetworkInitializer
+init.0 orange.OrangeNetworkInitializer
 init.0.protocol gcp2p
 init.0.category CATEGORY
 init.0.transport ot
@@ -51,7 +51,7 @@ init.0.transport ot
 control.dynamics orange.DynamicPop
 control.dynamics.protocol gcp2p
 control.dynamics.maxsize MAXSIZE
-control.dynamics.init.0 orange.Gcp2pNodeInit
+control.dynamics.init.0 orange.OrangeNodeInit
 control.dynamics.init.0.protocol gcp2p
 control.dynamics.init.0.category CATEGORY
 control.dynamics.init.0.minVideoSize MINVIDEOSIZE

@@ -595,14 +595,16 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 				int iterate = list.length;
 				if(iterate>100)
 					iterate = 100;
-				
-				arrangedPeerPool = new LinkedList<ProbingInfo>();
-				
+				if(arrangedPeerPool == null){
+					arrangedPeerPool = new LinkedList<ProbingInfo>();
+				}
+				int k = 0;
 				for (int i = 0; i < iterate && usedDownloadSpd < downloadSpd; i++){
 					if(list[i]!=null){
-						arrangedPeerPool.add(new ProbingInfo(i));
+						arrangedPeerPool.add(new ProbingInfo(k));
 						//TODO size 
-						p.sendMsg(new OrangeMessage(OrangeMessage.VERIFY, node, list[i], 232, i, downloadSpd - usedDownloadSpd), RTTs[i]);		
+						p.sendMsg(new OrangeMessage(OrangeMessage.VERIFY, node, list[i], 232, k, downloadSpd - usedDownloadSpd), RTTs[i]);		
+						k++;
 					}
 				}
 				/*
@@ -633,6 +635,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 				for(int i = 0; i < N; i++)
 				{
 					//need to pause for sending_gap HOW?
+					numConnectionsAttempted++;
 					p.sendMsg(new OrangeMessage(OrangeMessage.PROBING_PACKET, node, omsg.sender, size, my_id, sending_gap), omsg.delay);
 					
 				}
@@ -641,8 +644,8 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 			{
 				int id = omsg.data0;
 				int sending_gap = omsg.data;
+				//System.out.println(arrangedPeerPool.size()+":"+id);
 				ProbingInfo probeInfo =  arrangedPeerPool.get(id);
-				
 				if(probeInfo.rg_index != ProbingInfo.N - 1)
 				{
 					probeInfo.addReceivingGap();

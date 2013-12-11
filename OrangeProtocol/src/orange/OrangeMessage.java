@@ -57,7 +57,7 @@ public class OrangeMessage extends SimpleMessage{
 	public Node node1;
 	public Node node2;
 	public LinkedList<Node> linkedNodeList;
-	public LinkedList <ClientInterface> clients;
+	public LinkedList <clientInterface> clients;
 	
 	// DO_YOU_HAVE_THIS, REQUEST_PEERS_FROM_THIS_BIN, REQUEST_PEERS_FROM_OTHER_BINS, ACCEPT_SPEED
 	public OrangeMessage(int typeOfMsg, Node sender, Node receiver, int size, int data0, int data) 
@@ -67,7 +67,7 @@ public class OrangeMessage extends SimpleMessage{
 		this.data = data;
 	}
 	
-	public OrangeMessage (int typeOfMsg, Node sender, Node receiver, LinkedList<ClientInterface> clients, int size){
+	public OrangeMessage (int typeOfMsg, Node sender, Node receiver, LinkedList<clientInterface> clients, int size){
 		super(typeOfMsg, sender, receiver, size);
 		this.clients = clients;
 	}
