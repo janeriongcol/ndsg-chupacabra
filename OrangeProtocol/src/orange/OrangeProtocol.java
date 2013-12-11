@@ -627,6 +627,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 			else if(omsg.msgType == OrangeMessage.VERIFY)
 			{
 				int size = 168 + 240;
+				size = 60000;
 				int sending_gap = size/uploadSpd;	//formula in paper: sending_gap = size/bw req of stream;
 													//should it be uploadSpd or omsg.data -> downloadSpd -usedDownloadSpd of requesting peer?
 				int N = ProbingInfo.N; //number of probing packets
@@ -636,7 +637,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 				{
 					//need to pause for sending_gap HOW?
 					numConnectionsAttempted++;
-					p.sendMsg(new OrangeMessage(OrangeMessage.PROBING_PACKET, node, omsg.sender, size, my_id, sending_gap), omsg.delay);
+					p.sendMsg(new OrangeMessage(OrangeMessage.PROBING_PACKET, node, omsg.sender, size, my_id, sending_gap), omsg.delay  + sending_gap);
 					
 				}
 			}
@@ -655,7 +656,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 					boolean isABWAccepted = probeInfo.confirmABW(sending_gap);
 					if(isABWAccepted)	//ABW passes the computation
 					{
-						p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, omsg.sender, 232, downloadSpd - usedDownloadSpd), omsg.delay);						
+						p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, omsg.sender, 232, downloadSpd - usedDownloadSpd), omsg.delay-sending_gap);						
 					}
 				}
 				

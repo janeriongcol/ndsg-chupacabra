@@ -15,13 +15,13 @@ public class OrangeObserver implements Control {
 	 */
 	private static final String PAR_PROT = "protocol";
 	private int pid;
-	private PrintWriter writer1, writer2, writer3, writer4;
-	File f1, f2, f3, f4;
+	private PrintWriter writer1, writer2, writer3, writer4, writer5;
+	File f1, f2, f3, f4, f5;
 	String filebase = "data_orange_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
 	String PlaybackDelayTime = filebase + "PlaybackDelayTime" + ".txt";
-	
+	String RTT = filebase + "AverageRTT.txt";
 	String AverageReject = filebase + "AverageReject" + ".txt";
 	
 	public OrangeObserver(String prefix)
@@ -93,7 +93,7 @@ public class OrangeObserver implements Control {
 			averageUtilization = networkTotalUtilization/activeLeechers;
 		}
 		
-		if(activeSources!=0){
+		if(totalPeersConnected!=0){
 			averageConnect = networkTotalConnect/totalPeersConnected;
 		}
 		
@@ -136,7 +136,7 @@ public class OrangeObserver implements Control {
 		writer2.println(time + " " + averageConnect);
 		writer3.println(time + " " + averagePlayback);
 		writer4.println(time + " " + aveRejectionRate);
-		
+		writer5.println(time + " " + averageRTT);
 		
 		flushAllWriters();
 
@@ -151,12 +151,13 @@ public class OrangeObserver implements Control {
 		f2 = new File(ConnectionSetUpTime);
 		f3 = new File(PlaybackDelayTime);
 		f4 = new File(AverageReject);
-	
+		f5 = new File(RTT);
 		try {
 			writer1 = new PrintWriter(f1);
 			writer2 = new PrintWriter(f2);
 			writer3 = new PrintWriter(f3);
 			writer4 = new PrintWriter(f4);
+			writer5 = new PrintWriter(f5);
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found.");
@@ -183,6 +184,8 @@ public class OrangeObserver implements Control {
 		writer2.flush();
 		writer3.flush();
 		writer4.flush();
+		writer5.flush();
 	}
 
 }
+

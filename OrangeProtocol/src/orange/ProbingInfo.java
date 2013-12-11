@@ -49,12 +49,12 @@ public class ProbingInfo {
 			numerator = numerator + (receiving_gaps[i] - sending_gap);
 		}
 		
-		/*if(numerator/denominator <= theta)
+		if(numerator/denominator <= theta)
 			return true;
 		else 		
-			return false;*/
+			return false;
 		
-		return true;
+		//return true;
 	}
 	
 	

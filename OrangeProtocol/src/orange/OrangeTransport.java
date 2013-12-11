@@ -70,7 +70,7 @@ public class OrangeTransport implements Transport {
 		/*long delay = getLatency (sender, receiver);
 		EDSimulator.add(delay, msg, receiver, pid);*/
 		int delay = getDelayFluctuation();
-		int initial = ((OrangeMessage) msg).delay;
+		int initial = ((OrangeMessage) msg).delay/2;
 		EDSimulator.add(delay + initial, msg, receiver, pid);
 	}
 	public int getDelayFluctuation (){
