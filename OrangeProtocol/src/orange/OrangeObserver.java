@@ -167,6 +167,8 @@ public class OrangeObserver implements Control {
 		fileHeader(writer1, "Average Utilization", "Time", "Utilization (%)");
 		fileHeader(writer2, "Average Connection Set-up Time", "Time", "Connection Set-up Time");
 		fileHeader(writer3, "Average Playback Delay Time", "Time", "Playback Delay Time");
+		fileHeader(writer4, "Average Rejection Rate", "Time", "Rejection (%)");
+		fileHeader(writer5, "Averate RTT", "Time", "Time");
 	
 	}
 	
