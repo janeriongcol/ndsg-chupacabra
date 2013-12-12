@@ -4,7 +4,7 @@ warning('off')
 di ="C:\Users\Fatima De Villa\Desktop\"
 
 trad_fn = "Traditional P2P-CDN\data_traditional_"
-tsis_fn = "tsis\data_gcp2p_"
+tsis_fn = "GCP2P Adapted\data_gcp2p_"
 orange_fn = "Orange\data_orange_"
 
 fn_arr = ["Utilization.txt", "ConnectionSetUpTime.txt", "PlaybackDelayTime.txt", "AverageReject.txt"]
