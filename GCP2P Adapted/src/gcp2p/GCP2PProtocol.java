@@ -593,6 +593,7 @@ public class GCP2PProtocol implements Overlay, CDProtocol, EDProtocol{
 					else{
 						// 232 = 168 + 64bits for requested speed
 						sendMsg(new GCP2PMessage(GCP2PMessage.CONNECT, node, connectedCDN, 232, downloadSpd - usedDownloadSpd), cdnRTT);
+					numConnectionsAttempted++;	
 					}
 					potentialSource = null;
 					spSent = 0;
