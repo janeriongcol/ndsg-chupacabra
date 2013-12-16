@@ -13,12 +13,13 @@ public class TraditionalObserver implements Control{
 	private static final String PAR_PROT = "protocol";
 	private int pid;
 	
-	private PrintWriter writer1, writer2, writer3;
-	File f1, f2, f3;
+	private PrintWriter writer1, writer2, writer3, writer4;
+	File f1, f2, f3, f4;
 	String filebase = "data_traditional_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
 	String PlaybackDelayTime = filebase + "PlaybackDelayTime" + ".txt";
+	String RTT = filebase + "AverageRTT.txt";
 	
 	public TraditionalObserver(String prefix){
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
@@ -89,7 +90,7 @@ public class TraditionalObserver implements Control{
 		writer1.println(time + " " + averageUtilization);	
 		writer2.println(time + " " + averageConnect);
 		writer3.println(time + " " + averagePlayback);
-		
+		//writer4.println(time + " "+ averageRTT);
 		flushAllWriters();
 		
 		return true;

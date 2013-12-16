@@ -657,6 +657,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 					if(isABWAccepted)	//ABW passes the computation
 					{
 						p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, omsg.sender, 232, downloadSpd - usedDownloadSpd), omsg.delay-sending_gap);						
+						numConnectionsAttempted++;
 					}
 				}
 				

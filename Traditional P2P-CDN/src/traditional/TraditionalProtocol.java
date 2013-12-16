@@ -256,7 +256,6 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 					}				
 					prot.sendMsg(new TraditionalMessage (TraditionalMessage.CDN_RP_CONNECT_CONFIRM,
 							node, aem.sender, 296, spdAvail), aem.delay);
-
 				}
 			} else if (aem.msgType == TraditionalMessage.CDN_RP_DISCONNECT) {
 				// Reply with a confirm disconnect message
@@ -386,6 +385,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				// if not null, request connection with these Supplying Peers
 				// else request connection with CDN itself (CDN_RP_CONNECT)
 				if (aem.nodeList == null) {
+					
 					prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN, 
 							264, videoID, downloadSpd-usedDownloadSpd),cdnRTT);
 					numConnectionsAttempted++;
@@ -460,7 +460,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				if (spdAvail > aem.data) {
 					spdAvail = aem.data;
 				}
-				if (!firstConnect && spdAvail > 0) {
+				if (!firstConnect) {
 					setTimeElapsed();
 					firstConnect = true;
 					// System.out.println("elapsed: "+elapsedTime+"   |  Current: "+System.currentTimeMillis());

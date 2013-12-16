@@ -94,7 +94,7 @@ public class P2PCDNObserver implements Control {
 			averageUtilization = networkTotalUtilization / activeLeechers;
 
 		}
-		if (activeSources != 0) {
+		if (totalPeersConnected != 0) {
 
 			averageRTT = totalAveRTT / (numSuppliers);
 			averageConnect = networkTotalConnect / (totalPeersConnected);
