@@ -135,7 +135,8 @@ public class GCP2PProtocol implements Overlay, CDProtocol, EDProtocol{
 	Node potentialSource = null;
 	int numPotentialPeers = 0;
 	int spSent = 0;
-	
+	int numFirstConnectedPeers = 0; //number of parent peers connected contributing to the first playback
+		
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
 	Node[] superPeerList;	// list of SuperPeers
 	Node[] clientList;		// applicable to CDN and SuperPeer
@@ -615,6 +616,11 @@ public class GCP2PProtocol implements Overlay, CDProtocol, EDProtocol{
 						usedDownloadSpd = usedDownloadSpd + tobeAccepted;
 						// 296 = 168 + 64bits for requested speed + 64bits for speed to be accepted
 						p.sendMsg(new GCP2PMessage(GCP2PMessage.ACCEPT_SPEED, node, omsg.sender, 296, omsg.data, tobeAccepted), omsg.delay);		
+						
+						if(!firstPlayback)
+						{
+							numFirstConnectedPeers++;
+						}
 						
 						//System.out.println(numSource);
 						sourcePeerList[numSource] = omsg.sender;

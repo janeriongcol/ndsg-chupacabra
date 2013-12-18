@@ -135,6 +135,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 	Node potentialSource = null;
 	int numPotentialPeers = 0;
 	int spSent = 0;
+	int numFirstConnectedPeers = 0; //number of parent peers connected contributing to the first playback
 	
 	int[][] indexPerCategory; // index of peers per category i.e. indexPerCategory[0][1] = 5, then clientList[5] watches a video with category 0
 	Node[] superPeerList;	// list of SuperPeers
@@ -147,7 +148,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 	int maxSpdPerVid = 400;
 	Node[] sourcePeerList;	// list of peers that contribute to the node
 	Node[] candidatePeers;	// sent by the SuperPeer to a regular peer
-	int numSource;			// number of source peers that contribute to the node
+	int numSource;			// number of source (parent) peers that contribute to the node
 	int binSize[]; //binSize[i] contains the number of peers inside bin i
 	Node binList[][]; //binList[i] returns the list peers inside bin i
 	int binWatchList[][]; //binWatchList[i][j] returns the what video peer j of bin i is watching
@@ -574,24 +575,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 					//232 = 168 + 32 bits for category + 32bits for videoID
 					sendMsg(new OrangeMessage(OrangeMessage.REQUEST_PEERS_FROM_OTHER_BINS, node, omsg.sender, 232, categoryID, videoID), CommonState.r.nextInt(480)+20);				
 				}
-				/*while(usedDownloadSpd < downloadSpd && !peerPool.isEmpty()){
-						// TODO size of the message
-					if(peerPool.getFirst() != null){
-						// 232 = 168 + 64 bits for speed
-						p.sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, peerPool.remove(), 232, downloadSpd - usedDownloadSpd));		
-						numConnectionsAttempted++;
-						connectedAtleastOnce = true;
-					}
-					else
-						peerPool.remove();
-				}
-				if (!connectedAtleastOnce){
-					if(spSent == 5){
-						//232 = 168 + 64bits for speed
-						sendMsg(new OrangeMessage(OrangeMessage.CONNECT, node, connectedCDN, 232, downloadSpd - usedDownloadSpd));
-						numConnectionsAttempted++;
-					}
-				}*/
+			
 				int iterate = list.length;
 				if(iterate>100)
 					iterate = 100;
@@ -602,7 +586,6 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 				for (int i = 0; i < iterate && usedDownloadSpd < downloadSpd; i++){
 					if(list[i]!=null){
 						arrangedPeerPool.add(new ProbingInfo(k));
-						//TODO size 
 						p.sendMsg(new OrangeMessage(OrangeMessage.VERIFY, node, list[i], 232, k, downloadSpd - usedDownloadSpd), RTTs[i]);		
 						k++;
 					}
@@ -699,6 +682,11 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 						// 296 = 168 + 64bits for requested speed + 64bits for speed to be accepted
 						p.sendMsg(new OrangeMessage(OrangeMessage.ACCEPT_SPEED, node, omsg.sender, 296, omsg.data, tobeAccepted), omsg.delay);		
 						
+						if(!firstPlayback)
+						{
+							numFirstConnectedPeers++;
+						}
+							
 						//System.out.println(numSource);
 						sourcePeerList[numSource] = omsg.sender;
 						numSource++;

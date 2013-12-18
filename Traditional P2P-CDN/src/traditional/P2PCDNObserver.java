@@ -13,13 +13,16 @@ public class P2PCDNObserver implements Control {
 	private static final String PAR_PROT = "protocol";
 	private int pid;
 
-	private PrintWriter writer1, writer2, writer3, writer4, writer5;
-	File f1, f2, f3, f4, f5;
+	private PrintWriter writer1, writer2, writer3, writer4, writer5, writer6, writer7;
+	File f1, f2, f3, f4, f5, f6, f7;
 	String filebase = "data_traditional_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
 	String PlaybackDelayTime = filebase + "PlaybackDelayTime" + ".txt";
 	String AverageRTT = filebase + "AverageRTT" + ".txt";
+	String FirstConnectedPeers = filebase + "FirstConnectedPeers" + ".txt";
+	String ConnectedPeers = filebase + "ConnectedPeers" + ".txt";
+	
 	
 	String AverageReject = filebase + "AverageReject" + ".txt";
 
@@ -41,6 +44,9 @@ public class P2PCDNObserver implements Control {
 		int totalConnectionsAttempted = 0;
 		int totalConnectionsAccepted = 0;
 		int numSuppliers = 0;
+		int totalFirstConnectedPeers = 0;
+		int totalConnectedSourcePeers = 0;
+		
 		for(int i = 0; i < 3; i++){
 			Node n = Network.get(i);
 			TraditionalProtocol prot = (TraditionalProtocol) n.getProtocol(pid);
@@ -65,8 +71,10 @@ public class P2PCDNObserver implements Control {
 						totalPlayback += prot.firstPlay;
 						totalPeersPlayback++;
 					}
+					else{
+						totalFirstConnectedPeers++;
+					}				
 				}
-
 				
 
 				if (prot.nodeTag == 1){
@@ -77,6 +85,8 @@ public class P2PCDNObserver implements Control {
 						numSuppliers++;
 					}
 				}
+				
+				totalConnectedSourcePeers += prot.numSource;
 			}
 			
 			totalConnectionsAttempted += prot.numConnectionsAttempted;
@@ -89,6 +99,8 @@ public class P2PCDNObserver implements Control {
 		long averagePlayback = 0;
 		double averageRTT = 0;
 		double aveRejectionRate = 0;
+		double aveFirstConnectedPeers = 0;
+		double aveConnectedSourcePeers = 0;
 
 		if (activeLeechers != 0) {
 			averageUtilization = networkTotalUtilization / activeLeechers;
@@ -98,6 +110,9 @@ public class P2PCDNObserver implements Control {
 
 			averageRTT = totalAveRTT / (numSuppliers);
 			averageConnect = networkTotalConnect / (totalPeersConnected);
+			aveFirstConnectedPeers = totalFirstConnectedPeers / totalPeersConnected;
+			aveConnectedSourcePeers = totalConnectedSourcePeers / totalPeersConnected;
+			
 		}
 
 		if (totalPeersPlayback != 0) {
@@ -127,15 +142,20 @@ public class P2PCDNObserver implements Control {
 		System.out.println("Connections Accepted: " + totalConnectionsAccepted);
 		
 		System.out.println("Rejection Rate: " + aveRejectionRate);
+		
 		System.out.println("Network Size: "+Network.size());
-
-		System.out.println("----------------------------------------------");
-
-		writer1.println(time + " " + averageUtilization);
+		
+		System.out.println("Average Connected Peers Before First Playback: " + aveFirstConnectedPeers);
+		
+		System.out.println("Average Connected Peers Per Node: " + aveConnectedSourcePeers);
+		
+		writer1.println(time + " " + averageUtilization);	
 		writer2.println(time + " " + averageConnect);
 		writer3.println(time + " " + averagePlayback);
 		writer4.println(time + " " + averageRTT);
 		writer5.println(time + " " + aveRejectionRate);
+		writer6.println(time + " " + aveFirstConnectedPeers);
+		writer7.println(time + " " + aveConnectedSourcePeers);
 
 		flushAllWriters();
 
@@ -148,6 +168,8 @@ public class P2PCDNObserver implements Control {
 		f3 = new File(PlaybackDelayTime);
 		f4 = new File(AverageRTT);
 		f5 = new File(AverageReject);
+		f6 = new File(FirstConnectedPeers);
+		f7 = new File(ConnectedPeers);
 
 		try {
 			writer1 = new PrintWriter(f1);
@@ -155,6 +177,8 @@ public class P2PCDNObserver implements Control {
 			writer3 = new PrintWriter(f3);
 			writer4 = new PrintWriter(f4);
 			writer5 = new PrintWriter(f5);
+			writer6 = new PrintWriter(f6);
+			writer7 = new PrintWriter(f7);
 
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found.");
@@ -168,6 +192,8 @@ public class P2PCDNObserver implements Control {
 				"Playback Delay Time");
 		fileHeader(writer4, "Average Round Trip Time", "Time", "Average RTT");
 		fileHeader(writer5, "Average Rejection Rate", "Time", "Rejection Rate");
+		fileHeader(writer6, "Average First Connected Peers", "Time", "First Connected Peers");
+		fileHeader(writer7, "Average Connected Peers", "Time", "Connecte Peers");
 	}
 
 	public void fileHeader(PrintWriter w, String title, String x, String y) {
@@ -184,5 +210,7 @@ public class P2PCDNObserver implements Control {
 		writer3.flush();
 		writer4.flush();
 		writer5.flush();
+		writer6.flush();
+		writer7.flush();
 	}
 }

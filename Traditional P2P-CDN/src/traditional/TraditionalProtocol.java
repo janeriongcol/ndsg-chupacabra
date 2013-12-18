@@ -114,6 +114,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 	long firstPlay;
 	int numConnectionsAttempted = 0;
 	int numConnectionsAccepted = 0;
+	int numFirstConnectedPeers = 0; //number of parent peers connected contributing to the first playback	
 
 	Node[] supplyingPeerList; // list of supplying peer under the CDN
 	int numSupplier = 0;
@@ -456,6 +457,12 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				/*averageRTT = (averageRTT * numSource + cdnRTT)
 						/ (numSource + 1);*/
 				numSource++;
+				
+				if(!firstPlayback)
+				{
+					numFirstConnectedPeers++;
+				}
+				
 				int spdAvail = downloadSpd - usedDownloadSpd;
 				if (spdAvail > aem.data) {
 					spdAvail = aem.data;
@@ -486,6 +493,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				averageRTT = (averageRTT * numSource + tobeAdded)
 						/ (numSource + 1);*/
 				numSource++;
+								
 				int spdAvail = downloadSpd - usedDownloadSpd;
 				if (spdAvail > aem.data) {
 					spdAvail = aem.data;
