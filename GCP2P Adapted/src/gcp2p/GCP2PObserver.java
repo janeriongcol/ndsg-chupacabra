@@ -48,6 +48,8 @@ public class GCP2PObserver implements Control {
 		int totalFirstConnectedPeers = 0;
 		int totalConnectedSourcePeers = 0;
 		
+		int total = 0;
+		
 		for(int i = 0; i < 3; i++){
 			Node n = Network.get(i);
 			GCP2PProtocol prot = (GCP2PProtocol) n.getProtocol(pid);
@@ -80,7 +82,8 @@ public class GCP2PObserver implements Control {
 					totalPeersPlayback++;
 				}
 				else{
-					totalFirstConnectedPeers++;
+					totalFirstConnectedPeers += prot.numFirstConnectedPeers;
+					if(prot.numFirstConnectedPeers > 0) total++;
 				}
 				
 
@@ -109,9 +112,11 @@ public class GCP2PObserver implements Control {
 		
 		if(totalPeersConnected!=0){
 			averageConnect = networkTotalConnect/totalPeersConnected;
-			aveFirstConnectedPeers = totalFirstConnectedPeers / totalPeersConnected;
+			//aveFirstConnectedPeers = totalFirstConnectedPeers / total;
 			aveConnectedSourcePeers = totalConnectedSourcePeers / totalPeersConnected;
 		}
+		
+		if(total!=0) aveFirstConnectedPeers= totalFirstConnectedPeers/total;
 		
 		if(totalPeersPlayback!=0){
 			averagePlayback = totalPlayback/totalPeersPlayback;

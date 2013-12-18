@@ -47,6 +47,8 @@ public class P2PCDNObserver implements Control {
 		int totalFirstConnectedPeers = 0;
 		int totalConnectedSourcePeers = 0;
 		
+		int total = 0;
+		
 		for(int i = 0; i < 3; i++){
 			Node n = Network.get(i);
 			TraditionalProtocol prot = (TraditionalProtocol) n.getProtocol(pid);
@@ -72,7 +74,8 @@ public class P2PCDNObserver implements Control {
 						totalPeersPlayback++;
 					}
 					else{
-						totalFirstConnectedPeers++;
+						totalFirstConnectedPeers += prot.numFirstConnectedPeers;
+						if(prot.numFirstConnectedPeers > 0) total++;
 					}				
 				}
 				
@@ -110,10 +113,12 @@ public class P2PCDNObserver implements Control {
 
 			averageRTT = totalAveRTT / (numSuppliers);
 			averageConnect = networkTotalConnect / (totalPeersConnected);
-			aveFirstConnectedPeers = totalFirstConnectedPeers / totalPeersConnected;
+			//aveFirstConnectedPeers = totalFirstConnectedPeers / totalPeersConnected;
 			aveConnectedSourcePeers = totalConnectedSourcePeers / totalPeersConnected;
 			
 		}
+		
+		if(total!=0) aveFirstConnectedPeers= totalFirstConnectedPeers/total;
 
 		if (totalPeersPlayback != 0) {
 			averagePlayback = totalPlayback / totalPeersPlayback;

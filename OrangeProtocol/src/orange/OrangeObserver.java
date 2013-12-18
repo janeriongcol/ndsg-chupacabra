@@ -46,7 +46,9 @@ public class OrangeObserver implements Control {
 		int totalSupplying = 0;
 		int totalAverage = 0;
 		int totalFirstConnectedPeers = 0;
-		int totalConnectedSourcePeers = 0;		
+		int totalConnectedSourcePeers = 0;	
+		
+		int total = 0;
 		
 		for(int i = 0; i < 3; i++){
 			Node n = Network.get(i);
@@ -80,7 +82,8 @@ public class OrangeObserver implements Control {
 					totalPeersPlayback++;
 				}
 				else{
-					totalFirstConnectedPeers++;
+					totalFirstConnectedPeers += prot.numFirstConnectedPeers;
+					if(prot.numFirstConnectedPeers > 0) total++;
 				}
 				
 
@@ -107,9 +110,11 @@ public class OrangeObserver implements Control {
 		
 		if(totalPeersConnected!=0){
 			averageConnect = networkTotalConnect/totalPeersConnected;
-			aveFirstConnectedPeers = totalFirstConnectedPeers / totalPeersConnected;
+			//aveFirstConnectedPeers = totalFirstConnectedPeers / totalPeersConnected;
 			aveConnectedSourcePeers = totalConnectedSourcePeers / totalPeersConnected;
 		}
+		
+		if(total!=0) aveFirstConnectedPeers= totalFirstConnectedPeers/total;
 		
 		if(totalPeersPlayback!=0){
 			averagePlayback = totalPlayback/totalPeersPlayback;
