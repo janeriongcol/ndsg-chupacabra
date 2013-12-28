@@ -48,7 +48,7 @@ public class GCP2PObserver implements Control {
 		int totalAverage = 0;
 		int totalFirstConnectedPeers = 0;
 		int totalConnectedSourcePeers = 0;
-		
+		int realCount = 0;
 		int total = 0;
 		
 		for(int i = 0; i < 3; i++){
@@ -61,6 +61,9 @@ public class GCP2PObserver implements Control {
 		for(int i=3; i < Network.size(); i++) {
 			Node n = Network.get(i);
 			GCP2PProtocol prot = (GCP2PProtocol) n.getProtocol(pid);
+			if(!prot.doneStreaming){
+				realCount++;
+			}
 			if(prot.startedStreaming){
 				//System.out.println("--------------"+n.getIndex()+"--------------------");
 				
@@ -168,7 +171,7 @@ public class GCP2PObserver implements Control {
 		writer6.println(time + " " + aveFirstConnectedPeers);
 		writer7.println(time + " " + aveConnectedSourcePeers);	
 		writer8.println(time + " " + Network.size());
-		writer9.println(time + " " + activeLeechers);
+		writer9.println(time + " " + realCount);
 		flushAllWriters();
 
 		//writer.println("----------------------------------------------");

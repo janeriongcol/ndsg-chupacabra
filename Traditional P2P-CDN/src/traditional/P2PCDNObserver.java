@@ -47,7 +47,7 @@ public class P2PCDNObserver implements Control {
 		int numSuppliers = 0;
 		int totalFirstConnectedPeers = 0;
 		int totalConnectedSourcePeers = 0;
-		
+		int realCount = 0;
 		int total = 0;
 		
 		for(int i = 0; i < 3; i++){
@@ -60,7 +60,9 @@ public class P2PCDNObserver implements Control {
 		for (int i = 3; i < Network.size(); i++) {
 			Node n = Network.get(i);
 			TraditionalProtocol prot = (TraditionalProtocol) n.getProtocol(pid);
-			
+			if (prot.nodeTag == 2) {
+				realCount++;
+			}
 			if (prot.startedStreaming) {
 				if (prot.nodeTag == 2) {
 					networkTotalUtilization += (double) prot
@@ -163,7 +165,7 @@ public class P2PCDNObserver implements Control {
 		writer6.println(time + " " + aveFirstConnectedPeers);
 		writer7.println(time + " " + aveConnectedSourcePeers);
 		writer8.println(time + " " + Network.size());
-		writer9.println(time + " " + activeLeechers);
+		writer9.println(time + " " + realCount);
 		flushAllWriters();
 
 		return false;
