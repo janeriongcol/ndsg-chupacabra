@@ -36,13 +36,13 @@ while(%t)
     xtitle(graph_title, x_title, y_title)
     
     data_leechers = fscanfMat(di+dir_arr(choice)+fn_arr(1))
-    x_arr = data_trad(1:$,1)
-    y_arr = data_trad(1:$,2)
+    x_arr = data_leechers(1:$,1)
+    y_arr = data_leechers(1:$,2)
     plot(x_arr, y_arr, 'g')
     
     data_totalpeers = fscanfMat(di+dir_arr(choice)+fn_arr(2))
-    x_arr = data_tsis(1:$,1)
-    y_arr = data_tsis(1:$,2)
+    x_arr = data_totalpeers(1:$,1)
+    y_arr = data_totalpeers(1:$,2)
     plot(x_arr, y_arr, 'b')
     
     h1=legend(["Leechers";"Total Network Size"])
