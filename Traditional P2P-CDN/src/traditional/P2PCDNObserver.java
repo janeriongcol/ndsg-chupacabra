@@ -13,8 +13,8 @@ public class P2PCDNObserver implements Control {
 	private static final String PAR_PROT = "protocol";
 	private int pid;
 
-	private PrintWriter writer1, writer2, writer3, writer4, writer5, writer6, writer7;
-	File f1, f2, f3, f4, f5, f6, f7;
+	private PrintWriter writer1, writer2, writer3, writer4, writer5, writer6, writer7, writer8;
+	File f1, f2, f3, f4, f5, f6, f7, f8;
 	String filebase = "data_traditional_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
@@ -22,6 +22,7 @@ public class P2PCDNObserver implements Control {
 	String AverageRTT = filebase + "AverageRTT" + ".txt";
 	String FirstConnectedPeers = filebase + "FirstConnectedPeers" + ".txt";
 	String ConnectedPeers = filebase + "ConnectedPeers" + ".txt";
+	String population = filebase + "Network.txt";
 	
 	
 	String AverageReject = filebase + "AverageReject" + ".txt";
@@ -161,7 +162,7 @@ public class P2PCDNObserver implements Control {
 		writer5.println(time + " " + aveRejectionRate);
 		writer6.println(time + " " + aveFirstConnectedPeers);
 		writer7.println(time + " " + aveConnectedSourcePeers);
-
+		writer8.println(time + " " + Network.size() + " "+ activeLeechers);
 		flushAllWriters();
 
 		return false;
@@ -175,7 +176,7 @@ public class P2PCDNObserver implements Control {
 		f5 = new File(AverageReject);
 		f6 = new File(FirstConnectedPeers);
 		f7 = new File(ConnectedPeers);
-
+		f8 = new File(population);
 		try {
 			writer1 = new PrintWriter(f1);
 			writer2 = new PrintWriter(f2);
@@ -184,7 +185,7 @@ public class P2PCDNObserver implements Control {
 			writer5 = new PrintWriter(f5);
 			writer6 = new PrintWriter(f6);
 			writer7 = new PrintWriter(f7);
-
+			writer8 = new PrintWriter(f8);
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found.");
 			e.printStackTrace();
@@ -199,6 +200,7 @@ public class P2PCDNObserver implements Control {
 		fileHeader(writer5, "Average Rejection Rate", "Time", "Rejection Rate");
 		fileHeader(writer6, "Average First Connected Peers", "Time", "First Connected Peers");
 		fileHeader(writer7, "Average Connected Peers", "Time", "Connecte Peers");
+		fileHeader(writer8, "Network Population", "Time", "Number of Peers");
 	}
 
 	public void fileHeader(PrintWriter w, String title, String x, String y) {
@@ -217,5 +219,6 @@ public class P2PCDNObserver implements Control {
 		writer5.flush();
 		writer6.flush();
 		writer7.flush();
+		writer8.flush();
 	}
 }
