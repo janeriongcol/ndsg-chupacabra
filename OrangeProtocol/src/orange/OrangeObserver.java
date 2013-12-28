@@ -15,8 +15,8 @@ public class OrangeObserver implements Control {
 	 */
 	private static final String PAR_PROT = "protocol";
 	private int pid;
-	private PrintWriter writer1, writer2, writer3, writer4, writer5, writer6, writer7, writer8;
-	File f1, f2, f3, f4, f5, f6, f7, f8;
+	private PrintWriter writer1, writer2, writer3, writer4, writer5, writer6, writer7, writer8, writer9;
+	File f1, f2, f3, f4, f5, f6, f7, f8, f9;
 	String filebase = "data_orange_";
 	String UtilizationFilename = filebase + "Utilization" + ".txt";
 	String ConnectionSetUpTime = filebase + "ConnectionSetUpTime" + ".txt";
@@ -26,7 +26,7 @@ public class OrangeObserver implements Control {
 	String FirstConnectedPeers = filebase + "FirstConnectedPeers" + ".txt";
 	String ConnectedPeers = filebase + "ConnectedPeers" + ".txt";
 	String population = filebase + "Network.txt";
-	
+	String leechers = filebase + "Leechers.txt";
 	public OrangeObserver(String prefix)
 	{
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
@@ -164,7 +164,8 @@ public class OrangeObserver implements Control {
 		writer5.println(time + " " + aveRejectionRate);
 		writer6.println(time + " " + aveFirstConnectedPeers);
 		writer7.println(time + " " + aveConnectedSourcePeers);
-		writer8.println(time + " " + Network.size() + " "+ activeLeechers);
+		writer8.println(time + " " + Network.size());
+		writer9.println(time + " " + activeLeechers);
 		flushAllWriters();
 
 		//writer.println("----------------------------------------------");
@@ -181,6 +182,7 @@ public class OrangeObserver implements Control {
 		f6 = new File(FirstConnectedPeers);
 		f7 = new File(ConnectedPeers);
 		f8 = new File(population);
+		f9 = new File(leechers);
 		try {
 			writer1 = new PrintWriter(f1);
 			writer2 = new PrintWriter(f2);
@@ -190,6 +192,7 @@ public class OrangeObserver implements Control {
 			writer6 = new PrintWriter(f6);
 			writer7 = new PrintWriter(f7);
 			writer8 = new PrintWriter(f8);
+			writer9 = new PrintWriter(f9);
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found.");
 			e.printStackTrace();
@@ -204,6 +207,8 @@ public class OrangeObserver implements Control {
 		fileHeader(writer5, "Average Rejection Rate", "Time", "Rejection Rate");
 		fileHeader(writer6, "Average First Connected Peers", "Time", "First Connected Peers");
 		fileHeader(writer7, "Average Connected Peers", "Time", "Connecte Peers");
+		fileHeader(writer8, "Network Population", "Time", "Number of Peers");
+		fileHeader(writer9, "Network Population", "Time", "Leechers");
 	}
 
 	public void fileHeader(PrintWriter w, String title, String x, String y) {
@@ -223,6 +228,7 @@ public class OrangeObserver implements Control {
 		writer6.flush();
 		writer7.flush();
 		writer8.flush();
+		writer9.flush();
 	}
 
 }
