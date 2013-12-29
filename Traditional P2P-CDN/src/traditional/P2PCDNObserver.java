@@ -66,7 +66,7 @@ public class P2PCDNObserver implements Control {
 			if (prot.startedStreaming) {
 				if (prot.nodeTag == 2) {
 					networkTotalUtilization += (double) prot
-							.getUsedDownloadSpd() / prot.getDownloadSpd() * 100;
+							.getUsedDownloadSpd() / (double)prot.getDownloadSpd() * 100;
 					activeLeechers++;
 					if (prot.firstConnect) {
 						networkTotalConnect += prot.getTimeElapsed();

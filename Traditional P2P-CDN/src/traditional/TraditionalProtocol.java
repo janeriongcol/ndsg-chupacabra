@@ -194,9 +194,12 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 					}
 			}
 			if (nodeTag == RegularTag) {
-				if (usedDownloadSpd < downloadSpd && peerPool.isEmpty()) {
+				if (usedDownloadSpd < downloadSpd) {
 					prot.sendMsg(new TraditionalMessage (TraditionalMessage.GIVE_SP_LIST, 
 							node, connectedCDN, 200, videoID), cdnRTT);
+					prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN,
+							264, videoID, downloadSpd-usedDownloadSpd), cdnRTT);
+					numConnectionsAttempted++;
 				}
 			}
 		}
@@ -270,9 +273,11 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 						break;
 					}
 				}
+				if (i != numPeers){
 				peerList[i] = null;
 				peerSpdAlloted[i] = 0;
-				videoSpdAlloted[p.videoID] -= allotedSpd;
+				videoSpdAlloted[p.videoID] -= allotedSpd;}
+				//System.out.println("Bump: "+videoSpdAlloted[p.videoID]);
 			} else if (aem.msgType == TraditionalMessage.CDN_RP_CONNECT_ACCEPT) {
 				// uploadSpdBuffer -= aem.data;
 				// usedUploadSpd -= uploadSpdBuffer;
@@ -331,7 +336,6 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 						}
 					} else {
 						prot.sendMsg(new TraditionalMessage(TraditionalMessage.REJECT, node, aem.node, 232, uploadSpdBuffer), aem.delay);
-
 					}
 				}
 			} else if (aem.msgType == TraditionalMessage.SP_RP_CONNECT) {
