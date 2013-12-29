@@ -71,7 +71,7 @@ public class TraditionalNodeInit implements NodeInitializer {
 		// If same area as the CDN: 30 - 1 K
 		// If different area with the CDN: 1-1.5 K
 
-		prot.uploadSpd = CommonState.r.nextInt(maxUpSpeed + 1); // Random upload speed
+		prot.uploadSpd = CommonState.r.nextInt(500 + 1) + 500; // Random upload speed
 														// from 0-1000Kbps
 		prot.downloadSpd = CommonState.r.nextInt(maxDlSpeed - minDlSpeed + 1) + minDlSpeed; // Random
 																// download

@@ -114,6 +114,7 @@ public class TraditionalNetworkInit implements Control {
 		prot.peerSpdAlloted = new int[maxClients];
 		prot.startedStreaming = true;
 		prot.peerRTT = new int [maxClients];
+		prot.uploadSpd = 10000;
 	}
 
 	/**

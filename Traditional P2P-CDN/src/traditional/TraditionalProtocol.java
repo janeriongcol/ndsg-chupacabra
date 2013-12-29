@@ -263,7 +263,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				TraditionalProtocol p = (TraditionalProtocol) aem.sender
 						.getProtocol(pid);
 				int allotedSpd = 0;
-				int i;
+				int i = 0;
 				for (i = 0; i < numPeers; i++) {
 					if (peerList[i] != null && peerList[i].equals(aem.sender)) {
 						allotedSpd = peerSpdAlloted[i];
@@ -349,9 +349,10 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				for (int i = 0; i < numPeers; i++) {
 					if (peerList[i] != null)
 						if (peerList[i].equals(aem.sender)) {
+							usedUploadSpd -= peerSpdAlloted[i];
 							peerSpdAlloted[i] = 0;
 							peerList[i] = null;
-							usedUploadSpd -= peerSpdAlloted[i];
+							
 							break;
 						}
 
