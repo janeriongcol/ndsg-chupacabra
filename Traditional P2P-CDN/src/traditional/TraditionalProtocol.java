@@ -522,6 +522,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				usedDownloadSpd -= aem.data;
 				// System.out.println(aem.data);
 			} else if (aem.msgType == TraditionalMessage.UPLOAD) {
+				if(!doneStreaming){
 				// System.out.println("Upload");
 				if (!firstPlayback && streamedVideoSize >= 400) {
 					firstPlay = System.currentTimeMillis() - startTime
@@ -545,7 +546,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				}
 
 			}
-
+			}
 		}
 	}
 
