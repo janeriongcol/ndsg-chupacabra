@@ -62,8 +62,8 @@ public class Router implements CDProtocol{
 		
 		while(totSize <= maxUpload && !router.isEmpty()){
 			TraditionalMessage peek = router.peek();
-			if((double)peek.size <= maxUpload - totSize){
-				totSize += sendMsg();
+			if((double)peek.size/1000 <= maxUpload - totSize){
+				totSize += (double)sendMsg()/1000;
 			}
 			else
 				break;
@@ -79,8 +79,8 @@ public class Router implements CDProtocol{
 		
 		router.add(msg);
 		TraditionalMessage peek = router.peek();
-		if ((double)peek.size <= maxUpload - totSize){
-			totSize+= sendMsg();
+		if ((double)peek.size/1000 <= maxUpload - totSize){
+			totSize+= (double)sendMsg()/1000;
 		}
 	
 	}

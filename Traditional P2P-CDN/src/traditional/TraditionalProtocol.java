@@ -193,14 +193,15 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 						}
 					}
 			}
-			if (nodeTag == RegularTag) {
-				if (usedDownloadSpd < downloadSpd) {
-					prot.sendMsg(new TraditionalMessage (TraditionalMessage.GIVE_SP_LIST, 
-							node, connectedCDN, 200, videoID), cdnRTT);
-					prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN,
-							264, videoID, downloadSpd-usedDownloadSpd), cdnRTT);
-					numConnectionsAttempted++;
-				}
+			
+			}
+		if (nodeTag == RegularTag) {
+			if (usedDownloadSpd < downloadSpd) {
+				prot.sendMsg(new TraditionalMessage (TraditionalMessage.GIVE_SP_LIST, 
+						node, connectedCDN, 200, videoID), cdnRTT);
+				prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN,
+						264, videoID, downloadSpd-usedDownloadSpd), cdnRTT);
+				numConnectionsAttempted++;
 			}
 		}
 	}
@@ -380,7 +381,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				peerRTT[numPeers] = aem.delay;
 				numPeers++;
 				averageRTT = ((numPeers-1)*averageRTT + aem.delay)/numPeers;
-				System.out.println(averageRTT);
+				//System.out.println(averageRTT);
 				
 				// System.out.println("May nakapagconnect?");
 			}

@@ -143,7 +143,7 @@ public class P2PCDNObserver implements Control {
 
 		System.out.println("Active Seeders: " + activeSources);
 
-		System.out.println("Active Leechers: " + realCount);
+		System.out.println("Active Leechers: " + activeLeechers);
 		
 		System.out.println("Connections Attempted: " + totalConnectionsAttempted);
 		
