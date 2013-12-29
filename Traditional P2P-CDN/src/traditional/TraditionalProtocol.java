@@ -196,12 +196,9 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 			
 			}
 		if (nodeTag == RegularTag) {
-			if (usedDownloadSpd < downloadSpd) {
+			if (usedDownloadSpd < downloadSpd && peerPool.isEmpty()) {
 				prot.sendMsg(new TraditionalMessage (TraditionalMessage.GIVE_SP_LIST, 
 						node, connectedCDN, 200, videoID), cdnRTT);
-				prot.sendMsg(new TraditionalMessage(TraditionalMessage.CDN_RP_CONNECT, node, connectedCDN,
-						264, videoID, downloadSpd-usedDownloadSpd), cdnRTT);
-				numConnectionsAttempted++;
 			}
 		}
 	}
