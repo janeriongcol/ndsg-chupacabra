@@ -194,7 +194,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 					}
 			}
 			if (nodeTag == RegularTag) {
-				if (usedDownloadSpd < downloadSpd) {
+				if (usedDownloadSpd < downloadSpd && peerPool.isEmpty()) {
 					prot.sendMsg(new TraditionalMessage (TraditionalMessage.GIVE_SP_LIST, 
 							node, connectedCDN, 200, videoID), cdnRTT);
 				}
@@ -216,7 +216,7 @@ public class TraditionalProtocol implements EDProtocol, CDProtocol,
 				// supplying peers with that video
 				Node[] tobeRet = getSupplyingPeers(aem.data);
 				//prot.sendMsg(new TraditionalMessage(TraditionalMessage.RECEIVE_SP_LIST,
-					//	node, aem.sender, 0, tobeRet));
+					//	node, aem.sender, 0, tobeRet), aem.delay);
 				
 				LinkedList<Node> spBuffer = new LinkedList<Node>();
 				int spBatchNum = 0;
