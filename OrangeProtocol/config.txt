@@ -1,4 +1,4 @@
-#config file for gcp2p
+#config file for orange
 
 #set initial network size to 100 nodes with the first 3 nodes as CDN servers
 network.size 3
@@ -7,7 +7,13 @@ network.node peersim.core.GeneralNode
 
 MAXSIZE 10000
 CATEGORY 6
-MINVIDEOSIZE 10000
+
+#########Original Vid Range###########
+#MINVIDEOSIZE 10000
+#RANGEVIDEOSIZE 20000
+
+#########Higher Vid Range##########
+MINVIDEOSIZE 30000
 RANGEVIDEOSIZE 90000
 
 random.seed 1234567890
