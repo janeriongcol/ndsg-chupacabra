@@ -75,7 +75,7 @@ public class Router implements CDProtocol{
 		router.add(msg);
 		SimpleMessage peek = router.peek();
 		if ((double)peek.size/1000 <= maxUpload - totSize){
-			totSize+= sendMsg();
+			totSize+= sendMsg()/1000;
 		}
 	}
 	

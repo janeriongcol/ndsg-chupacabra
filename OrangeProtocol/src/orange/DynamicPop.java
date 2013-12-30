@@ -43,6 +43,7 @@ public class DynamicPop implements Control{
 			System.out.println("To be added: "+n);
 			if(n>maxsize-joinedPeerSize)
 				n = maxsize-joinedPeerSize;
+			n = 9997;
 			add(n);
 			joinedPeerSize+=n;
 		}
