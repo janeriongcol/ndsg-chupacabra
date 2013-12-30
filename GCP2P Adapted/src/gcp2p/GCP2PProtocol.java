@@ -234,7 +234,7 @@ public class GCP2PProtocol implements Overlay, CDProtocol, EDProtocol{
 					// 171 = 168 + 3(3 bits lang since 6 values)
 					prot.sendMsg(new GCP2PMessage(GCP2PMessage.GET_SUPERPEER_2, node, prot.connectedCDN, 171, binID), cdnRTT);
 				}
-				
+				//System.out.println("Oh my");
 			}
 		}
 		

@@ -34,12 +34,11 @@ public class TraditionalDynamicPop implements Control {
 	// true if success, otherwise false
 	public final boolean execute() {
 		if (joinedPeerSize < maxsize) {
-			int n = CommonState.r.nextInt(maxjoinsize);
+			int n = CommonState.r.nextInt(500);
 			// System.out.println("To be added: "+n);
 
 			if (n > maxsize - joinedPeerSize)
 				n = maxsize - joinedPeerSize;
-			n = 9997;
 			add(n);
 			joinedPeerSize += n;
 		}
