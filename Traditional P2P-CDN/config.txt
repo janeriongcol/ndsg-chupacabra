@@ -23,7 +23,7 @@ MINDLSPEED 1000 #range of dl speed: 1000-2000
 MAXDLSPEED 2000 
 MAXJOINSIZE 500
 
-random.seed 1234567890
+#random.seed 1234567890
 #random.seed 2345678901
 #random.seed 3456789012
 #random.seed 4567890123
@@ -37,11 +37,11 @@ random.seed 1234567890
 #random.seed 1230456789
 #random.seed 1234056789
 #random.seed 1234506789
-#random.seed 1234560789
+random.seed 1234560789
 
 
 #parameters for event-driven protocol type
-simulation.endtime 100000
+simulation.endtime 200000
 simulation.logtime 1000
 simulation.experiments 1
 simulation.step 1000
@@ -98,4 +98,5 @@ control.dynamics.step 1000
 
 control.observer traditional.P2PCDNObserver
 control.observer.protocol p2pcdn
+control.observer.sim 1
 control.observer.step 1000

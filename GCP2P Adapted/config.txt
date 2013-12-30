@@ -9,12 +9,12 @@ MAXSIZE 10000
 CATEGORY 6
 
 #########Original Vid Range###########
-#MINVIDEOSIZE 10000
-#RANGEVIDEOSIZE 20000
+MINVIDEOSIZE 10000
+RANGEVIDEOSIZE 20000
 
 #########Higher Vid Range##########
-MINVIDEOSIZE 30000
-RANGEVIDEOSIZE 90000
+#MINVIDEOSIZE 30000
+#RANGEVIDEOSIZE 90000
 
 random.seed 1234567890
 #random.seed 2345678901
@@ -33,7 +33,7 @@ random.seed 1234567890
 #random.seed 1234560789
 
 #parameters for event-driven protocol type
-simulation.endtime 100000
+simulation.endtime 200000
 simulation.logtime 1000
 simulation.experiments 1
 simulation.step 1000
@@ -79,5 +79,6 @@ control.dynamics.init.0.rangeVideoSize RANGEVIDEOSIZE
 control.dynamics.step 1000
 
 control.observer gcp2p.GCP2PObserver
+control.observer.sim 1
 control.observer.protocol gcp2p
 control.observer.step 1000

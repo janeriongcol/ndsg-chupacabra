@@ -11,7 +11,8 @@ import java.io.*;
 public class P2PCDNObserver implements Control {
 
 	private static final String PAR_PROT = "protocol";
-	private int pid;
+	private static final String PAR_SIM = "sim";
+	private int pid, sim;
 
 	private PrintWriter writer1, writer2, writer3, writer4, writer5, writer6, writer7, writer8, writer9;
 	File f1, f2, f3, f4, f5, f6, f7, f8, f9;
@@ -29,6 +30,7 @@ public class P2PCDNObserver implements Control {
 
 	public P2PCDNObserver(String prefix) {
 		pid = Configuration.getPid(prefix + "." + PAR_PROT);
+		sim = Configuration.getInt(prefix + "." + PAR_SIM);
 		initFiles();
 	}
 
@@ -172,6 +174,17 @@ public class P2PCDNObserver implements Control {
 	}
 
 	public void initFiles() {
+		UtilizationFilename = UtilizationFilename.replace(".txt",sim+".txt");
+		ConnectionSetUpTime = ConnectionSetUpTime.replace(".txt",sim+".txt");
+		PlaybackDelayTime = PlaybackDelayTime.replace(".txt",sim+".txt");
+		PlaybackDelayTime = PlaybackDelayTime.replace(".txt",sim+".txt");
+		AverageRTT = AverageRTT.replace(".txt",sim+".txt");
+		AverageReject = AverageReject.replace(".txt",sim+".txt");
+		FirstConnectedPeers = FirstConnectedPeers.replace(".txt",sim+".txt");
+		ConnectedPeers = ConnectedPeers.replace(".txt",sim+".txt");
+		population = population.replace(".txt",sim+".txt");
+		leechers = leechers.replace(".txt",sim+".txt");
+		
 		f1 = new File(UtilizationFilename);
 		f2 = new File(ConnectionSetUpTime);
 		f3 = new File(PlaybackDelayTime);
