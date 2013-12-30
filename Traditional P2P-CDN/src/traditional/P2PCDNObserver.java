@@ -177,7 +177,6 @@ public class P2PCDNObserver implements Control {
 		UtilizationFilename = UtilizationFilename.replace(".txt",sim+".txt");
 		ConnectionSetUpTime = ConnectionSetUpTime.replace(".txt",sim+".txt");
 		PlaybackDelayTime = PlaybackDelayTime.replace(".txt",sim+".txt");
-		PlaybackDelayTime = PlaybackDelayTime.replace(".txt",sim+".txt");
 		AverageRTT = AverageRTT.replace(".txt",sim+".txt");
 		AverageReject = AverageReject.replace(".txt",sim+".txt");
 		FirstConnectedPeers = FirstConnectedPeers.replace(".txt",sim+".txt");
