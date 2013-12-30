@@ -23,12 +23,18 @@ public class GCP2PNodeInit implements NodeInitializer{
 	private final String PAR_MINVIDEOSIZE = "minVideoSize";
 	private final String PAR_RANGEVIDEOSIZE = "rangeVideoSize";
 	
-	
-	
+	private final String PAR_MINDLSPEED = "minDLSpeed";
+	private final String PAR_MAXDLSPEED = "maxDLSpeed";	
+	private final String PAR_UPSPEED = "maxUPSpeed";
+		
 	private int pid;
 	private int category;
 	private int maxVideoSize;
 	private int rangeVideoSize;
+	private int maxUpSpeed;
+	private int minDlSpeed;
+	private int maxDlSpeed;
+ 
 	/*
 	*	GLOBALS
 	*/
@@ -41,6 +47,10 @@ public class GCP2PNodeInit implements NodeInitializer{
 		category = Configuration.getInt(prefix + "." + PAR_CATEGORY);
 		maxVideoSize = Configuration.getInt(prefix + "." + PAR_MINVIDEOSIZE);
 		rangeVideoSize = Configuration.getInt(prefix + "." + PAR_RANGEVIDEOSIZE);
+		
+		maxUpSpeed = Configuration.getInt(prefix + "." + PAR_UPSPEED);
+		minDlSpeed = Configuration.getInt(prefix + "." + PAR_MINDLSPEED);
+		maxDlSpeed = Configuration.getInt(prefix + "." + PAR_MAXDLSPEED);
 	}
 	
 	/**
@@ -79,8 +89,12 @@ public class GCP2PNodeInit implements NodeInitializer{
 		
 		prot.cdnRTT = CommonState.r.nextInt(980) + +20; 	//RTT from client to CDN;
 		prot.peerRTT = new int[prot.maxClients];
-		prot.uploadSpd = CommonState.r.nextInt(501) + 500; //Random upload speed from 0-1000Kbps
-		prot.downloadSpd = CommonState.r.nextInt(1001) + 1000; //Random download speed from 1000-2000Kbps
+		prot.uploadSpd = CommonState.r.nextInt(maxUpSpeed + 1) + 500; // Random upload speed
+														// from 0-1000Kbps
+		prot.downloadSpd = CommonState.r.nextInt(maxDlSpeed - minDlSpeed + 1) + minDlSpeed; // Random
+																// download
+																// speed from
+																// 1000-2000Kbps
 		prot.usedUploadSpd = 0; // initialize to zero since it is not yet seeding
 		prot.usedDownloadSpd = 0; // initialize to zero since it is not yet streaming
 		prot.videoID = CommonState.r.nextInt(category*20); // get a random video ID, each category has 20 videos each. Range [0, 19]

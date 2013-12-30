@@ -214,18 +214,18 @@ public class OrangeObserver implements Control {
 			e.printStackTrace();
 		}
 
-		fileHeader(writer1, "Average Utilization", "Time", "Utilization (%)");
-		fileHeader(writer2, "Average Connection Set-up Time", "Time",
-				"Connection Set-up Time");
-		fileHeader(writer3, "Average Playback Delay Time", "Time",
-				"Playback Delay Time");
-		fileHeader(writer4, "Average Round Trip Time", "Time", "Average RTT");
-		fileHeader(writer5, "Average Rejection Rate", "Time", "Rejection Rate");
-		fileHeader(writer6, "Average First Connected Peers", "Time", "First Connected Peers");
-		fileHeader(writer7, "Average Connected Peers", "Time", "Connecte Peers");
-		fileHeader(writer8, "Network Population", "Time", "Number of Peers");
-		fileHeader(writer9, "Network Population", "Time", "Leechers");
-	}
+		fileHeader(writer1, "Average Utilization", "Simulation Time (sec)", "Utilization (%)");
+		fileHeader(writer2, "Average Connection Set-up Time", "Simulation Time (sec)",
+				"Connection Set-up Time (milliseconds)");
+		fileHeader(writer3, "Average Playback Delay Time", "Simulation Time (sec)",
+				"Playback Delay Time (milliseconds)");
+		fileHeader(writer4, "Average Round Trip Time", "Simulation Time (sec)", "Average RTT (milliseconds)");
+		fileHeader(writer5, "Average Rejection Rate", "Simulation Time (sec)", "Rejection Rate(%)");
+		fileHeader(writer6, "Average First Connected Peers", "Simulation Time (sec)", "First Connected Peers");
+		fileHeader(writer7, "Average Connected Peers", "Simulation Time (sec)", "Connected Peers");
+		fileHeader(writer8, "Network Population", "Simulation Time (sec)", "Number of Peers");
+		fileHeader(writer9, "Network Population", "Simulation Time (sec)", "Leechers");
+}
 
 	public void fileHeader(PrintWriter w, String title, String x, String y) {
 		w.println(title);

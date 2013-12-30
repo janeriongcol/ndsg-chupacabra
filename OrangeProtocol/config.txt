@@ -16,6 +16,16 @@ RANGEVIDEOSIZE 20000
 #MINVIDEOSIZE 30000
 #RANGEVIDEOSIZE 90000
 
+#########Original Speed Range######
+#MAXUPSPEED 1000
+#MINDLSPEED 1000 #range of dl speed: 1000-2000
+#MAXDLSPEED 2000 
+
+#########Lower Speed Range######
+MAXUPSPEED 750
+MINDLSPEED 750 #range of dl speed: 1000-2000
+MAXDLSPEED 1500 
+
 random.seed 1234567890
 #random.seed 2345678901
 #random.seed 3456789012
