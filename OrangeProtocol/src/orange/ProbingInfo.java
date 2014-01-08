@@ -2,6 +2,8 @@ package orange;
 
 public class ProbingInfo {
 	
+	public static int size = 1024;
+	public static int B = 300000;
 	public static final int N = 5; //Number of probing packets
 	public static final double theta = 0.01; // the threshold
 			
