@@ -609,7 +609,7 @@ public class OrangeProtocol implements Overlay, CDProtocol, EDProtocol{
 			}
 			else if(omsg.msgType == OrangeMessage.VERIFY)
 			{
-				int sending_gap = ProbingInfo.size/ProbingInfo.B;	//formula in paper: sending_gap = size/bw req of stream;
+				int sending_gap = (ProbingInfo.size/ProbingInfo.B) * 1000;	//formula in paper: sending_gap = size/bw req of stream;
 													//should it be uploadSpd or omsg.data -> downloadSpd -usedDownloadSpd of requesting peer?
 				int N = ProbingInfo.N; //number of probing packets
 				int my_id = omsg.data0; // its index in the arrangedPeerPool list of the requesting peer
